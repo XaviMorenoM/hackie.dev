@@ -8,7 +8,9 @@ export const APP_NAME = 'Alterio';
 /** URL segment for the product's routes (`/en/alterio`, …). Stays stable even if the display name changes. */
 export const APP_SLUG = 'alterio';
 
-export const SITE_URL = 'https://hackie.dev';
+export const SITE_URL = import.meta.env.SITE ?? 'https://hackie.dev';
+/** Deployment base path (`/` in prod, `/<repo>/` for github.io previews). Always ends with `/`. */
+export const BASE_PATH = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 export const SITE_NAME = 'hackie.dev';
 
 export const CONTACT_EMAIL = 'xavier.moreno.martinez@gmail.com';

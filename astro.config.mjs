@@ -4,8 +4,13 @@ import tailwindcss from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
+// Preview builds (workflow_dispatch) override these to serve from <user>.github.io/<repo>/.
+const SITE_URL = process.env.SITE_URL ?? 'https://hackie.dev';
+const SITE_BASE = process.env.SITE_BASE ?? '/';
+
 export default defineConfig({
-  site: 'https://hackie.dev',
+  site: SITE_URL,
+  base: SITE_BASE,
   output: 'static',
   trailingSlash: 'always',
   i18n: {
@@ -45,7 +50,7 @@ export default defineConfig({
   integrations: [
     sitemap({
       // `/` is only a meta-refresh redirect to `/en/`.
-      filter: (page) => page !== 'https://hackie.dev/',
+      filter: (page) => page !== new URL(SITE_BASE, SITE_URL).href,
       i18n: {
         defaultLocale: 'en',
         locales: { en: 'en', es: 'es', ca: 'ca' },

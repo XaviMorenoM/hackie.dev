@@ -1,5 +1,6 @@
 import {
   APP_NAME,
+  BASE_PATH,
   CONTACT_EMAIL,
   DEFAULT_LOCALE,
   DEVELOPER_NAME,
@@ -72,13 +73,19 @@ export function useTranslations(locale: Locale): Translations {
 
 /** Reads the leading path segment (`/es/alterio` → `es`); falls back to the default locale. */
 export function getLocaleFromUrl(url: URL): Locale {
-  const [, first] = url.pathname.split('/');
+  const [, first] = stripBase(url.pathname).split('/');
   return isLocale(first) ? first : DEFAULT_LOCALE;
+}
+
+/** Removes the deployment base so locale helpers see `/es/alterio/` whether deployed at `/` or `/repo/`. */
+function stripBase(pathname: string): string {
+  const base = BASE_PATH.replace(/\/$/, '');
+  return base && pathname.startsWith(base) ? pathname.slice(base.length) || '/' : pathname;
 }
 
 /** Path with the locale prefix removed and a leading slash kept (`/es/alterio/` → `/alterio/`). */
 export function stripLocale(pathname: string): string {
-  const parts = pathname.split('/');
+  const parts = stripBase(pathname).split('/');
   if (isLocale(parts[1])) parts.splice(1, 1);
   const rest = parts.join('/');
   return rest === '' ? '/' : rest;
@@ -87,7 +94,12 @@ export function stripLocale(pathname: string): string {
 /** Builds a locale-prefixed, trailing-slash path: `localePath('ca', '/alterio/privacy')` → `/ca/alterio/privacy/`. */
 export function localePath(locale: Locale, path = '/'): string {
   const clean = path.replace(/^\/+|\/+$/g, '');
-  return clean ? `/${locale}/${clean}/` : `/${locale}/`;
+  return clean ? `${BASE_PATH}${locale}/${clean}/` : `${BASE_PATH}${locale}/`;
+}
+
+/** Prefixes a root-relative public asset path with the deployment base. */
+export function withBase(path: string): string {
+  return `${BASE_PATH}${path.replace(/^\/+/, '')}`;
 }
 
 /** `getStaticPaths` helper — one entry per locale. */

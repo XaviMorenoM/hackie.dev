@@ -26,7 +26,6 @@ Every page exists under each locale prefix. `/` is a meta-refresh redirect to `/
 | `/{en,es,ca}/alterio/support/` | FAQ + mailto (App Store Connect "Support URL")           |
 | `/404`                       | Not-found page (English)                                |
 
-Also emitted: `sitemap-index.xml`, `robots.txt`, `og.png`, `favicon.svg`, `CNAME`.
 
 ## Renaming the app
 
@@ -71,10 +70,23 @@ Both components are the only place media is referenced — nothing else needs to
 
 ## Deploy
 
-- Branch `main` auto-deploys to GitHub Pages via `.github/workflows/deploy.yml` (`withastro/action@v3` → `actions/deploy-pages@v4`). `public/CNAME` pins the custom domain.
 - Work on a feature branch (`feat/…`), open a PR, get QA sign-off, then merge. Nothing goes live without QA.
 - `site` in `astro.config.mjs` is `https://hackie.dev` — canonical URLs, hreflang alternates, the sitemap and OG URLs all derive from it.
 
 ## Design
 
 Dark only. Tokens in `src/styles/global.css` (`@theme`): background `#0B0B0C`, surface `#141416`, text `#F5F5F5`, muted `#9A9A9A`, accent lime `#C6FF3D`. Display type is Instrument Serif Italic (`.display`), body is Inter. `prefers-reduced-motion` disables transitions globally.
+
+## Preview on github.io (before DNS)
+
+The site is bound to `hackie.dev` in Pages settings. To view a build at
+`https://xavimorenom.github.io/hackie.dev/` instead, temporarily unset the custom
+domain and dispatch a preview build:
+
+```bash
+gh api -X PUT repos/XaviMorenoM/hackie.dev/pages -f cname=''          # unset domain
+gh workflow run deploy.yml -f preview=true                              # base=/hackie.dev/
+# … later, once DNS points at GitHub:
+gh api -X PUT repos/XaviMorenoM/hackie.dev/pages -f cname=hackie.dev   # restore domain
+gh workflow run deploy.yml                                              # prod build (base=/)
+```

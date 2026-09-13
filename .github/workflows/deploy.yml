@@ -4,6 +4,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      preview:
+        description: 'Build for xavimorenom.github.io/hackie.dev/ (custom domain must be unset in Pages settings)'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -22,6 +27,9 @@ jobs:
         uses: actions/checkout@v4
       - name: Install, build, and upload your site
         uses: withastro/action@v3
+        env:
+          SITE_URL: ${{ inputs.preview && 'https://xavimorenom.github.io' || 'https://hackie.dev' }}
+          SITE_BASE: ${{ inputs.preview && '/hackie.dev/' || '/' }}
         with:
           node-version: 22
 

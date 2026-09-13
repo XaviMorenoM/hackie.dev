@@ -10,7 +10,7 @@
 import { existsSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import type { Locale } from '../config';
-import { useTranslations } from '../i18n';
+import { useTranslations, withBase } from '../i18n';
 import PhoneFrame from './PhoneFrame.astro';
 
 interface Props {
@@ -22,8 +22,8 @@ const t = useTranslations(locale);
 const dir = fileURLToPath(new URL('../../public/video/', import.meta.url));
 const files = existsSync(dir) ? readdirSync(dir) : [];
 const sources = [
-  ...files.filter((f) => f.endsWith('.webm')).map((f) => ({ src: `/video/${f}`, type: 'video/webm' })),
-  ...files.filter((f) => f.endsWith('.mp4')).map((f) => ({ src: `/video/${f}`, type: 'video/mp4' })),
+  ...files.filter((f) => f.endsWith('.webm')).map((f) => ({ src: withBase(`/video/${f}`), type: 'video/webm' })),
+  ...files.filter((f) => f.endsWith('.mp4')).map((f) => ({ src: withBase(`/video/${f}`), type: 'video/mp4' })),
 ];
 const poster = files.find((f) => /^poster\.(jpe?g|png|webp)$/.test(f));
 const hasVideo = sources.length > 0;
@@ -40,7 +40,7 @@ const hasVideo = sources.length > 0;
           loop
           playsinline
           preload="none"
-          poster={poster ? `/video/${poster}` : undefined}
+          poster={poster ? withBase(`/video/${poster}`) : undefined}
           aria-label={t.product.videoHeading}
         >
           {sources.map((s) => (
