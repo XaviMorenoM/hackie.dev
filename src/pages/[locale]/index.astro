@@ -1,0 +1,79 @@
+---
+import Base from '../../layouts/Base.astro';
+import FeatureIcon from '../../components/FeatureIcon.astro';
+import PhoneFrame from '../../components/PhoneFrame.astro';
+import { APP_NAME, APP_SLUG, DEVELOPER_GITHUB, DEVELOPER_NAME, SITE_NAME, SITE_URL, type Locale } from '../../config';
+import { localePath, localeStaticPaths, useTranslations } from '../../i18n';
+
+export const getStaticPaths = localeStaticPaths;
+
+const locale = Astro.params.locale as Locale;
+const t = useTranslations(locale);
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: SITE_NAME,
+    url: SITE_URL,
+    inLanguage: locale,
+    author: { '@type': 'Person', name: DEVELOPER_NAME, url: DEVELOPER_GITHUB },
+  },
+];
+---
+
+<Base locale={locale} title={t.meta.hubTitle} description={t.meta.hubDescription} jsonLd={jsonLd}>
+  <section class="mx-auto max-w-6xl px-5 pt-20 pb-16 sm:px-8 sm:pt-28 sm:pb-24">
+    <p class="eyebrow mb-6">{t.hub.eyebrow}</p>
+    <h1 class="display text-6xl text-fg sm:text-7xl md:text-8xl lg:text-9xl">
+      hackie<span class="text-lime">.</span>
+    </h1>
+    <p class="display mt-4 max-w-3xl text-3xl text-muted sm:text-4xl md:text-5xl">{t.hub.heroTitle}</p>
+    <p class="mt-8 max-w-xl text-lg leading-relaxed text-muted">{t.hub.heroSub}</p>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-5 pb-20 sm:px-8 sm:pb-28" aria-labelledby="products">
+    <h2 id="products" class="eyebrow mb-6">{t.hub.productsHeading}</h2>
+    <a
+      href={localePath(locale, APP_SLUG)}
+      class="group grid gap-10 overflow-hidden rounded-card border border-line bg-surface p-6 transition-colors hover:border-muted sm:grid-cols-[1.4fr_1fr] sm:p-10"
+    >
+      <div class="flex flex-col justify-between gap-10">
+        <div>
+          <p class="text-xs font-semibold tracking-widest text-muted uppercase">{t.hub.productCardEyebrow}</p>
+          <h3 class="display mt-4 text-5xl text-fg sm:text-6xl">{APP_NAME}<span class="text-lime">.</span></h3>
+          <p class="mt-5 max-w-md text-lg leading-relaxed text-muted">{t.hub.productCardTagline}</p>
+        </div>
+        <span class="inline-flex items-center gap-2 text-sm font-semibold text-lime">
+          {t.hub.productCardCta}
+          <svg
+            viewBox="0 0 24 24"
+            class="h-4 w-4 transition-transform motion-safe:group-hover:translate-x-1"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg
+          >
+        </span>
+      </div>
+      <div class="relative mx-auto w-44 sm:w-52 sm:translate-y-8">
+        <PhoneFrame variant={0} />
+        <span
+          aria-hidden="true"
+          class="absolute -top-4 -right-4 flex h-12 w-12 items-center justify-center rounded-full bg-lime text-lime-ink"
+        >
+          <FeatureIcon name="log" class="h-6 w-6" />
+        </span>
+      </div>
+    </a>
+  </section>
+
+  <section class="border-t border-line/60">
+    <div class="mx-auto grid max-w-6xl gap-6 px-5 py-16 sm:grid-cols-[200px_1fr] sm:px-8 sm:py-20">
+      <h2 class="eyebrow">{t.hub.aboutHeading}</h2>
+      <p class="max-w-2xl text-lg leading-relaxed text-muted">{t.hub.aboutBody}</p>
+    </div>
+  </section>
+</Base>

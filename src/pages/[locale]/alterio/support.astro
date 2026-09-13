@@ -1,0 +1,72 @@
+---
+import Base from '../../../layouts/Base.astro';
+import Button from '../../../components/Button.astro';
+import { APP_NAME, APP_SLUG, CONTACT_EMAIL, type Locale } from '../../../config';
+import { localePath, localeStaticPaths, useTranslations } from '../../../i18n';
+
+export const getStaticPaths = localeStaticPaths;
+
+const locale = Astro.params.locale as Locale;
+const t = useTranslations(locale);
+
+const mailto = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`${APP_NAME} support`)}`;
+const [hintBefore = '', hintAfter = ''] = t.support.contactHint.split(CONTACT_EMAIL);
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: t.support.faq.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<Base locale={locale} title={t.meta.supportTitle} description={t.meta.supportDescription} jsonLd={[faqJsonLd]}>
+  <div class="mx-auto max-w-3xl px-5 py-16 sm:px-8 sm:py-24">
+    <header>
+      <p class="eyebrow mb-4">{t.support.eyebrow}</p>
+      <h1 class="display text-5xl text-fg sm:text-6xl">{t.support.title}</h1>
+      <p class="mt-3 text-sm text-muted">
+        <a href={localePath(locale, APP_SLUG)} class="text-fg underline decoration-lime underline-offset-4">{APP_NAME}</a>
+      </p>
+      <p class="mt-8 text-lg leading-relaxed text-muted">{t.support.intro}</p>
+    </header>
+
+    <section class="mt-14" aria-labelledby="faq">
+      <h2 id="faq" class="eyebrow mb-6">{t.support.faqHeading}</h2>
+      <div class="divide-y divide-line border-y border-line">
+        {
+          t.support.faq.map((f, i) => (
+            <details class="group py-5" open={i === 0}>
+              <summary class="flex cursor-pointer list-none items-start justify-between gap-6 text-base font-semibold text-fg [&::-webkit-details-marker]:hidden">
+                <span>{f.q}</span>
+                <span
+                  aria-hidden="true"
+                  class="mt-1 shrink-0 text-lime transition-transform duration-200 group-open:rotate-45"
+                >
+                  <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                </span>
+              </summary>
+              <p class="mt-3 max-w-2xl leading-relaxed text-muted">{f.a}</p>
+            </details>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="mt-14 rounded-card border border-line bg-surface p-6 sm:p-8" aria-labelledby="contact">
+      <h2 id="contact" class="text-xl font-semibold text-fg">{t.support.contactHeading}</h2>
+      <p class="mt-3 leading-relaxed text-muted">{t.support.contactBody}</p>
+      <div class="mt-6">
+        <Button href={mailto}>{t.support.contactCta}</Button>
+      </div>
+      <p class="mt-4 text-sm text-muted">
+        {hintBefore}<a href={mailto} class="text-fg underline decoration-lime underline-offset-4">{CONTACT_EMAIL}</a>{hintAfter}
+      </p>
+    </section>
+  </div>
+</Base>

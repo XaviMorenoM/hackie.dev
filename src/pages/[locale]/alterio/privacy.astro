@@ -1,0 +1,55 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { APP_NAME, APP_SLUG, CONTACT_EMAIL, type Locale } from '../../../config';
+import { localePath, localeStaticPaths, useTranslations } from '../../../i18n';
+
+export const getStaticPaths = localeStaticPaths;
+
+const locale = Astro.params.locale as Locale;
+const t = useTranslations(locale);
+
+/** Splits `contactBody` around the email so it can be rendered as a mailto link. */
+const [contactBefore = '', contactAfter = ''] = t.privacy.contactBody.split(CONTACT_EMAIL);
+---
+
+<Base locale={locale} title={t.meta.privacyTitle} description={t.meta.privacyDescription} ogType="article">
+  <article class="mx-auto max-w-3xl px-5 py-16 sm:px-8 sm:py-24">
+    <header>
+      <p class="eyebrow mb-4">{t.privacy.eyebrow}</p>
+      <h1 class="display text-5xl text-fg sm:text-6xl">
+        {t.privacy.title}
+      </h1>
+      <p class="mt-3 text-sm text-muted">
+        <a href={localePath(locale, APP_SLUG)} class="text-fg underline decoration-lime underline-offset-4">{APP_NAME}</a>
+        · {t.privacy.effective}
+      </p>
+    </header>
+
+    <div class="prose-dark mt-10 text-lg">
+      {t.privacy.intro.map((p) => <p>{p}</p>)}
+    </div>
+
+    {
+      t.privacy.sections.map((s) => (
+        <section class="prose-dark mt-12">
+          <h2 class="mb-4 text-xl font-semibold text-fg">{s.heading}</h2>
+          {s.paragraphs.map((p) => (
+            <p>{p}</p>
+          ))}
+          {s.bullets && (
+            <ul>
+              {s.bullets.map((b) => (
+                <li>{b}</li>
+              ))}
+            </ul>
+          )}
+        </section>
+      ))
+    }
+
+    <section class="prose-dark mt-12 rounded-card border border-line bg-surface p-6 sm:p-8">
+      <h2 class="mb-3 text-xl font-semibold text-fg">{t.privacy.contactHeading}</h2>
+      <p>{contactBefore}<a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>{contactAfter}</p>
+    </section>
+  </article>
+</Base>

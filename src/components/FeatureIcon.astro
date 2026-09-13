@@ -1,0 +1,35 @@
+---
+import type { FeatureIcon } from '../i18n/types';
+
+interface Props {
+  name: FeatureIcon;
+  class?: string;
+}
+const { name, class: extra = 'h-6 w-6' } = Astro.props;
+
+/** 24×24 stroke icons, 1.75px, round caps — decorative only. */
+const paths: Record<FeatureIcon, string> = {
+  log: '<rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 9h10M7 13h6M7 17h3"/>',
+  routines: '<path d="M4 6h16M4 12h10M4 18h7"/><circle cx="18" cy="16" r="3"/><path d="m17 16 1 1 2-2"/>',
+  heatmap: '<path d="M12 3c-3 4-6 6-6 10a6 6 0 0 0 12 0c0-4-3-6-6-10Z"/><path d="M12 21a3 3 0 0 0 3-3c0-2-3-4-3-4s-3 2-3 4a3 3 0 0 0 3 3Z"/>',
+  progress: '<path d="M3 20h18"/><path d="m4 15 5-5 4 4 7-8"/><path d="M16 6h4v4"/>',
+  library: '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5Z"/><path d="M4 20.5V5.5"/><path d="M8 3v15"/>',
+  health: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"/><path d="M5.5 12H9l1.5-3 2 6 1.5-3h4"/>',
+  cloud: '<path d="M7 18a4 4 0 0 1-.6-7.95A6 6 0 0 1 18 9a4.5 4.5 0 0 1-1 9H7Z"/><path d="m9.5 14 2 2 3.5-4"/>',
+  resume: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/><path d="M8.5 3.5 6 5"/><path d="m15.5 3.5 2.5 1.5"/>',
+};
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.75"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+  class={extra}
+  set:html={paths[name]}
+/>

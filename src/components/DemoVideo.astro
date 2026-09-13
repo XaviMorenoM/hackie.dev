@@ -1,0 +1,66 @@
+---
+/**
+ * Demo video section body. Looks for `public/video/*.{webm,mp4}` at build time
+ * (webm listed first, mp4 as fallback) and `public/video/poster.{jpg,png,webp}`.
+ * If no video exists → phone-frame placeholder.
+ *
+ * TODO(media): copy the export from media/video/ into public/video/ (plus a
+ * poster frame) — nothing else needs to change.
+ */
+import { existsSync, readdirSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import type { Locale } from '../config';
+import { useTranslations } from '../i18n';
+import PhoneFrame from './PhoneFrame.astro';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+
+const dir = fileURLToPath(new URL('../../public/video/', import.meta.url));
+const files = existsSync(dir) ? readdirSync(dir) : [];
+const sources = [
+  ...files.filter((f) => f.endsWith('.webm')).map((f) => ({ src: `/video/${f}`, type: 'video/webm' })),
+  ...files.filter((f) => f.endsWith('.mp4')).map((f) => ({ src: `/video/${f}`, type: 'video/mp4' })),
+];
+const poster = files.find((f) => /^poster\.(jpe?g|png|webp)$/.test(f));
+const hasVideo = sources.length > 0;
+---
+
+<div class="mx-auto w-full max-w-[300px]">
+  {
+    hasVideo ? (
+      <PhoneFrame>
+        <video
+          class="h-full w-full object-cover"
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="none"
+          poster={poster ? `/video/${poster}` : undefined}
+          aria-label={t.product.videoHeading}
+        >
+          {sources.map((s) => (
+            <source src={s.src} type={s.type} />
+          ))}
+          {t.product.videoUnsupported}
+        </video>
+      </PhoneFrame>
+    ) : (
+      <div class="relative">
+        <PhoneFrame variant={1} label={t.product.videoPlaceholder} />
+        <span
+          aria-hidden="true"
+          class="absolute top-1/2 left-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-lime/90 text-lime-ink shadow-lg"
+        >
+          <svg viewBox="0 0 24 24" class="ml-1 h-7 w-7" fill="currentColor">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        </span>
+      </div>
+    )
+  }
+</div>
