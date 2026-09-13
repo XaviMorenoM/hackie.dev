@@ -14,7 +14,7 @@
  * poster frame) — nothing else needs to change.
  */
 import { existsSync, readdirSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
 import type { Locale } from '../config';
 import { useTranslations, withBase } from '../i18n';
 import PhoneFrame from './PhoneFrame.astro';
@@ -25,7 +25,8 @@ interface Props {
 const { locale } = Astro.props;
 const t = useTranslations(locale);
 
-const dir = fileURLToPath(new URL('../../public/video/', import.meta.url));
+// Resolved from the project root: `import.meta.url` points at the bundled chunk at build time.
+const dir = resolve('public/video');
 const files = existsSync(dir) ? readdirSync(dir) : [];
 const isDark = (f: string) => /-dark\.[a-z0-9]+$/i.test(f);
 
@@ -68,7 +69,7 @@ const sets: { set: VideoSet; cls: string }[] = themed
             muted
             loop
             playsinline
-            preload="none"
+            preload="metadata"
             poster={set.poster ? withBase(`/video/${set.poster}`) : undefined}
             aria-label={t.product.videoHeading}
           >
