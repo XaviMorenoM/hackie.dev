@@ -1,6 +1,6 @@
 # hackie.dev
 
-Landing hub for Xavi Moreno's indie apps. Astro 7 · static output · Tailwind v4 · light/dark theme · no client JS beyond a <1 KB theme switch · en / es / ca.
+Standalone landing for Xavi Moreno's gym-tracker app (name in `src/config.ts`), hosted at hackie.dev. Astro 7 · static output · Tailwind v4 · light/dark theme · no client JS beyond a <1 KB theme switch · en / es / ca.
 
 ## Run
 
@@ -16,15 +16,17 @@ Node ≥ 22.12 (the repo is developed on Node 26). Fonts (Instrument Serif Itali
 
 ## Routes
 
-Every page exists under each locale prefix. `/` is a meta-refresh redirect to `/en/`.
+The site is the product's standalone landing — the `hackie.dev` brand appears only in the footer. Every page exists under each locale prefix. `/` is a meta-refresh redirect to `/en/`.
 
-| Path                         | What                                                    |
-| ---------------------------- | ------------------------------------------------------- |
-| `/{en,es,ca}/`               | Hub: wordmark, tagline, product card                    |
-| `/{en,es,ca}/alterio/`       | Product landing (hero, features, screens, video, data)  |
-| `/{en,es,ca}/alterio/privacy/` | Privacy policy (App Store Connect "Privacy Policy URL") |
-| `/{en,es,ca}/alterio/support/` | FAQ + mailto (App Store Connect "Support URL")           |
-| `/404`                       | Not-found page (English)                                |
+| Path                           | What                                                        |
+| ------------------------------ | ----------------------------------------------------------- |
+| `/{en,es,ca}/`                 | Product landing (hero, features, screens, video, data, CTA) |
+| `/{en,es,ca}/alterio/`         | Legacy URL → instant redirect to `/{locale}/` (noindex)      |
+| `/{en,es,ca}/alterio/privacy/` | Privacy policy (App Store Connect "Privacy Policy URL")      |
+| `/{en,es,ca}/alterio/support/` | FAQ + mailto (App Store Connect "Support URL")               |
+| `/404`                         | Not-found page (English)                                     |
+
+Sitemap lists the 9 real pages; redirects are excluded.
 
 
 ## Renaming the app

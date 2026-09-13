@@ -49,8 +49,8 @@ export default defineConfig({
   },
   integrations: [
     sitemap({
-      // `/` is only a meta-refresh redirect to `/en/`.
-      filter: (page) => page !== new URL(SITE_BASE, SITE_URL).href,
+      // `/` and `/<locale>/alterio/` are only meta-refresh redirects.
+      filter: (page) => page !== new URL(SITE_BASE, SITE_URL).href && !/\/alterio\/$/.test(page),
       i18n: {
         defaultLocale: 'en',
         locales: { en: 'en', es: 'es', ca: 'ca' },

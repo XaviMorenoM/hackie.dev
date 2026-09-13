@@ -1,139 +1,28 @@
 ---
-import Base from '../../../layouts/Base.astro';
-import Button from '../../../components/Button.astro';
-import DemoVideo from '../../../components/DemoVideo.astro';
-import FeatureIcon from '../../../components/FeatureIcon.astro';
-import ScreenshotGallery from '../../../components/ScreenshotGallery.astro';
-import SectionHeading from '../../../components/SectionHeading.astro';
-import {
-  APP_NAME,
-  APP_SLUG,
-  APP_STORE_URL,
-  DEVELOPER_GITHUB,
-  DEVELOPER_NAME,
-  MIN_IOS_VERSION,
-  SITE_URL,
-  TESTFLIGHT_URL,
-  type Locale,
-} from '../../../config';
-import { localePath, localeStaticPaths, useTranslations } from '../../../i18n';
+/**
+ * Legacy URL: the product landing now lives at the locale root. Kept as an
+ * instant meta-refresh redirect (base-aware) so old links keep working.
+ * Excluded from the sitemap and marked noindex.
+ */
+import { LOCALE_TAGS, SITE_URL, type Locale } from '../../../config';
+import { localePath, localeStaticPaths } from '../../../i18n';
 
 export const getStaticPaths = localeStaticPaths;
 
 const locale = Astro.params.locale as Locale;
-const t = useTranslations(locale);
-
-const ctaHref = APP_STORE_URL ?? TESTFLIGHT_URL;
-const ctaLabel = APP_STORE_URL ? t.product.ctaAppStore : TESTFLIGHT_URL ? t.product.ctaTestFlight : t.product.ctaComingSoon;
-
-const pageUrl = new URL(localePath(locale, APP_SLUG), SITE_URL).href;
-const jsonLd = [
-  {
-    '@context': 'https://schema.org',
-    '@type': 'SoftwareApplication',
-    name: APP_NAME,
-    description: t.meta.appDescription,
-    url: pageUrl,
-    applicationCategory: 'HealthApplication',
-    applicationSubCategory: 'Fitness',
-    operatingSystem: `iOS ${MIN_IOS_VERSION}+`,
-    inLanguage: ['en', 'es'],
-    author: { '@type': 'Person', name: DEVELOPER_NAME, url: DEVELOPER_GITHUB },
-    ...(APP_STORE_URL ? { installUrl: APP_STORE_URL, downloadUrl: APP_STORE_URL } : {}),
-  },
-];
+const target = localePath(locale);
+const canonical = new URL(target, SITE_URL).href;
 ---
 
-<Base locale={locale} title={t.meta.appTitle} description={t.meta.appDescription} jsonLd={jsonLd}>
-  {/* Hero */}
-  <section class="mx-auto max-w-6xl px-5 pt-20 pb-16 sm:px-8 sm:pt-28 sm:pb-20">
-    <p class="eyebrow mb-6">{t.product.eyebrow}</p>
-    <h1 class="display text-6xl text-fg sm:text-7xl md:text-8xl">
-      {APP_NAME}<span class="text-lime">.</span>
-    </h1>
-    <p class="display mt-4 max-w-3xl text-3xl text-muted sm:text-4xl md:text-5xl">{t.product.heroTitle}</p>
-    <p class="mt-8 max-w-xl text-lg leading-relaxed text-muted">{t.product.heroSub}</p>
-    <div class="mt-10 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-5">
-      <Button href={ctaHref} external>{ctaLabel}</Button>
-      {!ctaHref && <p class="text-sm text-muted">{t.product.ctaComingSoonNote}</p>}
-    </div>
-    <p class="mt-6 text-sm text-muted">{t.product.platformNote}</p>
-  </section>
-
-  {/* Features */}
-  <section class="border-t border-line/60" aria-labelledby="features">
-    <div class="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
-      <SectionHeading id="features" eyebrow={t.product.featuresEyebrow} title={t.product.featuresHeading} sub={t.product.featuresSub} />
-      <ul class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" role="list">
-        {
-          t.product.features.map((f) => (
-            <li class="rounded-card border border-line bg-surface p-6">
-              <span class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-lime/10 text-lime">
-                <FeatureIcon name={f.icon} />
-              </span>
-              <h3 class="mt-5 text-base font-semibold text-fg">{f.title}</h3>
-              <p class="mt-2 text-sm leading-relaxed text-muted">{f.body}</p>
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-  </section>
-
-  {/* Screenshots */}
-  <section class="border-t border-line/60" aria-labelledby="screens">
-    <div class="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
-      <SectionHeading id="screens" eyebrow={t.product.galleryEyebrow} title={t.product.galleryHeading} sub={t.product.gallerySub} />
-      <div class="mt-12">
-        <ScreenshotGallery locale={locale} />
-      </div>
-    </div>
-  </section>
-
-  {/* Demo video */}
-  <section class="border-t border-line/60" aria-labelledby="demo">
-    <div class="mx-auto grid max-w-6xl items-center gap-12 px-5 py-16 sm:px-8 sm:py-24 md:grid-cols-2">
-      <SectionHeading id="demo" eyebrow={t.product.videoEyebrow} title={t.product.videoHeading} sub={t.product.videoSub} />
-      <DemoVideo locale={locale} />
-    </div>
-  </section>
-
-  {/* Your data stays yours */}
-  <section class="border-t border-line/60" aria-labelledby="data">
-    <div class="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-24">
-      <SectionHeading id="data" eyebrow={t.product.dataEyebrow} title={t.product.dataHeading} sub={t.product.dataSub} />
-      <dl class="mt-12 grid gap-x-10 gap-y-8 sm:grid-cols-2">
-        {
-          t.product.dataPoints.map((p) => (
-            <div class="border-l-2 border-lime pl-5">
-              <dt class="font-semibold text-fg">{p.title}</dt>
-              <dd class="mt-2 text-sm leading-relaxed text-muted">{p.body}</dd>
-            </div>
-          ))
-        }
-      </dl>
-      <p class="mt-10">
-        <a
-          href={localePath(locale, `${APP_SLUG}/privacy`)}
-          class="text-sm font-semibold text-fg underline decoration-lime underline-offset-4 hover:text-lime"
-        >
-          {t.product.dataLink} →
-        </a>
-      </p>
-    </div>
-  </section>
-
-  {/* Final CTA */}
-  <section class="border-t border-line/60">
-    <div class="mx-auto max-w-6xl px-5 py-20 text-center sm:px-8 sm:py-32">
-      <h2 class="display text-5xl text-fg sm:text-6xl md:text-7xl">{t.product.finalHeading}</h2>
-      <p class="mt-5 text-lg text-muted">{t.product.finalSub}</p>
-      <div class="mt-10 flex flex-col items-center gap-4">
-        <Button href={ctaHref} external>{ctaLabel}</Button>
-        <a href={localePath(locale, `${APP_SLUG}/support`)} class="text-sm text-muted underline-offset-4 hover:text-fg hover:underline">
-          {t.product.finalSupport} →
-        </a>
-      </div>
-    </div>
-  </section>
-</Base>
+<html lang={LOCALE_TAGS[locale]}>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="refresh" content={`0;url=${target}`} />
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href={canonical} />
+    <title>→ {canonical}</title>
+  </head>
+  <body>
+    <a href={target}>{canonical}</a>
+  </body>
+</html>

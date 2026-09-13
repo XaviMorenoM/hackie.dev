@@ -1,6 +1,6 @@
 ---
-import { APP_SLUG, type Locale } from '../config';
-import { localePath, stripLocale, useTranslations } from '../i18n';
+import { APP_NAME, type Locale } from '../config';
+import { localePath, useTranslations } from '../i18n';
 import LangSwitcher from './LangSwitcher.astro';
 import ThemeSwitch from './ThemeSwitch.astro';
 
@@ -10,28 +10,14 @@ interface Props {
 }
 const { locale, showLangSwitcher = true } = Astro.props;
 const t = useTranslations(locale);
-const current = stripLocale(Astro.url.pathname);
-const isApp = current.startsWith(`/${APP_SLUG}`);
 ---
 
 <header class="sticky top-0 z-40 border-b border-line/60 bg-bg/80 backdrop-blur-md">
   <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4 sm:px-8">
     <a href={localePath(locale)} aria-label={t.nav.homeAria} class="display text-2xl text-fg">
-      hackie<span class="text-lime">.</span>
+      {APP_NAME}<span class="text-lime">.</span>
     </a>
-    <div class="flex items-center gap-5 sm:gap-8">
-      <nav aria-label={t.nav.primaryAria} class="hidden sm:block">
-        <a
-          href={localePath(locale, APP_SLUG)}
-          aria-current={isApp ? 'page' : undefined}
-          class:list={[
-            'text-sm font-medium transition-colors hover:text-fg',
-            isApp ? 'text-fg' : 'text-muted',
-          ]}
-        >
-          {t.nav.app}
-        </a>
-      </nav>
+    <div class="flex items-center gap-4 sm:gap-6">
       {showLangSwitcher && <LangSwitcher locale={locale} />}
       <ThemeSwitch locale={locale} />
     </div>

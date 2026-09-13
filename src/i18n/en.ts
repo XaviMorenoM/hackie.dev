@@ -2,10 +2,6 @@ import type { Translations } from './types';
 
 export const en: Translations = {
   meta: {
-    siteSuffix: 'hackie.dev',
-    hubTitle: 'hackie.dev — indie apps, built with care',
-    hubDescription:
-      'hackie.dev is the home of {app} and other small, carefully made apps by an independent developer.',
     appTitle: '{app} — the gym tracker that stays out of your way',
     appDescription:
       '{app} is a fast, local-first gym tracker for iPhone. Log sets in seconds, follow routines, see your progress and keep your data on your device and your own iCloud.',
@@ -17,28 +13,12 @@ export const en: Translations = {
   },
   nav: {
     skipToContent: 'Skip to content',
-    home: 'Home',
-    app: '{app}',
     privacy: 'Privacy',
     support: 'Support',
     language: 'Language',
     theme: { label: 'Theme', system: 'System theme', light: 'Light theme', dark: 'Dark theme' },
-    primaryAria: 'Main',
     footerAria: 'Footer',
-    homeAria: 'hackie.dev home',
-  },
-  hub: {
-    eyebrow: 'Independent software',
-    heroTitle: 'indie apps, built with care.',
-    heroSub:
-      'Small tools for real life, made by one person who uses them every day. No growth hacks, no dark patterns — just software that respects your time.',
-    productsHeading: 'Products',
-    productCardEyebrow: 'iPhone · iOS {ios}+',
-    productCardTagline: 'A gym tracker that stays out of your way. Log sets fast, follow routines, watch your progress.',
-    productCardCta: 'Discover {app}',
-    aboutHeading: 'About',
-    aboutBody:
-      'hackie.dev is where {developer} ships the things he builds for himself. Every app here is local-first, ad-free and made to last.',
+    homeAria: '{app} home',
   },
   product: {
     eyebrow: 'Gym tracker for iPhone',
@@ -244,14 +224,13 @@ export const en: Translations = {
     contactHint: 'Or write to {email}',
   },
   footer: {
-    madeBy: 'Made by {developer}',
+    byline: 'An indie app by hackie.dev',
     privacy: 'Privacy',
     support: 'Support',
-    github: 'GitHub',
   },
   notFound: {
     title: 'Page not found',
     body: 'That link doesn’t go anywhere.',
-    cta: 'Back to hackie.dev',
+    cta: 'Back to {app}',
   },
 };

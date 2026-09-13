@@ -1,5 +1,6 @@
 ---
-import { APP_SLUG, DEVELOPER_GITHUB, DEVELOPER_NAME, type Locale } from '../config';
+/** The only place the hackie.dev brand appears. */
+import { APP_SLUG, DEVELOPER_NAME, SITE_NAME, type Locale } from '../config';
 import { localePath, useTranslations } from '../i18n';
 
 interface Props {
@@ -8,27 +9,27 @@ interface Props {
 const { locale } = Astro.props;
 const t = useTranslations(locale);
 const year = new Date().getFullYear();
+const [bylineBefore = '', bylineAfter = ''] = t.footer.byline.split(SITE_NAME);
 ---
 
 <footer class="border-t border-line/60">
   <div
-    class="mx-auto flex max-w-6xl flex-col gap-6 px-5 py-10 text-sm text-muted sm:flex-row sm:items-center sm:justify-between sm:px-8"
+    class="mx-auto flex max-w-6xl flex-col gap-8 px-5 py-12 text-sm text-muted sm:flex-row sm:items-end sm:justify-between sm:px-8"
   >
-    <p>
-      <a href={localePath(locale)} class="display text-lg text-fg">hackie<span class="text-lime">.</span></a>
-      <span class="ml-3">© {year} {DEVELOPER_NAME}</span>
-    </p>
+    <div>
+      <a href={localePath(locale)} class="display text-3xl text-fg">hackie<span class="text-lime">.</span></a>
+      <p class="mt-2">
+        {bylineBefore}<a href={localePath(locale)} class="text-fg transition-colors hover:text-lime">{SITE_NAME}</a>{bylineAfter}
+      </p>
+      <p class="mt-1">© {year} {DEVELOPER_NAME}</p>
+    </div>
     <nav aria-label={t.nav.footerAria}>
       <ul class="flex flex-wrap gap-x-6 gap-y-2">
-        <li><a class="transition-colors hover:text-fg" href={localePath(locale, APP_SLUG)}>{t.nav.app}</a></li>
         <li>
           <a class="transition-colors hover:text-fg" href={localePath(locale, `${APP_SLUG}/privacy`)}>{t.footer.privacy}</a>
         </li>
         <li>
           <a class="transition-colors hover:text-fg" href={localePath(locale, `${APP_SLUG}/support`)}>{t.footer.support}</a>
-        </li>
-        <li>
-          <a class="transition-colors hover:text-fg" href={DEVELOPER_GITHUB} rel="me noopener" target="_blank">{t.footer.github}</a>
         </li>
       </ul>
     </nav>

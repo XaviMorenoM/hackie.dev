@@ -33,10 +33,6 @@ export interface PrivacySection {
 
 export interface Translations {
   meta: {
-    /** Appended to every `<title>`. */
-    siteSuffix: string;
-    hubTitle: string;
-    hubDescription: string;
     appTitle: string;
     appDescription: string;
     privacyTitle: string;
@@ -46,27 +42,13 @@ export interface Translations {
   };
   nav: {
     skipToContent: string;
-    home: string;
-    app: string;
     privacy: string;
     support: string;
     language: string;
     theme: { label: string; system: string; light: string; dark: string };
-    primaryAria: string;
     footerAria: string;
     /** aria-label for the wordmark link. */
     homeAria: string;
-  };
-  hub: {
-    eyebrow: string;
-    heroTitle: string;
-    heroSub: string;
-    productsHeading: string;
-    productCardEyebrow: string;
-    productCardTagline: string;
-    productCardCta: string;
-    aboutHeading: string;
-    aboutBody: string;
   };
   product: {
     eyebrow: string;
@@ -122,10 +104,10 @@ export interface Translations {
     contactHint: string;
   };
   footer: {
-    madeBy: string;
+    /** Must contain the literal `hackie.dev` — the footer turns it into a link. */
+    byline: string;
     privacy: string;
     support: string;
-    github: string;
   };
   notFound: {
     title: string;

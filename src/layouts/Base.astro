@@ -3,7 +3,7 @@ import { Font } from 'astro:assets';
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { LOCALES, LOCALE_TAGS, OG_LOCALES, SITE_NAME, SITE_URL, type Locale } from '../config';
+import { APP_NAME, LOCALES, LOCALE_TAGS, OG_LOCALES, SITE_URL, type Locale } from '../config';
 import { localePath, stripLocale, useTranslations, withBase } from '../i18n';
 
 interface Props {
@@ -28,14 +28,13 @@ const alternates = LOCALES.map((l) => ({
   href: new URL(localePath(l, path), SITE_URL).href,
 }));
 const ogImage = new URL(withBase('/og.png'), SITE_URL).href;
-const fullTitle = title.includes(SITE_NAME) ? title : `${title} · ${t.meta.siteSuffix}`;
 ---
 
 <html lang={LOCALE_TAGS[locale]} class="h-full antialiased">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{fullTitle}</title>
+    <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
     <meta name="color-scheme" content="dark light" />
@@ -56,8 +55,8 @@ const fullTitle = title.includes(SITE_NAME) ? title : `${title} · ${t.meta.site
     <link rel="sitemap" href={withBase("/sitemap-index.xml")} />
 
     <meta property="og:type" content={ogType} />
-    <meta property="og:site_name" content={SITE_NAME} />
-    <meta property="og:title" content={fullTitle} />
+    <meta property="og:site_name" content={APP_NAME} />
+    <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     {!noindex && <meta property="og:url" content={canonical} />}
     <meta property="og:image" content={ogImage} />
@@ -66,7 +65,7 @@ const fullTitle = title.includes(SITE_NAME) ? title : `${title} · ${t.meta.site
     <meta property="og:locale" content={OG_LOCALES[locale]} />
     {LOCALES.filter((l) => l !== locale).map((l) => <meta property="og:locale:alternate" content={OG_LOCALES[l]} />)}
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
 

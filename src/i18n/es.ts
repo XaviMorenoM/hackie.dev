@@ -2,10 +2,6 @@ import type { Translations } from './types';
 
 export const es: Translations = {
   meta: {
-    siteSuffix: 'hackie.dev',
-    hubTitle: 'hackie.dev — apps independientes, hechas con cariño',
-    hubDescription:
-      'hackie.dev es la casa de {app} y de otras apps pequeñas y cuidadas, creadas por un desarrollador independiente.',
     appTitle: '{app} — el registro de entrenos que no se interpone',
     appDescription:
       '{app} es un registro de entrenamientos para iPhone, rápido y local. Apunta tus series en segundos, sigue rutinas, mira tu progreso y guarda tus datos en tu dispositivo y en tu propio iCloud.',
@@ -17,28 +13,12 @@ export const es: Translations = {
   },
   nav: {
     skipToContent: 'Ir al contenido',
-    home: 'Inicio',
-    app: '{app}',
     privacy: 'Privacidad',
     support: 'Soporte',
     language: 'Idioma',
     theme: { label: 'Tema', system: 'Tema del sistema', light: 'Tema claro', dark: 'Tema oscuro' },
-    primaryAria: 'Principal',
     footerAria: 'Pie de página',
-    homeAria: 'Inicio de hackie.dev',
-  },
-  hub: {
-    eyebrow: 'Software independiente',
-    heroTitle: 'apps independientes, hechas con cariño.',
-    heroSub:
-      'Herramientas pequeñas para la vida real, creadas por una sola persona que las usa cada día. Sin trucos de crecimiento ni patrones oscuros: solo software que respeta tu tiempo.',
-    productsHeading: 'Productos',
-    productCardEyebrow: 'iPhone · iOS {ios}+',
-    productCardTagline: 'Un registro de entrenos que no se interpone. Apunta series rápido, sigue rutinas y observa tu progreso.',
-    productCardCta: 'Descubre {app}',
-    aboutHeading: 'Sobre hackie.dev',
-    aboutBody:
-      'hackie.dev es donde {developer} publica lo que construye para sí mismo. Todas las apps son locales, sin anuncios y hechas para durar.',
+    homeAria: 'Inicio de {app}',
   },
   product: {
     eyebrow: 'Registro de entrenos para iPhone',
@@ -244,14 +224,13 @@ export const es: Translations = {
     contactHint: 'O escribe a {email}',
   },
   footer: {
-    madeBy: 'Hecho por {developer}',
+    byline: 'Una app indie de hackie.dev',
     privacy: 'Privacidad',
     support: 'Soporte',
-    github: 'GitHub',
   },
   notFound: {
     title: 'Página no encontrada',
     body: 'Ese enlace no lleva a ninguna parte.',
-    cta: 'Volver a hackie.dev',
+    cta: 'Volver a {app}',
   },
 };
