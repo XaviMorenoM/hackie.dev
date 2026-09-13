@@ -22,6 +22,8 @@ export const en: Translations = {
     privacy: 'Privacy',
     support: 'Support',
     language: 'Language',
+    primaryAria: 'Main',
+    footerAria: 'Footer',
     homeAria: 'hackie.dev home',
   },
   hub: {
@@ -121,7 +123,7 @@ export const en: Translations = {
       },
       {
         title: 'Your own iCloud',
-        body: 'Optional sync uses the private CloudKit database tied to your Apple ID. The developer can’t read it.',
+        body: 'Optional sync uses the private CloudKit database tied to your Apple Account. The developer can’t read it.',
       },
       {
         title: 'Apple Health',
@@ -155,7 +157,7 @@ export const en: Translations = {
       {
         heading: 'iCloud sync',
         paragraphs: [
-          'If iCloud is enabled on your device, {app} syncs your data through Apple CloudKit using the private database attached to your Apple ID. That data is encrypted in transit and at rest by Apple and is only accessible from your own devices. The developer has no access to it.',
+          'If iCloud is enabled on your device, {app} syncs your data through Apple CloudKit using the private database attached to your Apple Account. That data is encrypted in transit and at rest by Apple and is only accessible from your own devices. The developer has no access to it.',
         ],
       },
       {
@@ -218,7 +220,7 @@ export const en: Translations = {
       },
       {
         q: 'How does sync work across my devices?',
-        a: 'Turn on iCloud on each device with the same Apple ID and {app} syncs automatically through your private iCloud database. Nothing goes through the developer.',
+        a: 'Turn on iCloud on each device with the same Apple Account and {app} syncs automatically through your private iCloud database. Nothing goes through the developer.',
       },
       {
         q: 'What does {app} do with Apple Health?',

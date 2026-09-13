@@ -1,6 +1,7 @@
 /**
  * Shared shape for every locale file. Strings may contain the `{app}` token,
- * which `useTranslations()` replaces with `APP_NAME` from `src/config.ts`.
+ * which `useTranslations()` replaces with `APP_NAME` from `src/config.ts`
+ * (`{dApp}` = Catalan "d’{app}" / "de {app}", picked by the name's initial letter).
  * Never hard-code the product name in a locale file.
  */
 export interface FeatureCopy {
@@ -50,6 +51,8 @@ export interface Translations {
     privacy: string;
     support: string;
     language: string;
+    primaryAria: string;
+    footerAria: string;
     /** aria-label for the wordmark link. */
     homeAria: string;
   };

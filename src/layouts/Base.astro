@@ -14,9 +14,11 @@ interface Props {
   jsonLd?: Record<string, unknown>[];
   /** `website` (default) or `article` for long-form legal pages. */
   ogType?: 'website' | 'article';
+  /** Error/utility pages: `noindex`, no canonical/hreflang, no language switcher. */
+  noindex?: boolean;
 }
 
-const { locale, title, description, jsonLd = [], ogType = 'website' } = Astro.props;
+const { locale, title, description, jsonLd = [], ogType = 'website', noindex = false } = Astro.props;
 const t = useTranslations(locale);
 
 const path = stripLocale(Astro.url.pathname);
@@ -39,16 +41,17 @@ const fullTitle = title.includes(SITE_NAME) ? title : `${title} · ${t.meta.site
     <meta name="theme-color" content="#0B0B0C" />
     <meta name="color-scheme" content="dark" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="canonical" href={canonical} />
-    {alternates.map((a) => <link rel="alternate" hreflang={LOCALE_TAGS[a.locale]} href={a.href} />)}
-    <link rel="alternate" hreflang="x-default" href={alternates[0]!.href} />
+    {noindex && <meta name="robots" content="noindex" />}
+    {!noindex && <link rel="canonical" href={canonical} />}
+    {!noindex && alternates.map((a) => <link rel="alternate" hreflang={LOCALE_TAGS[a.locale]} href={a.href} />)}
+    {!noindex && <link rel="alternate" hreflang="x-default" href={alternates[0]!.href} />}
     <link rel="sitemap" href="/sitemap-index.xml" />
 
     <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={SITE_NAME} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical} />
+    {!noindex && <meta property="og:url" content={canonical} />}
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
@@ -71,7 +74,7 @@ const fullTitle = title.includes(SITE_NAME) ? title : `${title} · ${t.meta.site
     >
       {t.nav.skipToContent}
     </a>
-    <Header locale={locale} />
+    <Header locale={locale} showLangSwitcher={!noindex} />
     <main id="main" class="flex-1">
       <slot />
     </main>

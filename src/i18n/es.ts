@@ -22,6 +22,8 @@ export const es: Translations = {
     privacy: 'Privacidad',
     support: 'Soporte',
     language: 'Idioma',
+    primaryAria: 'Principal',
+    footerAria: 'Pie de página',
     homeAria: 'Inicio de hackie.dev',
   },
   hub: {
@@ -48,7 +50,7 @@ export const es: Translations = {
     ctaComingSoon: 'Próximamente',
     ctaComingSoonNote: 'Todavía no está en el App Store. Vuelve pronto.',
     featuresEyebrow: 'Funciones',
-    featuresHeading: 'Todo lo que necesitas en el gimnasio. Nada de lo que no.',
+    featuresHeading: 'Todo lo que necesitas en el gimnasio. Nada de lo que te sobra.',
     featuresSub:
       'Pensada para cómo entrenas de verdad: registro rápido, valores por defecto con sentido y un progreso que se nota.',
     features: [
@@ -75,12 +77,12 @@ export const es: Translations = {
       {
         icon: 'library',
         title: 'Biblioteca de ejercicios cuidada',
-        body: 'Un catálogo seleccionado a mano con búsqueda inteligente, para encontrar el movimiento correcto en un segundo en lugar de pasar por miles.',
+        body: 'Un catálogo seleccionado a mano con búsqueda inteligente, para encontrar el movimiento correcto en un segundo en lugar de recorrer miles.',
       },
       {
         icon: 'health',
         title: 'Apple Health en ambos sentidos',
-        body: 'Lee tus entrenamientos y frecuencia cardíaca de Salud y escribe cada sesión completada, para que tus anillos y tu historial sigan completos.',
+        body: 'Lee tus entrenamientos y frecuencia cardíaca de Salud y escribe en Salud cada sesión completada, para que tus anillos y tu historial sigan completos.',
       },
       {
         icon: 'cloud',
@@ -113,7 +115,7 @@ export const es: Translations = {
     dataEyebrow: 'Tus datos',
     dataHeading: 'Tus datos son tuyos.',
     dataSub:
-      '{app} no tiene backend. No hay nada que registrar, nada que se pueda filtrar y nada que vender.',
+      '{app} no tiene backend. No hay que registrarse en ningún sitio, nada que se pueda filtrar y nada que vender.',
     dataPoints: [
       {
         title: 'En tu dispositivo',
@@ -121,7 +123,7 @@ export const es: Translations = {
       },
       {
         title: 'Tu propio iCloud',
-        body: 'La sincronización opcional usa la base de datos privada de CloudKit ligada a tu Apple ID. El desarrollador no puede leerla.',
+        body: 'La sincronización opcional usa la base de datos privada de CloudKit ligada a tu Cuenta de Apple. El desarrollador no puede leerla.',
       },
       {
         title: 'Apple Health',
@@ -155,7 +157,7 @@ export const es: Translations = {
       {
         heading: 'Sincronización con iCloud',
         paragraphs: [
-          'Si tienes iCloud activado en tu dispositivo, {app} sincroniza tus datos mediante Apple CloudKit usando la base de datos privada asociada a tu Apple ID. Apple cifra esos datos en tránsito y en reposo, y solo son accesibles desde tus propios dispositivos. El desarrollador no tiene acceso a ellos.',
+          'Si tienes iCloud activado en tu dispositivo, {app} sincroniza tus datos mediante Apple CloudKit usando la base de datos privada asociada a tu Cuenta de Apple. Apple cifra esos datos en tránsito y en reposo, y solo son accesibles desde tus propios dispositivos. El desarrollador no tiene acceso a ellos.',
         ],
       },
       {
@@ -218,7 +220,7 @@ export const es: Translations = {
       },
       {
         q: '¿Cómo funciona la sincronización entre mis dispositivos?',
-        a: 'Activa iCloud en cada dispositivo con el mismo Apple ID y {app} se sincroniza automáticamente a través de tu base de datos privada de iCloud. Nada pasa por el desarrollador.',
+        a: 'Activa iCloud en cada dispositivo con la misma Cuenta de Apple y {app} se sincroniza automáticamente a través de tu base de datos privada de iCloud. Nada pasa por el desarrollador.',
       },
       {
         q: '¿Qué hace {app} con Apple Health?',

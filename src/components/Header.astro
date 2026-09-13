@@ -5,8 +5,9 @@ import LangSwitcher from './LangSwitcher.astro';
 
 interface Props {
   locale: Locale;
+  showLangSwitcher?: boolean;
 }
-const { locale } = Astro.props;
+const { locale, showLangSwitcher = true } = Astro.props;
 const t = useTranslations(locale);
 const current = stripLocale(Astro.url.pathname);
 const isApp = current.startsWith(`/${APP_SLUG}`);
@@ -18,7 +19,7 @@ const isApp = current.startsWith(`/${APP_SLUG}`);
       hackie<span class="text-lime">.</span>
     </a>
     <div class="flex items-center gap-5 sm:gap-8">
-      <nav aria-label="Primary" class="hidden sm:block">
+      <nav aria-label={t.nav.primaryAria} class="hidden sm:block">
         <a
           href={localePath(locale, APP_SLUG)}
           aria-current={isApp ? 'page' : undefined}
@@ -30,7 +31,7 @@ const isApp = current.startsWith(`/${APP_SLUG}`);
           {t.nav.app}
         </a>
       </nav>
-      <LangSwitcher locale={locale} />
+      {showLangSwitcher && <LangSwitcher locale={locale} />}
     </div>
   </div>
 </header>

@@ -16,9 +16,13 @@ import type { Translations } from './types';
 const sources: Record<Locale, Translations> = { en, es, ca };
 
 /** Tokens every locale file may use. Replaced once per locale at module load. */
+/** Catalan `de` elides before a vowel (or mute h): `d’Alterio`, `de Zeta`. */
+const CA_DE_APP = /^[aeiouhàèéíòóúïü]/i.test(APP_NAME) ? `d’${APP_NAME}` : `de ${APP_NAME}`;
+
 function tokensFor(locale: Locale): Record<string, string> {
   return {
     app: APP_NAME,
+    dApp: CA_DE_APP,
     developer: DEVELOPER_NAME,
     email: CONTACT_EMAIL,
     ios: MIN_IOS_VERSION,
@@ -26,7 +30,7 @@ function tokensFor(locale: Locale): Record<string, string> {
   };
 }
 
-const tokenPattern = /\{(app|developer|email|ios|date)\}/g;
+const tokenPattern = /\{(app|dApp|developer|email|ios|date)\}/g;
 
 function interpolate<T>(value: T, tokens: Record<string, string>): T {
   if (typeof value === 'string') {

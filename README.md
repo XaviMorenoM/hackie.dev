@@ -40,11 +40,11 @@ The URL segment (`/alterio/`) is `APP_SLUG` + the `src/pages/[locale]/alterio/` 
 
 Other knobs in `src/config.ts`: `APP_STORE_URL` / `TESTFLIGHT_URL` (both `null` → CTA renders as a disabled "Coming soon"; set the App Store one when live), `CONTACT_EMAIL`, `DEVELOPER_NAME`, `PRIVACY_EFFECTIVE_DATE`, `MIN_IOS_VERSION`.
 
-> Catalan note: locale strings use the elided form `d’{app}` because the current name starts with a vowel. If the new name starts with a consonant, change those to `de {app}` in `src/i18n/ca.ts`.
+> Catalan elision (`d’Alterio` vs `de Zeta`) is handled by the `{dApp}` token in `src/i18n/index.ts`, chosen from the name's first letter — nothing to edit in `ca.ts`.
 
 ## Translations
 
-`src/i18n/{en,es,ca}.ts` share the `Translations` type in `src/i18n/types.ts`, so a missing key is a type error. Tokens available in any string: `{app}`, `{developer}`, `{email}`, `{ios}`, `{date}` (privacy effective date, formatted per locale). `useTranslations(locale)` returns the interpolated table; `getLocaleFromUrl`, `stripLocale`, `localePath` handle URL ↔ locale.
+`src/i18n/{en,es,ca}.ts` share the `Translations` type in `src/i18n/types.ts`, so a missing key is a type error. Tokens available in any string: `{app}`, `{dApp}` (Catalan `d’/de` + name), `{developer}`, `{email}`, `{ios}`, `{date}` (privacy effective date, formatted per locale). `useTranslations(locale)` returns the interpolated table; `getLocaleFromUrl`, `stripLocale`, `localePath` handle URL ↔ locale.
 
 ## Media
 

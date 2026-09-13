@@ -7,7 +7,7 @@ import { localePath, useTranslations } from '../i18n';
 const t = useTranslations(DEFAULT_LOCALE);
 ---
 
-<Base locale={DEFAULT_LOCALE} title="404" description={t.notFound.body}>
+<Base locale={DEFAULT_LOCALE} title="404" description={t.notFound.body} noindex>
   <section class="mx-auto flex max-w-6xl flex-col items-start gap-6 px-5 py-32 sm:px-8">
     <p class="eyebrow">404</p>
     <h1 class="display text-6xl text-fg sm:text-8xl">{t.notFound.title}<span class="text-lime">.</span></h1>

@@ -1,3 +1,4 @@
 ---
-// Root index required by Astro i18n; the `redirectToDefaultLocale` middleware turns it into a redirect to `/en/`.
+// Intentionally empty. Astro i18n (prefixDefaultLocale + redirectToDefaultLocale) refuses to build
+// without a root index route; its injected `/` → `/en/` redirect takes priority over this file.
 ---

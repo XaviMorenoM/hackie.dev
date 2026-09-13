@@ -5,7 +5,7 @@ export const ca: Translations = {
     siteSuffix: 'hackie.dev',
     hubTitle: 'hackie.dev — apps independents, fetes amb cura',
     hubDescription:
-      'hackie.dev és la casa d’{app} i d’altres apps petites i ben fetes, creades per un desenvolupador independent.',
+      'hackie.dev és la casa {dApp} i d’altres apps petites i ben fetes, creades per un desenvolupador independent.',
     appTitle: '{app} — el registre d’entrenaments que no et destorba',
     appDescription:
       '{app} és un registre d’entrenaments per a iPhone, ràpid i local. Apunta les sèries en segons, segueix rutines, mira el teu progrés i guarda les dades al teu dispositiu i al teu propi iCloud.',
@@ -22,6 +22,8 @@ export const ca: Translations = {
     privacy: 'Privacitat',
     support: 'Suport',
     language: 'Idioma',
+    primaryAria: 'Principal',
+    footerAria: 'Peu de pàgina',
     homeAria: 'Inici de hackie.dev',
   },
   hub: {
@@ -48,7 +50,7 @@ export const ca: Translations = {
     ctaComingSoon: 'Properament',
     ctaComingSoonNote: 'Encara no és a l’App Store. Torna-hi aviat.',
     featuresEyebrow: 'Funcions',
-    featuresHeading: 'Tot el que necessites al gimnàs. Res del que no.',
+    featuresHeading: 'Tot el que necessites al gimnàs. Res del que et sobra.',
     featuresSub:
       'Pensada per a com entrenes de debò: registre ràpid, valors per defecte amb seny i un progrés que es nota.',
     features: [
@@ -75,7 +77,7 @@ export const ca: Translations = {
       {
         icon: 'library',
         title: 'Biblioteca d’exercicis seleccionada',
-        body: 'Un catàleg triat a mà amb cerca intel·ligent, per trobar el moviment correcte en un segon en lloc de passar-ne milers.',
+        body: 'Un catàleg triat a mà amb cerca intel·ligent, per trobar el moviment correcte en un segon en lloc de repassar-ne milers.',
       },
       {
         icon: 'health',
@@ -97,12 +99,12 @@ export const ca: Translations = {
     galleryHeading: 'Dissenyada per al racó fosc del gimnàs.',
     gallerySub: 'Alt contrast, botons grans, una sola mà. Es veu igual a les 6 del matí que a les 11 de la nit.',
     screenshotAlts: [
-      'Pantalla d’avui d’{app} amb la rutina actual i els darrers entrenaments',
-      'Pantalla de registre d’{app} amb sèries, pes, repeticions i temporitzador de descans',
-      'Detall de rutina d’{app} amb mapa de calor muscular',
-      'Gràfics de progrés d’{app} amb gràfic de línia interactiu',
-      'Biblioteca d’exercicis d’{app} amb cercador',
-      'Pantalla de perfil d’{app} amb unitats i ajustos d’Apple Health',
+      'Pantalla d’avui {dApp} amb la rutina actual i els darrers entrenaments',
+      'Pantalla de registre {dApp} amb sèries, pes, repeticions i temporitzador de descans',
+      'Detall de rutina {dApp} amb mapa de calor muscular',
+      'Gràfics de progrés {dApp} amb gràfic de línia interactiu',
+      'Biblioteca d’exercicis {dApp} amb cercador',
+      'Pantalla de perfil {dApp} amb unitats i ajustos d’Apple Health',
     ],
     placeholderLabel: 'Captura properament',
     videoEyebrow: 'En moviment',
@@ -113,7 +115,7 @@ export const ca: Translations = {
     dataEyebrow: 'Les teves dades',
     dataHeading: 'Les teves dades són teves.',
     dataSub:
-      '{app} no té backend. No hi ha res per registrar-se, res que es pugui filtrar i res per vendre.',
+      '{app} no té backend. No cal registrar-se enlloc, res que es pugui filtrar i res per vendre.',
     dataPoints: [
       {
         title: 'Al teu dispositiu',
@@ -121,7 +123,7 @@ export const ca: Translations = {
       },
       {
         title: 'El teu propi iCloud',
-        body: 'La sincronització opcional fa servir la base de dades privada de CloudKit lligada al teu Apple ID. El desenvolupador no la pot llegir.',
+        body: 'La sincronització opcional fa servir la base de dades privada de CloudKit lligada al teu Compte d’Apple. El desenvolupador no la pot llegir.',
       },
       {
         title: 'Apple Health',
@@ -155,7 +157,7 @@ export const ca: Translations = {
       {
         heading: 'Sincronització amb iCloud',
         paragraphs: [
-          'Si tens l’iCloud activat al dispositiu, {app} sincronitza les teves dades mitjançant Apple CloudKit fent servir la base de dades privada associada al teu Apple ID. Apple xifra aquestes dades en trànsit i en repòs, i només són accessibles des dels teus propis dispositius. El desenvolupador no hi té accés.',
+          'Si tens l’iCloud activat al dispositiu, {app} sincronitza les teves dades mitjançant Apple CloudKit fent servir la base de dades privada associada al teu Compte d’Apple. Apple xifra aquestes dades en trànsit i en repòs, i només són accessibles des dels teus propis dispositius. El desenvolupador no hi té accés.',
         ],
       },
       {
@@ -218,11 +220,11 @@ export const ca: Translations = {
       },
       {
         q: 'Com funciona la sincronització entre els meus dispositius?',
-        a: 'Activa l’iCloud a cada dispositiu amb el mateix Apple ID i {app} se sincronitza automàticament a través de la teva base de dades privada d’iCloud. Res no passa pel desenvolupador.',
+        a: 'Activa l’iCloud a cada dispositiu amb el mateix Compte d’Apple i {app} se sincronitza automàticament a través de la teva base de dades privada d’iCloud. Res no passa pel desenvolupador.',
       },
       {
         q: 'Què fa {app} amb Apple Health?',
-        a: 'Amb el teu permís, llegeix entrenaments i freqüència cardíaca d’Apple Health i escriu a Salut cada entrenament que acabes, perquè l’historial i els anells d’activitat es mantinguin complets. Ho pots canviar en qualsevol moment des de l’app Salut, a Compartició.',
+        a: 'Amb el teu permís, llegeix entrenaments i freqüència cardíaca d’Apple Health i escriu a Salut cada entrenament que acabes, perquè l’historial i els anells d’activitat es mantinguin complets. Ho pots canviar en qualsevol moment des de l’app Salut, a Compartir.',
       },
       {
         q: 'He tancat l’app a mig entrenament. He perdut la sessió?',
@@ -234,7 +236,7 @@ export const ca: Translations = {
       },
       {
         q: 'Com esborro les meves dades?',
-        a: 'Esborra l’app per eliminar les dades locals. Per netejar les dades sincronitzades, ves a Configuració → el teu nom → iCloud → Gestiona l’emmagatzematge del compte i esborra les dades d’{app}. Consulta la política de privacitat per a més detalls.',
+        a: 'Esborra l’app per eliminar les dades locals. Per netejar les dades sincronitzades, ves a Configuració → el teu nom → iCloud → Gestiona l’emmagatzematge del compte i esborra les dades {dApp}. Consulta la política de privacitat per a més detalls.',
       },
     ],
     contactHeading: 'Encara encallat?',

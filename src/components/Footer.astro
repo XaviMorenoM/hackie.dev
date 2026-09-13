@@ -18,7 +18,7 @@ const year = new Date().getFullYear();
       <a href={localePath(locale)} class="display text-lg text-fg">hackie<span class="text-lime">.</span></a>
       <span class="ml-3">© {year} {DEVELOPER_NAME}</span>
     </p>
-    <nav aria-label="Footer">
+    <nav aria-label={t.nav.footerAria}>
       <ul class="flex flex-wrap gap-x-6 gap-y-2">
         <li><a class="transition-colors hover:text-fg" href={localePath(locale, APP_SLUG)}>{t.nav.app}</a></li>
         <li>
