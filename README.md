@@ -1,6 +1,6 @@
 # hackie.dev
 
-Landing hub for Xavi Moreno's indie apps. Astro 7 · static output · Tailwind v4 · zero client JS · en / es / ca.
+Landing hub for Xavi Moreno's indie apps. Astro 7 · static output · Tailwind v4 · light/dark theme · no client JS beyond a <1 KB theme switch · en / es / ca.
 
 ## Run
 
@@ -62,7 +62,8 @@ To wire them into the site:
    - an empty locale folder falls back to `en`;
    - no screenshots anywhere → CSS phone-frame placeholders.
    Alt texts live in `product.screenshotAlts` (one per screenshot, in order).
-2. **Video** → copy into `public/video/` (`.webm` preferred, `.mp4` fallback; both are picked up) plus an optional `public/video/poster.{jpg,png,webp}`. `DemoVideo.astro` renders a muted, looping, `playsinline`, `preload="none"` `<video>` inside the phone frame; with no file present it shows a placeholder.
+   **Dark-mode screenshots** go in `src/assets/screenshots-dark/{en,es}/` with the *same filenames*. When a locale has both sets, both are rendered and CSS shows the one matching the resolved theme (`.shot-light` / `.shot-dark`, driven by the `--shot-*` tokens); the hidden set is `display:none` + `loading="lazy"`, so it isn't fetched. The dark set is read from the same folder the light set resolved to (so `ca` gets `es` dark, and an `en`-fallback locale gets `en` dark). If the dark folder is missing, the light set is used for every theme.
+2. **Video** → copy into `public/video/` (`.webm` preferred, `.mp4` fallback; both are picked up) plus an optional `public/video/poster.{jpg,png,webp}`. `DemoVideo.astro` renders a muted, looping, `playsinline`, `preload="none"` `<video>` inside the phone frame; with no file present it shows a placeholder. Files ending in `-dark.<ext>` (e.g. `alterio-demo-dark.webm`, `poster-dark.jpg`) form an optional dark set, switched the same way as screenshots.
 
 Both components are the only place media is referenced — nothing else needs to change. Search for `TODO(media)` to find them.
 
@@ -73,9 +74,24 @@ Both components are the only place media is referenced — nothing else needs to
 - Work on a feature branch (`feat/…`), open a PR, get QA sign-off, then merge. Nothing goes live without QA.
 - `site` in `astro.config.mjs` is `https://hackie.dev` — canonical URLs, hreflang alternates, the sitemap and OG URLs all derive from it.
 
-## Design
+## Design & theming
 
-Dark only. Tokens in `src/styles/global.css` (`@theme`): background `#0B0B0C`, surface `#141416`, text `#F5F5F5`, muted `#9A9A9A`, accent lime `#C6FF3D`. Display type is Instrument Serif Italic (`.display`), body is Inter. `prefers-reduced-motion` disables transitions globally.
+Dark-first with a light theme. Three states on `<html>`: nothing stamped (follow the OS), `data-theme="dark"`, `data-theme="light"`. The header switch (system / sun / moon, `aria-pressed` buttons) stamps the attribute and persists it in `localStorage.theme`; a ~170-byte inline script in `<head>` re-applies it before first paint (no flash). That switch is the only client JS on the site.
+
+Tokens live in `src/styles/global.css`: the full dark palette on bare `:root`, the light palette repeated under `@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) }` and `:root[data-theme="light"]`, then mapped onto Tailwind via `@theme inline`. Every colour goes through a token — never hard-code a hex in a component.
+
+| Token        | Dark      | Light     | Use                                             |
+| ------------ | --------- | --------- | ----------------------------------------------- |
+| `bg`         | `#0B0B0C` | `#F6F4EE` | page ground (warm off-white in light)           |
+| `surface`    | `#141416` | `#FFFFFF` | cards, header                                   |
+| `line`       | `#232326` | `#E3DFD5` | borders, rules                                  |
+| `fg`         | `#F5F5F5` | `#141413` | text                                            |
+| `muted`      | `#9A9A9A` | `#5C5A54` | secondary text (≥ 6:1 on ground in both)        |
+| `lime`       | `#C6FF3D` | `#4A6600` | accent for text/icons/links (≈ 6:1 on light)    |
+| `lime-fill`  | `#C6FF3D` | `#C6FF3D` | filled buttons/badges, always with `lime-ink`   |
+| `lime-ink`   | `#101400` | `#101400` | text on `lime-fill`                             |
+
+`--shot-light` / `--shot-dark` flip in the same blocks and power the per-theme screenshot/video sets (`.shot-light` / `.shot-dark` utilities). Display type is Instrument Serif Italic (`.display`), body is Inter. `prefers-reduced-motion` disables transitions globally.
 
 ## Preview on github.io (before DNS)
 

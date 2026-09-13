@@ -51,6 +51,7 @@ export interface Translations {
     privacy: string;
     support: string;
     language: string;
+    theme: { label: string; system: string; light: string; dark: string };
     primaryAria: string;
     footerAria: string;
     /** aria-label for the wordmark link. */

@@ -4,6 +4,12 @@
  * (webm listed first, mp4 as fallback) and `public/video/poster.{jpg,png,webp}`.
  * If no video exists → phone-frame placeholder.
  *
+ * Theme-aware: files whose name ends in `-dark.<ext>` form the dark set
+ * (`alterio-demo-dark.webm`, poster `poster-dark.jpg`); the rest form the light
+ * set. When both exist, both <video>s are rendered and CSS shows exactly one
+ * (`.shot-light` / `.shot-dark`, see global.css). With a single set it is used
+ * for every theme.
+ *
  * TODO(media): copy the export from media/video/ into public/video/ (plus a
  * poster frame) — nothing else needs to change.
  */
@@ -21,40 +27,64 @@ const t = useTranslations(locale);
 
 const dir = fileURLToPath(new URL('../../public/video/', import.meta.url));
 const files = existsSync(dir) ? readdirSync(dir) : [];
-const sources = [
-  ...files.filter((f) => f.endsWith('.webm')).map((f) => ({ src: withBase(`/video/${f}`), type: 'video/webm' })),
-  ...files.filter((f) => f.endsWith('.mp4')).map((f) => ({ src: withBase(`/video/${f}`), type: 'video/mp4' })),
-];
-const poster = files.find((f) => /^poster\.(jpe?g|png|webp)$/.test(f));
-const hasVideo = sources.length > 0;
+const isDark = (f: string) => /-dark\.[a-z0-9]+$/i.test(f);
+
+interface VideoSet {
+  sources: { src: string; type: string }[];
+  poster: string | undefined;
+}
+function setFor(dark: boolean): VideoSet {
+  const own = files.filter((f) => isDark(f) === dark);
+  return {
+    sources: [
+      ...own.filter((f) => f.endsWith('.webm')).map((f) => ({ src: withBase(`/video/${f}`), type: 'video/webm' })),
+      ...own.filter((f) => f.endsWith('.mp4')).map((f) => ({ src: withBase(`/video/${f}`), type: 'video/mp4' })),
+    ],
+    poster: own.find((f) => /^poster(-dark)?\.(jpe?g|png|webp)$/.test(f)),
+  };
+}
+
+const light = setFor(false);
+const dark = setFor(true);
+const themed = light.sources.length > 0 && dark.sources.length > 0;
+const single = light.sources.length ? light : dark;
+const hasVideo = single.sources.length > 0;
+const sets: { set: VideoSet; cls: string }[] = themed
+  ? [
+      { set: light, cls: 'shot-light' },
+      { set: dark, cls: 'shot-dark' },
+    ]
+  : [{ set: single, cls: '' }];
 ---
 
 <div class="mx-auto w-full max-w-[300px]">
   {
     hasVideo ? (
       <PhoneFrame>
-        <video
-          class="h-full w-full object-cover"
-          autoplay
-          muted
-          loop
-          playsinline
-          preload="none"
-          poster={poster ? withBase(`/video/${poster}`) : undefined}
-          aria-label={t.product.videoHeading}
-        >
-          {sources.map((s) => (
-            <source src={s.src} type={s.type} />
-          ))}
-          {t.product.videoUnsupported}
-        </video>
+        {sets.map(({ set, cls }) => (
+          <video
+            class={`h-full w-full object-cover ${cls}`}
+            autoplay
+            muted
+            loop
+            playsinline
+            preload="none"
+            poster={set.poster ? withBase(`/video/${set.poster}`) : undefined}
+            aria-label={t.product.videoHeading}
+          >
+            {set.sources.map((s) => (
+              <source src={s.src} type={s.type} />
+            ))}
+            {t.product.videoUnsupported}
+          </video>
+        ))}
       </PhoneFrame>
     ) : (
       <div class="relative">
         <PhoneFrame variant={1} label={t.product.videoPlaceholder} />
         <span
           aria-hidden="true"
-          class="absolute top-1/2 left-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-lime/90 text-lime-ink shadow-lg"
+          class="absolute top-1/2 left-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-lime-fill/90 text-lime-ink shadow-lg"
         >
           <svg viewBox="0 0 24 24" class="ml-1 h-7 w-7" fill="currentColor">
             <path d="M8 5v14l11-7z" />

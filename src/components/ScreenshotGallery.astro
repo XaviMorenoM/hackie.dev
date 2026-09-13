@@ -1,11 +1,17 @@
 ---
 /**
- * Screenshot carousel. Reads `src/assets/screenshots/<locale>/*.{png,jpg,jpeg,webp}`
- * at build time (sorted by filename). `ca` reuses `es`; an empty locale folder
- * falls back to `en`; no screenshots at all → CSS phone-frame placeholders.
+ * Screenshot carousel, theme-aware.
  *
- * TODO(media): drop the real exports from media/screenshots/{en,es} into
- * src/assets/screenshots/{en,es} — nothing else needs to change.
+ * Light set:  src/assets/screenshots/<locale>/*.{png,jpg,jpeg,webp}
+ * Dark set:   src/assets/screenshots-dark/<locale>/*  (optional — falls back to light)
+ *
+ * Files are sorted by name, so prefix `01-`, `02-`, …. `ca` reuses `es`; an empty
+ * light folder falls back to `en`; the dark set is read from the same folder the
+ * light set came from (so both themes show one language) and is optional; no
+ * screenshots at all → CSS phone-frame placeholders. When both sets exist, both are rendered and CSS shows exactly one
+ * (`.shot-light` / `.shot-dark` read the theme tokens in global.css), so the pick
+ * is right in all three theme states with no JS and no layout shift. The hidden
+ * set is `loading="lazy"` and `display:none`, so it is never fetched.
  */
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
@@ -19,22 +25,39 @@ interface Props {
 const { locale } = Astro.props;
 const t = useTranslations(locale);
 
-const all = import.meta.glob<ImageMetadata>('../assets/screenshots/*/*.{png,jpg,jpeg,webp}', {
+const lightAll = import.meta.glob<ImageMetadata>('../assets/screenshots/*/*.{png,jpg,jpeg,webp}', {
+  eager: true,
+  import: 'default',
+});
+const darkAll = import.meta.glob<ImageMetadata>('../assets/screenshots-dark/*/*.{png,jpg,jpeg,webp}', {
   eager: true,
   import: 'default',
 });
 
-function shotsFor(folder: string): ImageMetadata[] {
+function shotsFor(all: Record<string, ImageMetadata>, folder: string): ImageMetadata[] {
   return Object.entries(all)
-    .filter(([path]) => path.includes(`/screenshots/${folder}/`))
+    .filter(([path]) => path.includes(`/${folder}/`))
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([, img]) => img);
 }
-
-const folder = locale === 'ca' ? 'es' : locale;
-const shots = shotsFor(folder).length ? shotsFor(folder) : shotsFor('en');
+// Locale folder for the light set (`ca` → `es`, empty → `en`); the dark set must
+// come from the SAME folder so both themes show the same language.
+const preferred = locale === 'ca' ? 'es' : locale;
+const folder = shotsFor(lightAll, preferred).length ? preferred : 'en';
+const light = shotsFor(lightAll, folder);
+const dark = shotsFor(darkAll, folder);
+const themed = light.length > 0 && dark.length > 0;
+const shots = light.length ? light : dark;
 const placeholders = shots.length ? [] : ([0, 1, 2, 3, 4, 5] as const);
 const altFor = (i: number) => t.product.screenshotAlts[Math.min(i, t.product.screenshotAlts.length - 1)]!;
+const imgProps = {
+  widths: [280, 420, 560],
+  sizes: '(min-width: 640px) 280px, 68vw',
+  format: 'webp' as const,
+  quality: 82,
+  decoding: 'async' as const,
+};
+const imgClass = 'h-full w-full object-cover';
 ---
 
 <div class="relative -mx-5 sm:-mx-8">
@@ -46,17 +69,21 @@ const altFor = (i: number) => t.product.screenshotAlts[Math.min(i, t.product.scr
       shots.map((img, i) => (
         <li class="w-[68vw] shrink-0 snap-center sm:w-[280px]">
           <PhoneFrame>
-            <Image
-              src={img}
-              alt={altFor(i)}
-              widths={[280, 420, 560]}
-              sizes="(min-width: 640px) 280px, 68vw"
-              format="webp"
-              quality={82}
-              loading={i === 0 ? 'eager' : 'lazy'}
-              decoding="async"
-              class="h-full w-full object-cover"
-            />
+            {themed ? (
+              <>
+                <Image src={img} alt={altFor(i)} loading="lazy" class={`${imgClass} shot-light`} data-shot="light" {...imgProps} />
+                <Image
+                  src={dark[i] ?? dark[dark.length - 1]!}
+                  alt={altFor(i)}
+                  loading="lazy"
+                  class={`${imgClass} shot-dark`}
+                  data-shot="dark"
+                  {...imgProps}
+                />
+              </>
+            ) : (
+              <Image src={img} alt={altFor(i)} loading={i === 0 ? 'eager' : 'lazy'} class={imgClass} {...imgProps} />
+            )}
           </PhoneFrame>
         </li>
       ))

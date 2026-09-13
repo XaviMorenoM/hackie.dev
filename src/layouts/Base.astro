@@ -38,8 +38,16 @@ const fullTitle = title.includes(SITE_NAME) ? title : `${title} · ${t.meta.site
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
-    <meta name="theme-color" content="#0B0B0C" />
-    <meta name="color-scheme" content="dark" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0B0B0C" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F6F4EE" />
+    {/* Stamp the stored theme before first paint so there is no flash. The only client JS on the site. */}
+    <script is:inline>
+      try {
+        var t = localStorage.getItem('theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
     <link rel="icon" type="image/svg+xml" href={withBase("/favicon.svg")} />
     {noindex && <meta name="robots" content="noindex" />}
     {!noindex && <link rel="canonical" href={canonical} />}
@@ -70,7 +78,7 @@ const fullTitle = title.includes(SITE_NAME) ? title : `${title} · ${t.meta.site
   <body class="flex min-h-full flex-col bg-bg text-fg">
     <a
       href="#main"
-      class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-full focus:bg-lime focus:px-4 focus:py-2 focus:text-lime-ink"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-full focus:bg-lime-fill focus:px-4 focus:py-2 focus:text-lime-ink"
     >
       {t.nav.skipToContent}
     </a>
@@ -79,5 +87,22 @@ const fullTitle = title.includes(SITE_NAME) ? title : `${title} · ${t.meta.site
       <slot />
     </main>
     <Footer locale={locale} />
+    <script is:inline>
+      (function (r, bs) {
+        function sync() {
+          var c = r.dataset.theme || 'system';
+          bs.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.setTheme === c)); });
+        }
+        bs.forEach(function (b) {
+          b.onclick = function () {
+            var v = b.dataset.setTheme;
+            v === 'system' ? delete r.dataset.theme : (r.dataset.theme = v);
+            try { v === 'system' ? localStorage.removeItem('theme') : localStorage.setItem('theme', v); } catch (e) {}
+            sync();
+          };
+        });
+        sync();
+      })(document.documentElement, document.querySelectorAll('[data-set-theme]'));
+    </script>
   </body>
 </html>

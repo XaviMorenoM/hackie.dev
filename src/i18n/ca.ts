@@ -22,6 +22,7 @@ export const ca: Translations = {
     privacy: 'Privacitat',
     support: 'Suport',
     language: 'Idioma',
+    theme: { label: 'Tema', system: 'Tema del sistema', light: 'Tema clar', dark: 'Tema fosc' },
     primaryAria: 'Principal',
     footerAria: 'Peu de pàgina',
     homeAria: 'Inici de hackie.dev',

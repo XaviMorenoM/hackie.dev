@@ -2,6 +2,7 @@
 import { APP_SLUG, type Locale } from '../config';
 import { localePath, stripLocale, useTranslations } from '../i18n';
 import LangSwitcher from './LangSwitcher.astro';
+import ThemeSwitch from './ThemeSwitch.astro';
 
 interface Props {
   locale: Locale;
@@ -32,6 +33,7 @@ const isApp = current.startsWith(`/${APP_SLUG}`);
         </a>
       </nav>
       {showLangSwitcher && <LangSwitcher locale={locale} />}
+      <ThemeSwitch locale={locale} />
     </div>
   </div>
 </header>

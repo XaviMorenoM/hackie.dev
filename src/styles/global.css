@@ -1,14 +1,72 @@
 @import 'tailwindcss';
 
-@theme {
+/*
+ * Theme model — three states on <html>:
+ *   (nothing)            follow the OS (`prefers-color-scheme`)
+ *   data-theme="dark"    forced dark
+ *   data-theme="light"   forced light
+ * Dark-first: the full dark palette lives on bare :root. Light is defined twice —
+ * once behind the media query (system state) and once under [data-theme="light"]
+ * (forced state) — so the toggle wins in both directions. Every colour goes through
+ * these tokens; `@theme inline` maps them onto Tailwind utilities.
+ */
+:root {
+  color-scheme: dark;
+  --t-bg: #0b0b0c;
+  --t-surface: #141416;
+  --t-line: #232326;
+  --t-fg: #f5f5f5;
+  --t-muted: #9a9a9a;
+  --t-lime: #c6ff3d; /* accent for text, icons, rules */
+  --t-lime-fill: #c6ff3d; /* filled buttons/badges — always paired with --t-lime-ink text */
+  --t-lime-ink: #101400;
+  --t-bezel: #1c1c1f; /* phone-frame bezel — a device colour, same in both themes */
+  /* Per-theme media: exactly one of each pair is `block`. */
+  --shot-light: none;
+  --shot-dark: block;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) {
+    color-scheme: light;
+    --t-bg: #f6f4ee;
+    --t-surface: #ffffff;
+    --t-line: #e3dfd5;
+    --t-fg: #141413;
+    --t-muted: #5c5a54;
+    --t-lime: #4a6600;
+    --t-lime-fill: #c6ff3d;
+    --t-lime-ink: #101400;
+    --shot-light: block;
+    --shot-dark: none;
+  }
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --t-bg: #f6f4ee;
+  --t-surface: #ffffff;
+  --t-line: #e3dfd5;
+  --t-fg: #141413;
+  --t-muted: #5c5a54;
+  --t-lime: #4a6600;
+  --t-lime-fill: #c6ff3d;
+  --t-lime-ink: #101400;
+  --shot-light: block;
+  --shot-dark: none;
+}
+
+@theme inline {
   --color-*: initial;
-  --color-bg: #0b0b0c;
-  --color-surface: #141416;
-  --color-line: #232326;
-  --color-fg: #f5f5f5;
-  --color-muted: #9a9a9a;
-  --color-lime: #c6ff3d;
-  --color-lime-ink: #101400;
+  --color-bg: var(--t-bg);
+  --color-surface: var(--t-surface);
+  --color-line: var(--t-line);
+  --color-fg: var(--t-fg);
+  --color-muted: var(--t-muted);
+  --color-lime: var(--t-lime);
+  --color-lime-fill: var(--t-lime-fill);
+  --color-lime-ink: var(--t-lime-ink);
+  --color-bezel: var(--t-bezel);
   --color-white: #ffffff;
   --color-black: #000000;
   --color-transparent: transparent;
@@ -22,20 +80,21 @@
 
 @layer base {
   html {
-    color-scheme: dark;
     background-color: var(--color-bg);
     color: var(--color-fg);
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
   }
   body {
+    background-color: var(--color-bg);
+    color: var(--color-fg);
     font-family: var(--font-sans);
     font-feature-settings: 'ss01', 'cv11';
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
   }
   ::selection {
-    background: var(--color-lime);
+    background: var(--color-lime-fill);
     color: var(--color-lime-ink);
   }
   :focus-visible {
@@ -97,4 +156,12 @@
     text-underline-offset: 0.2em;
     text-decoration-color: var(--color-lime);
   }
+}
+
+/* Theme-gated media: render both sets, CSS shows exactly one (see :root tokens). */
+@utility shot-light {
+  display: var(--shot-light);
+}
+@utility shot-dark {
+  display: var(--shot-dark);
 }
