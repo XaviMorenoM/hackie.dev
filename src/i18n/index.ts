@@ -16,7 +16,7 @@ import type { Translations } from './types';
 const sources: Record<Locale, Translations> = { en, es, ca };
 
 /** Tokens every locale file may use. Replaced once per locale at module load. */
-/** Catalan `de` elides before a vowel (or mute h): `d’Alterio`, `de Zeta`. */
+/** Catalan `de` elides before a vowel (or mute h): `d’Ona`, `de Zeta`. */
 const CA_DE_APP = /^[aeiouhàèéíòóúïü]/i.test(APP_NAME) ? `d’${APP_NAME}` : `de ${APP_NAME}`;
 
 function tokensFor(locale: Locale): Record<string, string> {
