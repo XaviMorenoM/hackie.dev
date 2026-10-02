@@ -7,7 +7,7 @@ import type { Locale } from '../../../config';
 import { LOCALES } from '../../../config';
 import { useTranslations } from '../../../i18n';
 import '../../../content/projects/alterio/index';
-// import '../../../content/projects/diskspace/index';
+import '../../../content/projects/diskspace/index';
 export async function getStaticPaths() {
   const projects = getAllProjects();
   return LOCALES.flatMap((locale) =>

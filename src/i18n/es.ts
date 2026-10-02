@@ -246,5 +246,12 @@ export const es: Translations = {
       description:
         'Alterio es un registro de entrenos rápido y local para iPhone. Apunta series en segundos, sigue rutinas, ve tu progreso y guarda tus datos en tu dispositivo y en tu propio iCloud.',
     },
+    diskspace: {
+      // TODO: translate
+      tagline: 'Scan your disk. Find the bloat. Free the space.',
+      // TODO: translate
+      description:
+        'diskspace is a terminal disk-usage explorer and cleaner for macOS and Linux. Navigate your filesystem sorted by size, mark items for removal, and delete to Trash or permanently — all with a fast TUI and an optional native macOS window with a treemap view.',
+    },
   },
 };
