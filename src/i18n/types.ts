@@ -109,6 +109,8 @@ export interface Translations {
   }
   directory: {
     intro: string
+    work: string
+    bio: string
     platformBadge: Record<'ios' | 'macos' | 'cli', string>
   }
   projects: Record<string, { tagline: string; description: string }>
