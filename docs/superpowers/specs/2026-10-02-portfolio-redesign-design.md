@@ -390,29 +390,54 @@ Recursively search for:
 
 Classify: files with `-dark` in name or path → dark set. Others → light set.
 
-**Step 2 — generate if missing (per platform)**
+**Step 2 — detect screenshot generation mechanism**
 
-If no screenshots found, generate them:
+Before generating, check whether the project already has a mechanism:
 
-**`macos` platform (including the macOS side of `mixed`):**
+| Platform | What to look for |
+|----------|-----------------|
+| `macos` | `scripts/ui-snapshots.sh` or any `*snapshot*.sh` in `scripts/` |
+| `cli` | `scripts/landing-demo.tape` or any `*.tape` file |
+| `ios` | `fastlane/Snapfile` or `fastlane/screenshots/` |
 
-Check for `scripts/ui-snapshots.sh` in the project root. If present:
-1. Run `make ui` (or `make build` if `ui` target missing) to build the binary
+**If a mechanism exists:** run it (see below). The skill trusts what the project already built.
+
+**If no mechanism exists:** do NOT silently fall back to a placeholder. Instead:
+1. Inform the user: "No screenshot generation mechanism found for `{platform}` in this project."
+2. Propose a plan to create one — specific to the platform (see templates below)
+3. Ask for approval before proceeding
+4. If approved, implement the mechanism, then run it
+
+This ensures every project that goes onto the landing page has a repeatable, automated way to regenerate its screenshots.
+
+**`macos` platform — fixture-driven snapshots:**
+
+If `scripts/ui-snapshots.sh` is present:
+1. Run `make ui` to build the binary
 2. Run `scripts/ui-snapshots.sh` — outputs to `$TMPDIR/{project}-snapshots/full/`
-3. Select the most representative states: prefer `browse-tiles-{appearance}-1200x780.png` or equivalent "main view" state
-4. Copy selected light/dark pairs to `hackie.dev/src/assets/projects/{slug}/screenshots{,-dark}/`
+3. Pick representative states: prefer `browse-tiles-{appearance}-1200x780.png` or equivalent main-view fixture
+4. Copy light/dark pairs to `hackie.dev/src/assets/projects/{slug}/screenshots{,-dark}/`
 
-If no `ui-snapshots.sh` script: take a manual screenshot of the running app using `screencapture -l <windowID>` after launching with mock data.
+If no snapshot script exists → propose creating one following the same `DISKSPACE_UI_FIXTURE` / `DISKSPACE_UI_SNAPSHOT` env-var pattern, or a simpler `screencapture` script if the project does not have a fixture system.
 
-**`cli` platform:**
+**`cli` platform — VHS tape:**
 
-1. Check for `which vhs`. If missing: `brew install vhs`
-2. Build the binary (`make build` or `go build ./cmd/...`)
-3. Generate `scripts/landing-demo.tape` if it does not already exist (see §7 Diskspace for the template — adapt paths and commands to the specific tool)
-4. Run `vhs scripts/landing-demo.tape` — outputs GIF + PNG stills
-5. Copy GIF → `hackie.dev/public/projects/{slug}/video/landing-demo.gif`
-6. Copy PNG stills → `hackie.dev/src/assets/projects/{slug}/screenshots/tui/`
-7. Commit `scripts/landing-demo.tape` to the project repo so it can be re-run at release time
+If `scripts/landing-demo.tape` exists: run it directly.
+
+If not → propose creating the tape file:
+1. Check `which vhs`; if missing propose `brew install vhs`
+2. Write `scripts/landing-demo.tape` adapted to this project's binary name, flags, and a realistic mock data setup (inferred from the README's usage examples)
+3. Run `vhs scripts/landing-demo.tape` — outputs GIF + PNG stills
+4. Commit `scripts/landing-demo.tape` to the project repo
+
+Copy GIF → `hackie.dev/public/projects/{slug}/video/landing-demo.gif`  
+Copy PNG stills → `hackie.dev/src/assets/projects/{slug}/screenshots/tui/`
+
+**`ios` platform — Fastlane Snapshot:**
+
+If `fastlane/Snapfile` exists: run `bundle exec fastlane snapshot`.
+
+If not → propose creating a `Snapfile` with a single UI test that navigates to the main screen and calls `snapshot("main")`. This requires adding a UI test target if none exists — flag this as a non-trivial addition and confirm with the user before proceeding.
 
 **Step 3 — copy everything to hackie.dev**
 
@@ -439,6 +464,54 @@ Write `hackie.dev/src/content/projects/{slug}/index.ts` with all extracted value
 
 Extend `src/i18n/{en,es,ca}.ts` with `projects.{slug}.tagline` and `projects.{slug}.description`. Populate EN from the README first paragraph. Mark ES/CA with a `// TODO: translate` comment and copy the EN value as a placeholder so the type system doesn't error.
 
+### Phase 5b: CLAUDE.md updates
+
+**In the project's own CLAUDE.md** (e.g., `gym-tracker/CLAUDE.md`, `disk/CLAUDE.md`):
+
+Append a `### Landing page` entry under the existing `## Agent skills` section (or create that section if absent):
+
+```markdown
+### Landing page
+
+`hackie.dev` has a project page for this app at `/{locale}/{slug}/`.
+
+- To update the landing after a release: run `/release-{slug}` from inside this repo. The skill updates the changelog, re-extracts design tokens if the design changed, and regenerates screenshots.
+- To do a full re-onboard (rare): run `/onboard-project` from this repo with `hackie.dev` as the target.
+- Screenshots are generated via `scripts/landing-demo.tape` (CLI) or `scripts/ui-snapshots.sh` (macOS app). Run these manually if you want to preview before a release.
+```
+
+Adapt the tool references and script names to what actually exists in the project.
+
+**In `hackie.dev/CLAUDE.md`** (create if absent):
+
+```markdown
+# hackie.dev
+
+Standalone portfolio for Xavi Moreno's AI-built projects. Astro 7 · static · Tailwind v4 · light/dark theme · trilingual (en/es/ca).
+
+## Adding a project
+
+Run `/onboard-project` from inside the target project's repo. The skill detects the platform, extracts design tokens, generates screenshots, populates the content file, and creates a per-project release skill.
+
+## Updating a project after a release
+
+Run `/release-{slug}` from inside that project's repo.
+
+## Project content files
+
+Each project is defined in `src/content/projects/{slug}/index.ts`. Order in `src/content/projects/index.ts` controls directory page card order.
+
+## Routes
+
+- `/{locale}/` — directory page
+- `/{locale}/{slug}/` — project landing
+- `/{locale}/{slug}/privacy/` and `/{locale}/{slug}/support/` — legal pages (iOS projects only)
+
+## Design system
+
+Tokens in `src/styles/global.css`. Per-project accent colors are injected as `--project-accent` / `--project-accent-dark` / `--project-accent-ink` by `ProjectLayout.astro`.
+```
+
 ### Phase 6: Release sub-skill generation
 
 Write `~/.claude/skills/release-{slug}.md`. Template:
@@ -454,11 +527,24 @@ Steps:
 3. Read the tag body or CHANGELOG.md for bullet notes
 4. Open `hackie.dev/src/content/projects/{slug}/index.ts`
 5. Prepend a new ChangelogEntry to the `changelog` array
-6. Ask: "Any new screenshots or videos to add for this release?"
-   - If yes: re-run asset collection (Phase 3) for new files only
-7. Commit the changelog update in hackie.dev with message:
-   "chore({slug}): changelog {version}"
+
+6. Ask: "Has the app's visual design changed in this release?"
+   If yes (or if this is a major version bump):
+   a. Re-run Phase 2 (color + font extraction) from the onboarding skill
+   b. Compare extracted values against the current project config
+   c. If any tokens differ, update `src/content/projects/{slug}/index.ts` and report the changes
+   d. Re-run Phase 3 (screenshot generation) using the project's existing mechanism
+      to capture the updated UI
+
+   If no design changes:
+   a. Ask: "Any new screenshots to add for this release?"
+   b. If yes: re-run Phase 3 (screenshot generation only) for new files
+
+7. Commit all changes in hackie.dev with message:
+   "chore({slug}): release {version}"
 ```
+
+The re-extraction check ensures the landing page stays in sync with the app's evolving design without requiring a full re-onboard.
 
 ---
 
