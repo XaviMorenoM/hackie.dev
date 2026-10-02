@@ -46,6 +46,9 @@ export default defineConfig({
   ],
   vite: {
     plugins: [tailwindcss()],
+    server: {
+      allowedHosts: ['mac-mini'],
+    },
   },
   integrations: [
     sitemap({
