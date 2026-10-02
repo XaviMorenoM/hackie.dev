@@ -1,0 +1,20 @@
+---
+interface Props { title?: string; class?: string }
+const { title = 'bash', class: cls = '' } = Astro.props;
+---
+<div class:list={['terminal-frame', cls]}>
+  <div class="terminal-frame__bar">
+    <span class="terminal-frame__dot" style="background:#ff5f57"></span>
+    <span class="terminal-frame__dot" style="background:#ffbd2e"></span>
+    <span class="terminal-frame__dot" style="background:#28c840"></span>
+    <span class="terminal-frame__title">{title}</span>
+  </div>
+  <div class="terminal-frame__body"><slot /></div>
+</div>
+<style>
+  .terminal-frame { border-radius: 0.75rem; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); background: #0D1117; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+  .terminal-frame__bar { display: flex; align-items: center; gap: 0.375rem; padding: 0.625rem 0.875rem; background: #161b22; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .terminal-frame__dot { width: 0.75rem; height: 0.75rem; border-radius: 50%; flex-shrink: 0; }
+  .terminal-frame__title { flex: 1; text-align: center; font-family: ui-monospace, monospace; font-size: 0.7rem; color: rgba(255,255,255,0.4); margin-right: 2.25rem; }
+  .terminal-frame__body { padding: 1rem; font-family: ui-monospace, monospace; font-size: 0.8125rem; line-height: 1.6; color: #c9d1d9; overflow: auto; }
+</style>

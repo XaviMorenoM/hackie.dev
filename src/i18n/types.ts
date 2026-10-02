@@ -1,7 +1,7 @@
 /**
  * Shared shape for every locale file. Strings may contain the `{app}` token,
  * which `useTranslations()` replaces with `APP_NAME` from `src/config.ts`
- * (`{dApp}` = Catalan "d’{app}" / "de {app}", picked by the name's initial letter).
+ * (`{dApp}` = Catalan "d'{app}" / "de {app}", picked by the name's initial letter).
  * Never hard-code the product name in a locale file.
  */
 export interface FeatureCopy {
@@ -114,4 +114,9 @@ export interface Translations {
     body: string;
     cta: string;
   };
+  directory: {
+    intro: string;
+    platformBadge: Record<'ios' | 'macos' | 'cli', string>;
+  };
+  projects: Record<string, { tagline: string; description: string }>;
 }

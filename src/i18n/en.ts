@@ -233,4 +233,15 @@ export const en: Translations = {
     body: 'That link doesn’t go anywhere.',
     cta: 'Back to {app}',
   },
+  directory: {
+    intro: 'Apps and tools, built with AI.',
+    platformBadge: { ios: 'iOS', macos: 'macOS', cli: 'CLI' },
+  },
+  projects: {
+    alterio: {
+      tagline: 'Log the set. Get back to lifting.',
+      description:
+        'Alterio is a fast, local-first gym tracker for iPhone. Log sets in seconds, follow routines, track your progress, and keep your data on your device and your own iCloud.',
+    },
+  },
 };

@@ -1,0 +1,28 @@
+---
+import type { Project } from '../content/projects/index';
+import { localePath, useTranslations } from '../i18n';
+import type { Locale } from '../config';
+interface Props { project: Project; locale: Locale }
+const { project, locale } = Astro.props;
+const t = useTranslations(locale);
+const projectT = (t.projects as Record<string, { tagline: string }>)[project.slug];
+---
+<a href={localePath(locale, `/${project.slug}/`)}
+   class="group flex flex-col gap-3 rounded-2xl border border-line bg-surface p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/10 focus-visible:outline-2 focus-visible:outline-[var(--lime)]">
+  <div class="flex items-start gap-3">
+    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-bg text-2xl">
+      {project.platform.includes('ios') ? '📱' : project.platform.includes('cli') ? '⌨️' : '🖥️'}
+    </div>
+    <div class="min-w-0">
+      <h2 class="truncate text-base font-semibold text-fg">{project.name}</h2>
+      <p class="mt-0.5 truncate text-sm text-muted">{projectT?.tagline ?? ''}</p>
+    </div>
+  </div>
+  <div class="flex flex-wrap gap-1.5">
+    {project.platform.map((p) => (
+      <span class="rounded-full border border-line px-2 py-0.5 text-xs text-muted">
+        {t.directory.platformBadge[p]}
+      </span>
+    ))}
+  </div>
+</a>
