@@ -235,6 +235,8 @@ export const en: Translations = {
   },
   directory: {
     intro: 'Apps and tools, built with AI.',
+    work: 'Work',
+    bio: 'indie developer',
     platformBadge: { ios: 'iOS', macos: 'macOS', cli: 'CLI' },
   },
   projects: {

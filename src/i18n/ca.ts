@@ -235,6 +235,8 @@ export const ca: Translations = {
   },
   directory: {
     intro: 'Apps i eines, fetes amb IA.',
+    work: 'Projectes', // TODO: translate
+    bio: 'desenvolupador indie', // TODO: translate
     platformBadge: { ios: 'iOS', macos: 'macOS', cli: 'CLI' },
   },
   projects: {
