@@ -265,15 +265,67 @@ Destination in `hackie.dev/`: `src/assets/projects/alterio/` and `public/project
 
 ### Diskspace
 
-Source in `../disk/`:
+Diskspace has two visual surfaces. Both are generated, not hand-captured.
 
-| Asset | Source path |
-|-------|------------|
-| App icon | `ui/DiskspaceUI/Sources/*/Assets.xcassets/AppIcon.appiconset/*.png` |
-| Terminal screenshots | `docs/*.{png,gif}`, `media/*.{png,gif,svg}` (if present) |
-| TUI ASCII snapshot | Extracted from DESIGN.md code blocks containing box-drawing characters |
+#### macOS native app — fixture-driven snapshots
 
-If no real screenshots exist: the skill generates a styled `<pre>` frame from the DESIGN.md mockup. This is preferred over a blank placeholder.
+Diskspace already has `scripts/ui-snapshots.sh`: it runs `Diskspace.app` against JSON state files in `internal/ipc/testdata/states/` via `DISKSPACE_UI_FIXTURE` / `DISKSPACE_UI_SNAPSHOT` env vars, and outputs PNGs at 1200×780 in both light and dark appearance.
+
+The onboarding skill:
+1. Builds the app: `make ui`
+2. Runs `scripts/ui-snapshots.sh`
+3. Selects representative screenshots for the landing page from `$TMPDIR/diskspace-snapshots/full/`:
+   - `browse-tiles-light-1200x780.png` → light screenshot
+   - `browse-tiles-dark-1200x780.png` → dark screenshot
+   - Optionally: `browse-list-light-1200x780.png` as a second slide
+4. Copies selected PNGs to `hackie.dev/src/assets/projects/diskspace/screenshots/` (light) and `.../screenshots-dark/`
+
+#### TUI terminal — VHS recording
+
+The CLI surface is captured using **VHS** (Charmbracelet's tape-based terminal recorder), which runs the actual `diskspace` binary against a mock directory and outputs a GIF or PNG.
+
+VHS setup:
+```bash
+brew install vhs   # or: go install github.com/charmbracelet/vhs@latest
+```
+
+The onboarding skill generates a `scripts/landing-demo.tape` in the Diskspace repo:
+
+```tape
+Output landing-demo.gif
+Set FontSize 14
+Set Width 120
+Set Height 40
+Set Theme "Dracula"
+Set Shell "bash"
+
+# Build the binary first (if not present)
+# Type "make build" + Enter handled outside the tape
+
+# Create a realistic mock directory
+Type "mkdir -p /tmp/diskspace-demo/{Downloads,Documents,Applications,Library/Caches}"
+Enter
+Type "dd if=/dev/urandom of=/tmp/diskspace-demo/Downloads/bigfile.dmg bs=1m count=512 2>/dev/null"
+Enter
+Sleep 500ms
+Type "diskspace /tmp/diskspace-demo"
+Enter
+Sleep 2s
+Screenshot browse.png
+Type "j j j"
+Sleep 500ms
+Screenshot browse-selection.png
+```
+
+The tape file is committed to `disk/scripts/landing-demo.tape` so it can be re-run for future releases. The GIF and PNGs are copied to `hackie.dev/public/projects/diskspace/video/` (GIF) and `src/assets/projects/diskspace/screenshots/tui/`.
+
+| Asset | Source | Destination in hackie.dev |
+|-------|--------|--------------------------|
+| App icon | `ui/DiskspaceUI/Sources/*/Assets.xcassets/AppIcon.appiconset/*.png` | `src/assets/projects/diskspace/` |
+| macOS screenshots (light) | `ui-snapshots.sh` output: `browse-tiles-light-1200x780.png` | `src/assets/projects/diskspace/screenshots/` |
+| macOS screenshots (dark) | `ui-snapshots.sh` output: `browse-tiles-dark-1200x780.png` | `src/assets/projects/diskspace/screenshots-dark/` |
+| TUI GIF | VHS output: `landing-demo.gif` | `public/projects/diskspace/video/` |
+| TUI PNG stills | VHS output: `browse.png`, `browse-selection.png` | `src/assets/projects/diskspace/screenshots/tui/` |
 
 ---
 
@@ -327,17 +379,46 @@ Detect platform by file signatures in project root:
 
 Run both extraction routines. CLI palette → `accent` / `accentDark`. Swift palette → used for the macOS section token overrides (stored separately in the project config as `macosAccent`).
 
-### Phase 3: Asset collection
+### Phase 3: Asset collection + screenshot generation
 
-1. Recursively search the project for:
-   - `**/{screenshots,screens,media,docs}/**/*.{png,jpg,webp}` 
-   - `**/{screenshots-dark,media-dark}/**/*.{png,jpg,webp}`
-   - `**/*.{mp4,webm,gif}` (exclude `node_modules`, `.build`, `vendor`)
-2. Classify: files with `-dark` in name or path → dark set. Others → light set.
-3. Copy light → `hackie.dev/src/assets/projects/{slug}/screenshots/`
-4. Copy dark → `hackie.dev/src/assets/projects/{slug}/screenshots-dark/`
-5. Copy video → `hackie.dev/public/projects/{slug}/video/`
-6. If no screenshots found: generate a `<pre>`-based placeholder frame using the extracted palette (see §7 Diskspace)
+**Step 1 — look for existing assets first**
+
+Recursively search for:
+- `**/{screenshots,screens,media,docs}/**/*.{png,jpg,webp}`
+- `**/{screenshots-dark,media-dark}/**/*.{png,jpg,webp}`
+- `**/*.{mp4,webm,gif}` (exclude `node_modules`, `.build`, `vendor`, `DerivedData`)
+
+Classify: files with `-dark` in name or path → dark set. Others → light set.
+
+**Step 2 — generate if missing (per platform)**
+
+If no screenshots found, generate them:
+
+**`macos` platform (including the macOS side of `mixed`):**
+
+Check for `scripts/ui-snapshots.sh` in the project root. If present:
+1. Run `make ui` (or `make build` if `ui` target missing) to build the binary
+2. Run `scripts/ui-snapshots.sh` — outputs to `$TMPDIR/{project}-snapshots/full/`
+3. Select the most representative states: prefer `browse-tiles-{appearance}-1200x780.png` or equivalent "main view" state
+4. Copy selected light/dark pairs to `hackie.dev/src/assets/projects/{slug}/screenshots{,-dark}/`
+
+If no `ui-snapshots.sh` script: take a manual screenshot of the running app using `screencapture -l <windowID>` after launching with mock data.
+
+**`cli` platform:**
+
+1. Check for `which vhs`. If missing: `brew install vhs`
+2. Build the binary (`make build` or `go build ./cmd/...`)
+3. Generate `scripts/landing-demo.tape` if it does not already exist (see §7 Diskspace for the template — adapt paths and commands to the specific tool)
+4. Run `vhs scripts/landing-demo.tape` — outputs GIF + PNG stills
+5. Copy GIF → `hackie.dev/public/projects/{slug}/video/landing-demo.gif`
+6. Copy PNG stills → `hackie.dev/src/assets/projects/{slug}/screenshots/tui/`
+7. Commit `scripts/landing-demo.tape` to the project repo so it can be re-run at release time
+
+**Step 3 — copy everything to hackie.dev**
+
+- Light screenshots → `hackie.dev/src/assets/projects/{slug}/screenshots/`
+- Dark screenshots → `hackie.dev/src/assets/projects/{slug}/screenshots-dark/`
+- Video/GIF → `hackie.dev/public/projects/{slug}/video/`
 
 ### Phase 4: Changelog population
 
@@ -412,7 +493,7 @@ Merge D + E → main. Smoke-test all routes. Deploy.
 |---|----------|---------|
 | D1 | Bubble placement: top-left vs top-right (top-right conflicts with language/theme bar) | **top-left** |
 | D2 | Directory intro copy | "Apps and tools, built with AI." |
-| D3 | Diskspace has no real screenshots | Skill generates styled `<pre>` from DESIGN.md ASCII mockups |
+| D3 | Diskspace has no pre-existing screenshots | Skill generates them: macOS via `ui-snapshots.sh` fixture runner; TUI via VHS tape |
 | D4 | Alterio i18n of project description | EN from README; ES/CA placeholder with `// TODO: translate` comment |
 | D5 | Changelog entries shown by default | 5, with CSS-only "Show all" toggle |
 | D6 | Alterio accent on site | Keep existing lime `#C6FF3D` (app itself is monochrome; lime is the landing's brand accent) |
