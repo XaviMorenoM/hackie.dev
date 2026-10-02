@@ -5,7 +5,7 @@ import { getAllProjects } from '../../content/projects/index'
 import { localeStaticPaths, useTranslations } from '../../i18n'
 import type { Locale } from '../../config'
 import '../../content/projects/alterio/index'
-// import '../../content/projects/diskspace/index';
+import '../../content/projects/diskspace/index'
 export const getStaticPaths = localeStaticPaths
 const locale = Astro.params.locale as Locale
 const t = useTranslations(locale)

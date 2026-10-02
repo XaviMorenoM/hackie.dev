@@ -247,5 +247,10 @@ export const en: Translations = {
       description:
         'Alterio is a fast, local-first gym tracker for iPhone. Log sets in seconds, follow routines, track your progress, and keep your data on your device and your own iCloud.',
     },
+    diskspace: {
+      tagline: 'Scan your disk. Find the bloat. Free the space.',
+      description:
+        'diskspace is a terminal disk-usage explorer and cleaner for macOS and Linux. Navigate your filesystem sorted by size, mark items for removal, and delete to Trash or permanently — all with a fast TUI and an optional native macOS window with a treemap view.',
+    },
   },
 }
