@@ -7,15 +7,16 @@ import ThemeSwitch from './ThemeSwitch.astro'
 interface Props {
   locale: Locale
   showLangSwitcher?: boolean
+  wordmark?: string
 }
-const { locale, showLangSwitcher = true } = Astro.props
+const { locale, showLangSwitcher = true, wordmark = APP_NAME } = Astro.props
 const t = useTranslations(locale)
 ---
 
 <header class="sticky top-0 z-40 border-b border-line/60 bg-bg/80 backdrop-blur-md">
   <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4 sm:px-8">
     <a href={localePath(locale)} aria-label={t.nav.homeAria} class="display text-2xl text-fg">
-      {APP_NAME}
+      {wordmark}
       <span class="text-lime">.</span>
     </a>
     <div class="flex items-center gap-4 sm:gap-6">
