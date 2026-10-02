@@ -16,9 +16,13 @@ interface Props {
   ogType?: 'website' | 'article';
   /** Error/utility pages: `noindex`, no canonical/hreflang, no language switcher. */
   noindex?: boolean;
+  /** Hide the sticky header entirely (project pages use the LiquidGlassBubble instead). */
+  noHeader?: boolean;
+  /** Override the wordmark text in the header. */
+  wordmark?: string;
 }
 
-const { locale, title, description, jsonLd = [], ogType = 'website', noindex = false } = Astro.props;
+const { locale, title, description, jsonLd = [], ogType = 'website', noindex = false, noHeader = false, wordmark } = Astro.props;
 const t = useTranslations(locale);
 
 const path = stripLocale(Astro.url.pathname);
@@ -81,7 +85,7 @@ const ogImage = new URL(withBase('/og.png'), SITE_URL).href;
     >
       {t.nav.skipToContent}
     </a>
-    <Header locale={locale} showLangSwitcher={!noindex} />
+    {!noHeader && <Header locale={locale} showLangSwitcher={!noindex} wordmark={wordmark} />}
     <main id="main" class="flex-1">
       <slot />
     </main>

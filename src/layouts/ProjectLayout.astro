@@ -13,7 +13,7 @@ interface Props {
 const { project, locale, title, description } = Astro.props;
 ---
 
-<Base locale={locale} title={title} description={description}>
+<Base locale={locale} title={title} description={description} noHeader={true}>
   <style define:vars={{
     'project-accent': project.accent,
     'project-accent-dark': project.accentDark,

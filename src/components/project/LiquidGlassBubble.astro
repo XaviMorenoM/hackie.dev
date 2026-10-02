@@ -3,10 +3,12 @@ import { localePath } from '../../i18n';
 import type { Locale } from '../../config';
 interface Props { locale: Locale }
 const { locale } = Astro.props;
+
+const PHOTO_URL = 'https://media.licdn.com/dms/image/v2/C4D03AQF6SwLPg9_rcQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1573058109252?e=1792627200&v=beta&t=pw0VAgDh_DkNAp8y3IiJKppN3iRnuYVW1OHQbCWLwrU';
 ---
 <div class="glass-bubble">
-  <a href={localePath(locale, '/')} class="glass-bubble__link">
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+  <a href={localePath(locale, '/')} class="glass-bubble__projects" aria-label="All projects">
+    <svg width="18" height="18" viewBox="0 0 16 16" fill="none" aria-hidden="true">
       <rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor"/>
       <rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/>
       <rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/>
@@ -14,51 +16,109 @@ const { locale } = Astro.props;
     </svg>
     <span class="glass-bubble__label">Projects</span>
   </a>
+
   <div class="glass-bubble__sep" aria-hidden="true"></div>
+
   <a href="https://www.linkedin.com/in/xavimorenom" target="_blank" rel="noopener noreferrer"
-     class="glass-bubble__link" aria-label="LinkedIn">
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path d="M13.5 1h-11A1.5 1.5 0 0 0 1 2.5v11A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-11A1.5 1.5 0 0 0 13.5 1ZM5.5 13H3.5V6.5h2V13Zm-1-7.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2ZM13 13h-2V9.75C11 8.79 10.21 8 9.25 8S7.5 8.79 7.5 9.75V13h-2V6.5h2v.97A2.74 2.74 0 0 1 9.25 6.5c1.52 0 3.75.88 3.75 3.25V13Z" fill="currentColor"/>
-    </svg>
+     class="glass-bubble__linkedin" aria-label="Xavi Moreno on LinkedIn">
+    <div class="glass-bubble__photo-wrap">
+      <img src={PHOTO_URL} alt="Xavi Moreno" class="glass-bubble__photo" width="34" height="34" loading="eager" />
+      <span class="glass-bubble__li-badge" aria-hidden="true">
+        <!-- LinkedIn logo badge -->
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <rect width="24" height="24" rx="4" fill="#0A66C2"/>
+          <path d="M8.5 10.5v7H6v-7h2.5zm-1.25-4a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5zM11.5 10.5v.96A3.1 3.1 0 0 1 14.2 10.5c2.3 0 3.3 1.35 3.3 3.55V17.5H15V14.3c0-1.2-.55-1.85-1.6-1.85s-2 .65-2 2.1v2.95H9V10.5h2.5z" fill="white"/>
+        </svg>
+      </span>
+    </div>
+    <span class="glass-bubble__name">Xavi Moreno</span>
   </a>
 </div>
+
 <style>
   .glass-bubble {
-    position: fixed; top: 1rem; left: 1rem; z-index: 45;
+    position: fixed; top: 1rem; left: 1rem; z-index: 50;
     display: flex; align-items: center;
-    padding: 0.4rem 0.75rem;
-    background: rgba(0,0,0,0.22);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(255,255,255,0.10);
+    padding: 0.45rem 0.6rem 0.45rem 0.75rem;
+    background: rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(24px) saturate(200%);
+    -webkit-backdrop-filter: blur(24px) saturate(200%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 9999px;
-    color: rgba(255,255,255,0.75);
+    color: rgba(255, 255, 255, 0.80);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.25);
   }
   :root[data-theme="light"] .glass-bubble {
-    background: rgba(255,255,255,0.55);
-    border-color: rgba(255,255,255,0.70);
-    color: rgba(0,0,0,0.65);
+    background: rgba(255, 255, 255, 0.65);
+    border-color: rgba(255, 255, 255, 0.75);
+    color: rgba(0, 0, 0, 0.70);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.10);
   }
   @media (prefers-color-scheme: light) {
     :root:not([data-theme="dark"]) .glass-bubble {
-      background: rgba(255,255,255,0.55);
-      border-color: rgba(255,255,255,0.70);
-      color: rgba(0,0,0,0.65);
+      background: rgba(255, 255, 255, 0.65);
+      border-color: rgba(255, 255, 255, 0.75);
+      color: rgba(0, 0, 0, 0.70);
+      box-shadow: 0 2px 16px rgba(0,0,0,0.10);
     }
   }
-  .glass-bubble__link {
-    display: flex; align-items: center; gap: 0.4rem;
+
+  .glass-bubble__projects {
+    display: flex; align-items: center; gap: 0.45rem;
     text-decoration: none; color: inherit;
-    padding: 0.1rem 0.25rem;
+    padding: 0.2rem 0.35rem;
+    border-radius: 9999px;
     transition: opacity 0.15s;
+    white-space: nowrap;
   }
-  .glass-bubble__link:hover { opacity: 1; color: var(--fg, inherit); }
+  .glass-bubble__projects:hover { opacity: 1; color: var(--fg, inherit); }
+
   .glass-bubble__sep {
-    width: 1px; height: 1.1em;
-    background: rgba(255,255,255,0.20);
+    width: 1px; height: 1.4em;
+    background: rgba(255, 255, 255, 0.20);
     margin: 0 0.5rem; flex-shrink: 0;
   }
   :root[data-theme="light"] .glass-bubble__sep { background: rgba(0,0,0,0.12); }
-  .glass-bubble__label { font-size: 0.75rem; font-weight: 500; }
-  @media (max-width: 639px) { .glass-bubble__label { display: none; } }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) .glass-bubble__sep { background: rgba(0,0,0,0.12); }
+  }
+
+  .glass-bubble__linkedin {
+    display: flex; align-items: center; gap: 0.5rem;
+    text-decoration: none; color: inherit;
+    padding: 0.1rem 0.25rem;
+    border-radius: 9999px;
+    transition: opacity 0.15s;
+    white-space: nowrap;
+  }
+  .glass-bubble__linkedin:hover { opacity: 1; }
+
+  .glass-bubble__photo-wrap {
+    position: relative; flex-shrink: 0;
+    width: 34px; height: 34px;
+  }
+  .glass-bubble__photo {
+    width: 34px; height: 34px;
+    border-radius: 9999px;
+    object-fit: cover;
+    display: block;
+  }
+  .glass-bubble__li-badge {
+    position: absolute; bottom: -2px; right: -2px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 4px;
+    background: white;
+    padding: 1px;
+    line-height: 0;
+  }
+
+  .glass-bubble__label,
+  .glass-bubble__name {
+    font-size: 0.8rem; font-weight: 500; letter-spacing: -0.01em;
+  }
+
+  @media (max-width: 480px) {
+    .glass-bubble__label { display: none; }
+    .glass-bubble__name { display: none; }
+  }
 </style>
