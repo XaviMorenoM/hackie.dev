@@ -1,0 +1,66 @@
+---
+import PhoneFrame from '../PhoneFrame.astro';
+import TerminalFrame from './TerminalFrame.astro';
+import type { Project } from '../../content/projects/index';
+import type { Locale } from '../../config';
+import { useTranslations } from '../../i18n';
+interface Props { project: Project; locale: Locale }
+const { project, locale } = Astro.props;
+const t = useTranslations(locale);
+const isCli = project.platform.includes('cli');
+const isIos = project.platform.includes('ios');
+const isMixed = isCli && project.platform.includes('macos');
+const projectT = (t.projects as Record<string, { tagline: string; description: string }>)[project.slug] ?? { tagline: '', description: '' };
+---
+<section class:list={['px-5 py-20 sm:px-8 sm:py-28 relative overflow-hidden', isCli ? 'bg-[#0D1117]' : 'hero-ios-bg']}
+  style={`--project-accent:${project.accent};--project-accent-dark:${project.accentDark};--project-accent-ink:${project.accentInk}`}>
+  <div class="mx-auto max-w-6xl">
+    <div class:list={['flex gap-12', isMixed ? 'flex-col lg:flex-row' : 'flex-col md:flex-row items-center']}>
+      <div class="flex-1 flex flex-col justify-center">
+        <div class="flex flex-wrap gap-1.5 mb-5">
+          {project.platform.map((p) => (
+            <span class="rounded-full border border-line px-2 py-0.5 text-xs font-semibold uppercase tracking-wider text-muted">
+              {t.directory.platformBadge[p]}
+            </span>
+          ))}
+        </div>
+        <h1 class="display text-5xl text-fg sm:text-6xl md:text-7xl">
+          {project.name}<span style="color:var(--project-accent)">.</span>
+        </h1>
+        <p class="display mt-4 max-w-xl text-2xl text-muted sm:text-3xl">{projectT.tagline}</p>
+        <p class="mt-6 max-w-lg text-base leading-relaxed text-muted">{projectT.description}</p>
+        <div class="mt-8 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
+          {project.appStoreUrl && <a href={project.appStoreUrl} target="_blank" rel="noopener" class="hero-cta-primary">Download on the App Store</a>}
+          {project.testflightUrl && !project.appStoreUrl && <a href={project.testflightUrl} target="_blank" rel="noopener" class="hero-cta-primary">Join the TestFlight beta</a>}
+          {project.installCommand && (
+            <div class="flex items-center gap-2 rounded-lg border border-line bg-surface px-3 py-2 font-mono text-sm text-fg">
+              <code>{project.installCommand}</code>
+            </div>
+          )}
+          {project.githubUrl && <a href={project.githubUrl} target="_blank" rel="noopener" class="text-sm text-muted hover:text-fg">GitHub ↗</a>}
+        </div>
+      </div>
+      <div class:list={[isMixed ? 'lg:w-1/2' : 'md:w-2/5']}>
+        {isIos && !isCli && <PhoneFrame><slot name="screenshot" /></PhoneFrame>}
+        {isCli && !isMixed && <TerminalFrame title={project.name.toLowerCase()}><slot name="tui" /></TerminalFrame>}
+        {isMixed && (
+          <div class="flex flex-col gap-4 sm:flex-row">
+            <div class="flex-1">
+              <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-white/30">Terminal</p>
+              <TerminalFrame title={project.name.toLowerCase()}><slot name="tui" /></TerminalFrame>
+            </div>
+            <div class="flex-1">
+              <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-white/30">App</p>
+              <TerminalFrame title={project.name}><slot name="app-screenshot" /></TerminalFrame>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+</section>
+<style>
+  .hero-ios-bg { background: linear-gradient(160deg, var(--bg) 40%, color-mix(in srgb, var(--project-accent-dark) 12%, var(--bg)) 100%); }
+  .hero-cta-primary { display:inline-flex; align-items:center; padding:0.6rem 1.25rem; border-radius:9999px; background:var(--project-accent); color:var(--project-accent-ink); font-weight:600; font-size:0.9rem; text-decoration:none; transition:opacity 0.15s; }
+  .hero-cta-primary:hover { opacity: 0.88; }
+</style>

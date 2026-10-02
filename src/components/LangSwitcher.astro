@@ -29,6 +29,7 @@ const path = stripLocale(Astro.url.pathname)
             hreflang={LOCALE_TAGS[l]}
             lang={LOCALE_TAGS[l]}
             title={LOCALE_LABELS[l]}
+            data-lang-link={l}
             class="px-1 text-muted transition-colors hover:text-fg"
           >
             {l}
@@ -38,3 +39,10 @@ const path = stripLocale(Astro.url.pathname)
     ))}
   </ul>
 </nav>
+<script is:inline>
+  document.querySelectorAll('[data-lang-link]').forEach(function(a) {
+    a.addEventListener('click', function() {
+      try { localStorage.lang = a.getAttribute('data-lang-link'); } catch(_) {}
+    });
+  });
+</script>

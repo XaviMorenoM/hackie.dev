@@ -237,4 +237,16 @@ export const es: Translations = {
     body: 'Ese enlace no lleva a ninguna parte.',
     cta: 'Volver a {app}',
   },
+  directory: {
+    intro: 'Apps y herramientas, creadas con IA.',
+    platformBadge: { ios: 'iOS', macos: 'macOS', cli: 'CLI' },
+  },
+  projects: {
+    alterio: {
+      tagline: 'Apunta la serie. Vuelve al entreno.',
+      // TODO: translate description
+      description:
+        'Alterio es un registro de entrenos rápido y local para iPhone. Apunta series en segundos, sigue rutinas, ve tu progreso y guarda tus datos en tu dispositivo y en tu propio iCloud.',
+    },
+  },
 }

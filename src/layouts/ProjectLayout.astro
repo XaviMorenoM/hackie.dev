@@ -1,0 +1,30 @@
+---
+import Base from './Base.astro';
+import LiquidGlassBubble from '../components/project/LiquidGlassBubble.astro';
+import type { Project } from '../content/projects/index';
+import type { Locale } from '../config';
+
+interface Props {
+  project: Project;
+  locale: Locale;
+  title: string;
+  description: string;
+}
+const { project, locale, title, description } = Astro.props;
+---
+
+<Base locale={locale} title={title} description={description}>
+  <style define:vars={{
+    'project-accent': project.accent,
+    'project-accent-dark': project.accentDark,
+    'project-accent-ink': project.accentInk,
+  }}>
+    :root {
+      --project-accent: var(--project-accent);
+      --project-accent-dark: var(--project-accent-dark);
+      --project-accent-ink: var(--project-accent-ink);
+    }
+  </style>
+  <LiquidGlassBubble locale={locale} />
+  <slot />
+</Base>
