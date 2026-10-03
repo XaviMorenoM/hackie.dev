@@ -16,6 +16,7 @@ export const SITE_NAME = 'hackie.dev'
 export const CONTACT_EMAIL = 'xavier.moreno.martinez@gmail.com'
 export const DEVELOPER_NAME = 'Xavi Moreno'
 export const DEVELOPER_GITHUB = 'https://github.com/XaviMorenoM'
+export const DEVELOPER_LINKEDIN = 'https://www.linkedin.com/in/xavimorenom'
 
 /** Set when the app is live on the App Store. `null` → CTA renders as "Coming soon". */
 export const APP_STORE_URL: string | null = null

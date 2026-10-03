@@ -1,24 +1,20 @@
 ---
-import { APP_NAME, type Locale } from '../config'
-import { localePath, useTranslations } from '../i18n'
+import type { Locale } from '../config'
 import LangSwitcher from './LangSwitcher.astro'
 import ThemeSwitch from './ThemeSwitch.astro'
 
 interface Props {
   locale: Locale
   showLangSwitcher?: boolean
-  wordmark?: string
 }
-const { locale, showLangSwitcher = true, wordmark = APP_NAME } = Astro.props
-const t = useTranslations(locale)
+const { locale, showLangSwitcher = true } = Astro.props
 ---
 
-<header class="sticky top-0 z-40 border-b border-line/60 bg-bg/80 backdrop-blur-md">
-  <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4 sm:px-8">
-    <a href={localePath(locale)} aria-label={t.nav.homeAria} class="display text-2xl text-fg">
-      {wordmark}
-      <span class="text-lime">.</span>
-    </a>
+<header
+  data-testid="site-header"
+  class="sticky top-0 z-40 border-b border-line/60 bg-bg/80 backdrop-blur-md"
+>
+  <div class="mx-auto flex max-w-6xl items-center justify-end gap-4 px-5 py-4 sm:px-8">
     <div class="flex items-center gap-4 sm:gap-6">
       {showLangSwitcher && <LangSwitcher locale={locale} />}
       <ThemeSwitch locale={locale} />

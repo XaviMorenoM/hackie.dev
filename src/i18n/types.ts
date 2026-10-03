@@ -42,6 +42,7 @@ export interface Translations {
     footerAria: string
     /** aria-label for the wordmark link. */
     homeAria: string
+    bubble: { label: string; projects: string; linkedinAria: string }
   }
   product: {
     eyebrow: string
