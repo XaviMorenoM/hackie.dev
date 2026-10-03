@@ -10,5 +10,5 @@ export default [
     plugins: { '@typescript-eslint': tsPlugin },
     rules: { ...tsPlugin.configs.recommended.rules },
   },
-  { ignores: ['dist/', 'node_modules/'] },
+  { ignores: ['dist/', 'node_modules/', '.astro/'] },
 ]

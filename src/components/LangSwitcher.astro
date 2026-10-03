@@ -44,7 +44,7 @@ const path = stripLocale(Astro.url.pathname)
     a.addEventListener('click', function () {
       try {
         localStorage.lang = a.getAttribute('data-lang-link')
-      } catch (_) {}
+      } catch {}
     })
   })
 </script>

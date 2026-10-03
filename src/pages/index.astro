@@ -12,7 +12,7 @@
         var saved = ''
         try {
           saved = localStorage.lang || ''
-        } catch (_) {}
+        } catch {}
         var lang = saved || navigator.language || 'en'
         var map = { es: 'es', ca: 'ca' }
         var k =
