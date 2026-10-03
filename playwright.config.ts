@@ -2,11 +2,12 @@ import { defineConfig, devices } from '@playwright/test'
 
 export default defineConfig({
   testDir: './tests/e2e',
-  use: { baseURL: 'http://localhost:4355' },
+  use: { baseURL: 'http://localhost:4350' },
   webServer: {
-    command: 'npm run build && npm run preview -- --port 4355',
-    url: 'http://localhost:4355',
-    reuseExistingServer: !process.env.CI,
+    command: 'npm run build && npx astro preview --port 4350',
+    url: 'http://localhost:4350',
+    reuseExistingServer: true,
+    timeout: 120_000,
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
 })

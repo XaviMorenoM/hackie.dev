@@ -14,8 +14,13 @@ const { locale, showLangSwitcher = true } = Astro.props
   data-testid="site-header"
   class="sticky top-0 z-40 border-b border-line/60 bg-bg/80 backdrop-blur-md"
 >
-  <div class="mx-auto flex max-w-6xl items-center justify-end gap-4 py-4 pl-36 pr-5 sm:pr-8">
-    <div class="flex items-center gap-4 sm:gap-6">
+  <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-end py-4 px-5 sm:px-8">
+    <!-- spacer: tracks bubble right edge. compact ≤639px: left 1.25rem + ~96px width + 0.75rem buffer. expanded ≥640px: left 1.25rem + ~224px + 0.75rem buffer -->
+    <div
+      class="h-[2rem] basis-[calc(2rem+96px)] shrink-0 sm:basis-[calc(2rem+224px)]"
+      aria-hidden="true"
+    ></div>
+    <div class="flex flex-wrap items-center gap-4 sm:gap-6">
       {showLangSwitcher && <LangSwitcher locale={locale} />}
       <ThemeSwitch locale={locale} />
     </div>

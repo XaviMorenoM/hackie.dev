@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets'
 import { localePath, stripLocale, useTranslations } from '../../i18n'
 import { DEVELOPER_LINKEDIN, DEVELOPER_NAME, type Locale } from '../../config'
+import { projectSlugs } from '../../content/projects/index'
 import avatar from '../../assets/avatar/xavi.jpg'
 
 interface Props {
@@ -9,6 +10,11 @@ interface Props {
 }
 const { locale } = Astro.props
 const t = useTranslations(locale)
+const _p = stripLocale(Astro.url.pathname)
+const _isDirectory = _p === '/'
+// Trailing slash is always present in Astro static output, including the 404 page (/404/).
+// Check against registered project slugs so error pages are never marked active.
+const _isProjectPage = !_isDirectory && projectSlugs.some((s) => _p.startsWith(`/${s}/`))
 ---
 
 <nav class="bubble" aria-label={t.nav.bubble.label} data-testid="site-bubble">
@@ -16,7 +22,7 @@ const t = useTranslations(locale)
     href={localePath(locale)}
     class="bubble__nav"
     data-testid="bubble-projects"
-    aria-current={stripLocale(Astro.url.pathname) === '/' ? 'page' : 'true'}
+    aria-current={_isDirectory ? 'page' : _isProjectPage ? 'true' : undefined}
   >
     <svg width="15" height="15" viewBox="0 0 14 14" fill="none" aria-hidden="true">
       <rect x="0" y="0" width="6" height="6" rx="1.5" fill="currentColor" opacity=".9" />
@@ -193,7 +199,7 @@ const t = useTranslations(locale)
     opacity: 0.9;
   }
 
-  @media (max-width: 480px) {
+  @media (max-width: 639px) {
     .bubble__label {
       position: absolute;
       width: 1px;

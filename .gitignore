@@ -6,6 +6,6 @@ dist/
 # raw media drops (large, copied into src/assets + public/video by the build author)
 media/
 
-# Playwright outputs
+# playwright
 test-results/
 playwright-report/
