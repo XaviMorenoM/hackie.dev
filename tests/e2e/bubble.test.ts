@@ -11,7 +11,7 @@
  * Drive only by data-testid selectors — never by display text.
  */
 
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -73,7 +73,9 @@ test('bubble does not overlap header language switcher at 375px with 150% text s
 }) => {
   await page.setViewportSize({ width: 375, height: 812 })
   // 150% text scale: default browser font is 16px → 24px
-  await page.goto('/en/alterio/')
+  // Use the directory page (/en/) — it renders the header (site-header);
+  // project pages use noHeader:true so site-header is absent there.
+  await page.goto('/en/')
   await page.addStyleTag({ content: 'html { font-size: 24px !important; }' })
   await page.waitForLoadState('networkidle')
 
@@ -109,10 +111,7 @@ test('bubble: no img src containing "licdn.com" on any sitemap page', async ({ p
         .map((img) => img.src)
         .filter((src) => src.includes('licdn.com'))
     })
-    expect(
-      licdnImages,
-      `${path} must not have any img src containing licdn.com`,
-    ).toHaveLength(0)
+    expect(licdnImages, `${path} must not have any img src containing licdn.com`).toHaveLength(0)
   }
 })
 
