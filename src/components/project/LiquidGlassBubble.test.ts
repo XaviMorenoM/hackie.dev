@@ -3,6 +3,9 @@ import { experimental_AstroContainer as AstroContainer } from 'astro/container'
 import { LOCALES, DEVELOPER_LINKEDIN } from '../../config'
 import { localePath, useTranslations } from '../../i18n'
 import LiquidGlassBubble from './LiquidGlassBubble.astro'
+// Register all projects so projectSlugs is populated for the isProjectPage check
+import '../../content/projects/alterio/index'
+import '../../content/projects/diskspace/index'
 
 describe('LiquidGlassBubble', () => {
   let container: AstroContainer
@@ -64,6 +67,16 @@ describe('LiquidGlassBubble', () => {
       expect(html).toContain('data-testid="bubble-avatar"')
     })
   }
+
+  it(`${LOCALES[0]}: bubble-projects has no aria-current on 404 page`, async () => {
+    const locale = LOCALES[0]
+    const html = await container.renderToString(LiquidGlassBubble, {
+      props: { locale },
+      request: new Request(`http://localhost/${locale}/404`),
+    })
+    // 404 path has no trailing slash — must not receive aria-current
+    expect(html).not.toContain('aria-current')
+  })
 
   // control: component must not revert to hard-coded strings
   it('no hard-coded English "Projects" string outside translation', async () => {

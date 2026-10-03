@@ -4,7 +4,7 @@
  * Covers:
  * - Bubble appears exactly once on every sitemap URL
  * - aria-current semantics on directory vs project pages
- * - No visual overlap with header controls at 375 px / 150% text scale
+ * - No visual overlap with header controls at 375 px / 150% text scale (all locales)
  * - No licdn.com image references
  * - Skip link layers above the bubble
  *
@@ -65,39 +65,40 @@ test('bubble-projects has aria-current="true" on a project page', async ({ page 
 })
 
 // ---------------------------------------------------------------------------
-// 3. Non-overlap at 375 px / 150% text scale
+// 3. Non-overlap at 375 px / 150% text scale — all three locales
 // ---------------------------------------------------------------------------
 
-test('bubble does not overlap header language switcher at 375px with 150% text size', async ({
-  page,
-}) => {
-  await page.setViewportSize({ width: 375, height: 812 })
-  // 150% text scale: default browser font is 16px → 24px
-  // Use the directory page (/en/) — it renders the header (site-header);
-  // project pages use noHeader:true so site-header is absent there.
-  await page.goto('/en/')
-  await page.addStyleTag({ content: 'html { font-size: 24px !important; }' })
-  await page.waitForLoadState('networkidle')
+for (const locale of ['en', 'es', 'ca'] as const) {
+  test(`bubble does not overlap header controls at 375px/150% text — /${locale}/`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 375, height: 812 })
+    // 150% text scale: default browser font is 16px → 24px
+    await page.goto(`/${locale}/`)
+    await page.addStyleTag({ content: 'html { font-size: 24px !important; }' })
+    await page.waitForLoadState('networkidle')
 
-  const bubble = page.getByTestId('site-bubble')
-  const header = page.getByTestId('site-header')
+    const bubble = page.getByTestId('site-bubble')
+    const controls = page.getByTestId('lang-switcher')
 
-  const bubbleBox = await bubble.boundingBox()
-  const headerBox = await header.boundingBox()
+    const bubbleBox = await bubble.boundingBox()
+    const controlsBox = await controls.boundingBox()
 
-  expect(bubbleBox).not.toBeNull()
-  expect(headerBox).not.toBeNull()
+    expect(bubbleBox).not.toBeNull()
+    expect(controlsBox).not.toBeNull()
 
-  if (bubbleBox && headerBox) {
-    const bubbleRight = bubbleBox.x + bubbleBox.width
-    const headerRight = headerBox.x + headerBox.width
+    if (bubbleBox && controlsBox) {
+      const bubbleRight = bubbleBox.x + bubbleBox.width
 
-    // bubble must not extend beyond the right edge of the viewport
-    expect(bubbleRight).toBeLessThanOrEqual(375)
-    // header must not overflow the viewport horizontally (no sideways scroll)
-    expect(headerRight).toBeLessThanOrEqual(375)
-  }
-})
+      // bubble must end before the controls begin — no intersection allowed
+      expect(bubbleRight).toBeLessThanOrEqual(controlsBox.x)
+
+      // no horizontal scroll: neither element overflows the 375px viewport
+      expect(bubbleRight).toBeLessThanOrEqual(375)
+      expect(controlsBox.x + controlsBox.width).toBeLessThanOrEqual(375)
+    }
+  })
+}
 
 // ---------------------------------------------------------------------------
 // 4. No licdn.com image sources on any page
@@ -111,7 +112,10 @@ test('bubble: no img src containing "licdn.com" on any sitemap page', async ({ p
         .map((img) => img.src)
         .filter((src) => src.includes('licdn.com'))
     })
-    expect(licdnImages, `${path} must not have any img src containing licdn.com`).toHaveLength(0)
+    expect(
+      licdnImages,
+      `${path} must not have any img src containing licdn.com`,
+    ).toHaveLength(0)
   }
 })
 
@@ -125,7 +129,6 @@ test('bubble: skip link z-index is above bubble z-index', async ({ page }) => {
   // Tab from body to trigger the skip link
   await page.keyboard.press('Tab')
 
-  // The skip link becomes visible on focus; get its computed z-index.
   const skipLinkZ = await page.evaluate(() => {
     const el = document.querySelector('a[href="#main"]')
     if (!el) return null
