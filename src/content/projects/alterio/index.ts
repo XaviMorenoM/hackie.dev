@@ -1,4 +1,4 @@
-import { registerProject } from '../index';
+import { registerProject } from '../index'
 
 registerProject({
   slug: 'alterio',
@@ -9,6 +9,14 @@ registerProject({
   accentInk: '#101400',
   githubUrl: 'https://github.com/XaviMorenoM/gym-tracker',
   changelog: [
-    { version: 'v0.13.18', date: '2026-10-02', notes: ['Exercise library with hero photo, muscle volume cards, and Info/Activity tabs.', 'Profile: routine-level muscle card and recent workout rows with photos.', 'Active workout: one routine-level muscle card.'] },
+    {
+      version: 'v0.13.18',
+      date: '2026-10-02',
+      notes: [
+        'Exercise library with hero photo, muscle volume cards, and Info/Activity tabs.',
+        'Profile: routine-level muscle card and recent workout rows with photos.',
+        'Active workout: one routine-level muscle card.',
+      ],
+    },
   ],
-});
+})

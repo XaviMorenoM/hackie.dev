@@ -1,4 +1,4 @@
-import { registerProject } from '../index';
+import { registerProject } from '../index'
 
 registerProject({
   slug: 'diskspace',
@@ -50,4 +50,4 @@ registerProject({
       ],
     },
   ],
-});
+})

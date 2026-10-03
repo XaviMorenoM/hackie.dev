@@ -1,9 +1,11 @@
 # hackie.dev Homepage Design Brief
 
 ## The Problem
-The current homepage borrows the product-page aesthetic (big Instrument Serif italic tagline) and applies it to a portfolio index, where it doesn't belong. Big serif italic is a *product* voice — aggressive, single-minded. A portfolio needs a *personal* voice — confident, human, editorial. The tiny "Xavi Moreno · Barcelona" byline above a giant headline inverts the hierarchy: the *person* is the product here.
+
+The current homepage borrows the product-page aesthetic (big Instrument Serif italic tagline) and applies it to a portfolio index, where it doesn't belong. Big serif italic is a _product_ voice — aggressive, single-minded. A portfolio needs a _personal_ voice — confident, human, editorial. The tiny "Xavi Moreno · Barcelona" byline above a giant headline inverts the hierarchy: the _person_ is the product here.
 
 ## Hierarchy
+
 1. **Who** — Xavi Moreno (the person, the brand)
 2. **What** — Makes apps and tools with AI
 3. **Where** — Barcelona
@@ -36,6 +38,7 @@ Left-aligned, not centred. Centred feels like a marketing landing page. Left-ali
 ```
 
 **Typography:**
+
 - Name: `font-sans font-bold tracking-tight` — Inter heavy. NOT Instrument Serif. The person's name should feel grounded and strong.
 - Period: `text-lime` — inherits the hackie.dev. brand mark from the header.
 - Tagline: `text-xl text-muted font-sans` — descriptive, comfortable, muted. No italic.
@@ -47,10 +50,9 @@ Left-aligned, not centred. Centred feels like a marketing landing page. Left-ali
 
 ```html
 <section max-w-5xl px-5 pb-28>
-  <p class="eyebrow mb-8">{t.directory.work}</p>   ← lime eyebrow utility
-  <div class={gridClass}>
-    {cards}
-  </div>
+  <p class="eyebrow mb-8">{t.directory.work}</p>
+  ← lime eyebrow utility
+  <div class="{gridClass}">{cards}</div>
 </section>
 ```
 
@@ -73,6 +75,7 @@ No emoji icon box. The project name and tagline are the card. Clean.
 ```
 
 On hover:
+
 - Card border turns to project accent colour
 - Card lifts 1px
 - Arrow fades in on the right

@@ -1,27 +1,38 @@
 ---
-import ProjectLayout from '../../../layouts/ProjectLayout.astro';
-import ProjectHero from '../../../components/project/ProjectHero.astro';
-import ChangelogSection from '../../../components/project/ChangelogSection.astro';
-import { getAllProjects } from '../../../content/projects/index';
-import type { Locale } from '../../../config';
-import { LOCALES } from '../../../config';
-import { useTranslations } from '../../../i18n';
-import '../../../content/projects/alterio/index';
-import '../../../content/projects/diskspace/index';
+import ProjectLayout from '../../../layouts/ProjectLayout.astro'
+import ProjectHero from '../../../components/project/ProjectHero.astro'
+import ChangelogSection from '../../../components/project/ChangelogSection.astro'
+import { getAllProjects } from '../../../content/projects/index'
+import type { Locale } from '../../../config'
+import { LOCALES } from '../../../config'
+import { useTranslations } from '../../../i18n'
+import '../../../content/projects/alterio/index'
+import '../../../content/projects/diskspace/index'
 export async function getStaticPaths() {
-  const projects = getAllProjects();
+  const projects = getAllProjects()
   return LOCALES.flatMap((locale) =>
-    projects.map((project) => ({ params: { locale, slug: project.slug }, props: { project, locale } }))
-  );
+    projects.map((project) => ({
+      params: { locale, slug: project.slug },
+      props: { project, locale },
+    })),
+  )
 }
 const { project, locale } = Astro.props as {
-  project: import('../../../content/projects/index').Project;
-  locale: Locale;
-};
-const t = useTranslations(locale);
-const pt = (t.projects as Record<string, { tagline: string; description: string }>)[project.slug] ?? { tagline: '', description: '' };
+  project: import('../../../content/projects/index').Project
+  locale: Locale
+}
+const t = useTranslations(locale)
+const pt = (t.projects as Record<string, { tagline: string; description: string }>)[
+  project.slug
+] ?? { tagline: '', description: '' }
 ---
-<ProjectLayout project={project} locale={locale} title={`${project.name} — ${pt.tagline}`} description={pt.description}>
+
+<ProjectLayout
+  project={project}
+  locale={locale}
+  title={`${project.name} — ${pt.tagline}`}
+  description={pt.description}
+>
   <ProjectHero project={project} locale={locale} />
   {project.changelog.length > 0 && <ChangelogSection changelog={project.changelog} />}
 </ProjectLayout>

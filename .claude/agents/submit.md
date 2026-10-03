@@ -24,13 +24,16 @@ Tracker: GitHub Issues (`gh` CLI). Ticket close: `gh issue close <number>`.
    - No credential is missing for `gh` CLI.
 
 2. **Merge each PR** with squash merge, deleting the branch:
+
    ```
    gh pr merge <number> --squash --delete-branch
    ```
+
    Verify the base branch contains the PR title afterwards. A warning is not a
    merge.
 
 3. **Close tickets**. For each ticket:
+
    ```
    gh issue close <number> --comment "Shipped in <PR URL> (<merge sha>). What to test: <what_to_test from validator>"
    ```

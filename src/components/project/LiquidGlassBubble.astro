@@ -1,32 +1,43 @@
 ---
-import { localePath } from '../../i18n';
-import type { Locale } from '../../config';
-interface Props { locale: Locale }
-const { locale } = Astro.props;
-const PHOTO = 'https://media.licdn.com/dms/image/v2/C4D03AQF6SwLPg9_rcQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1573058109252?e=1792627200&v=beta&t=pw0VAgDh_DkNAp8y3IiJKppN3iRnuYVW1OHQbCWLwrU';
+import { localePath } from '../../i18n'
+import type { Locale } from '../../config'
+interface Props {
+  locale: Locale
+}
+const { locale } = Astro.props
+const PHOTO =
+  'https://media.licdn.com/dms/image/v2/C4D03AQF6SwLPg9_rcQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1573058109252?e=1792627200&v=beta&t=pw0VAgDh_DkNAp8y3IiJKppN3iRnuYVW1OHQbCWLwrU'
 ---
 
 <nav class="bubble" aria-label="Site navigation">
   <a href={localePath(locale, '/')} class="bubble__nav">
     <svg width="15" height="15" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-      <rect x="0" y="0" width="6" height="6" rx="1.5" fill="currentColor" opacity=".9"/>
-      <rect x="8" y="0" width="6" height="6" rx="1.5" fill="currentColor" opacity=".9"/>
-      <rect x="0" y="8" width="6" height="6" rx="1.5" fill="currentColor" opacity=".9"/>
-      <rect x="8" y="8" width="6" height="6" rx="1.5" fill="currentColor" opacity=".9"/>
+      <rect x="0" y="0" width="6" height="6" rx="1.5" fill="currentColor" opacity=".9" />
+      <rect x="8" y="0" width="6" height="6" rx="1.5" fill="currentColor" opacity=".9" />
+      <rect x="0" y="8" width="6" height="6" rx="1.5" fill="currentColor" opacity=".9" />
+      <rect x="8" y="8" width="6" height="6" rx="1.5" fill="currentColor" opacity=".9" />
     </svg>
     <span class="bubble__label">Projects</span>
   </a>
 
   <div class="bubble__sep" aria-hidden="true"></div>
 
-  <a href="https://www.linkedin.com/in/xavimorenom" target="_blank" rel="noopener noreferrer"
-     class="bubble__profile" aria-label="Xavi Moreno on LinkedIn">
+  <a
+    href="https://www.linkedin.com/in/xavimorenom"
+    target="_blank"
+    rel="noopener noreferrer"
+    class="bubble__profile"
+    aria-label="Xavi Moreno on LinkedIn"
+  >
     <img src={PHOTO} alt="" class="bubble__avatar" width="28" height="28" loading="eager" />
     <span class="bubble__name">Xavi</span>
     <span class="bubble__li-logo" aria-hidden="true">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-        <rect width="24" height="24" rx="5" fill="#0A66C2"/>
-        <path d="M7.75 9.5v9H5.25v-9h2.5zm-1.25-4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zM10.75 9.5v1.22A3.5 3.5 0 0 1 13.6 9.5c2.65 0 3.9 1.6 3.9 4.35V18.5H15v-4.35c0-1.55-.7-2.4-2.1-2.4-1.5 0-2.15 1-2.15 2.65V18.5H8.25v-9h2.5z" fill="white"/>
+        <rect width="24" height="24" rx="5" fill="#0A66C2" />
+        <path
+          d="M7.75 9.5v9H5.25v-9h2.5zm-1.25-4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zM10.75 9.5v1.22A3.5 3.5 0 0 1 13.6 9.5c2.65 0 3.9 1.6 3.9 4.35V18.5H15v-4.35c0-1.55-.7-2.4-2.1-2.4-1.5 0-2.15 1-2.15 2.65V18.5H8.25v-9h2.5z"
+          fill="white"
+        />
       </svg>
     </span>
   </a>
@@ -48,11 +59,11 @@ const PHOTO = 'https://media.licdn.com/dms/image/v2/C4D03AQF6SwLPg9_rcQ/profile-
     border: 1px solid rgba(255, 255, 255, 0.09);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.07),
-      0 8px 40px rgba(0, 0, 0, 0.40),
-      0 2px 8px rgba(0, 0, 0, 0.20);
+      0 8px 40px rgba(0, 0, 0, 0.4),
+      0 2px 8px rgba(0, 0, 0, 0.2);
   }
   @media (prefers-color-scheme: light) {
-    :root:not([data-theme="dark"]) .bubble {
+    :root:not([data-theme='dark']) .bubble {
       background: rgba(255, 255, 255, 0.78);
       border-color: rgba(0, 0, 0, 0.07);
       box-shadow:
@@ -61,7 +72,7 @@ const PHOTO = 'https://media.licdn.com/dms/image/v2/C4D03AQF6SwLPg9_rcQ/profile-
         0 2px 8px rgba(0, 0, 0, 0.06);
     }
   }
-  :root[data-theme="light"] .bubble {
+  :root[data-theme='light'] .bubble {
     background: rgba(255, 255, 255, 0.78);
     border-color: rgba(0, 0, 0, 0.07);
     box-shadow:
@@ -80,13 +91,23 @@ const PHOTO = 'https://media.licdn.com/dms/image/v2/C4D03AQF6SwLPg9_rcQ/profile-
     transition: color 0.15s;
     border-radius: 99px 0 0 99px;
   }
-  .bubble__nav:hover { color: #fff; }
-  @media (prefers-color-scheme: light) {
-    :root:not([data-theme="dark"]) .bubble__nav { color: rgba(0,0,0,0.60); }
-    :root:not([data-theme="dark"]) .bubble__nav:hover { color: #000; }
+  .bubble__nav:hover {
+    color: #fff;
   }
-  :root[data-theme="light"] .bubble__nav { color: rgba(0,0,0,0.60); }
-  :root[data-theme="light"] .bubble__nav:hover { color: #000; }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme='dark']) .bubble__nav {
+      color: rgba(0, 0, 0, 0.6);
+    }
+    :root:not([data-theme='dark']) .bubble__nav:hover {
+      color: #000;
+    }
+  }
+  :root[data-theme='light'] .bubble__nav {
+    color: rgba(0, 0, 0, 0.6);
+  }
+  :root[data-theme='light'] .bubble__nav:hover {
+    color: #000;
+  }
 
   .bubble__sep {
     width: 1px;
@@ -95,9 +116,13 @@ const PHOTO = 'https://media.licdn.com/dms/image/v2/C4D03AQF6SwLPg9_rcQ/profile-
     background: rgba(255, 255, 255, 0.12);
   }
   @media (prefers-color-scheme: light) {
-    :root:not([data-theme="dark"]) .bubble__sep { background: rgba(0,0,0,0.10); }
+    :root:not([data-theme='dark']) .bubble__sep {
+      background: rgba(0, 0, 0, 0.1);
+    }
   }
-  :root[data-theme="light"] .bubble__sep { background: rgba(0,0,0,0.10); }
+  :root[data-theme='light'] .bubble__sep {
+    background: rgba(0, 0, 0, 0.1);
+  }
 
   .bubble__profile {
     display: flex;
@@ -109,13 +134,23 @@ const PHOTO = 'https://media.licdn.com/dms/image/v2/C4D03AQF6SwLPg9_rcQ/profile-
     transition: color 0.15s;
     border-radius: 0 99px 99px 0;
   }
-  .bubble__profile:hover { color: #fff; }
-  @media (prefers-color-scheme: light) {
-    :root:not([data-theme="dark"]) .bubble__profile { color: rgba(0,0,0,0.60); }
-    :root:not([data-theme="dark"]) .bubble__profile:hover { color: #000; }
+  .bubble__profile:hover {
+    color: #fff;
   }
-  :root[data-theme="light"] .bubble__profile { color: rgba(0,0,0,0.60); }
-  :root[data-theme="light"] .bubble__profile:hover { color: #000; }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme='dark']) .bubble__profile {
+      color: rgba(0, 0, 0, 0.6);
+    }
+    :root:not([data-theme='dark']) .bubble__profile:hover {
+      color: #000;
+    }
+  }
+  :root[data-theme='light'] .bubble__profile {
+    color: rgba(0, 0, 0, 0.6);
+  }
+  :root[data-theme='light'] .bubble__profile:hover {
+    color: #000;
+  }
 
   .bubble__avatar {
     width: 28px;
@@ -142,7 +177,11 @@ const PHOTO = 'https://media.licdn.com/dms/image/v2/C4D03AQF6SwLPg9_rcQ/profile-
   }
 
   @media (max-width: 480px) {
-    .bubble__label { display: none; }
-    .bubble__name  { display: none; }
+    .bubble__label {
+      display: none;
+    }
+    .bubble__name {
+      display: none;
+    }
   }
 </style>

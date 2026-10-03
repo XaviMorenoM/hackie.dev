@@ -22,7 +22,16 @@ interface Props {
   wordmark?: string
 }
 
-const { locale, title, description, jsonLd = [], ogType = 'website', noindex = false, noHeader = false, wordmark } = Astro.props
+const {
+  locale,
+  title,
+  description,
+  jsonLd = [],
+  ogType = 'website',
+  noindex = false,
+  noHeader = false,
+  wordmark,
+} = Astro.props
 const t = useTranslations(locale)
 
 const path = stripLocale(Astro.url.pathname)

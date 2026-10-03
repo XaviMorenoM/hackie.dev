@@ -10,9 +10,8 @@ export const getStaticPaths = localeStaticPaths
 const locale = Astro.params.locale as Locale
 const t = useTranslations(locale)
 const projects = getAllProjects()
-const gridClass = projects.length === 1
-  ? 'grid gap-5 max-w-xs'
-  : 'grid gap-5 sm:grid-cols-2 lg:grid-cols-3'
+const gridClass =
+  projects.length === 1 ? 'grid gap-5 max-w-xs' : 'grid gap-5 sm:grid-cols-2 lg:grid-cols-3'
 ---
 
 <Base locale={locale} title="hackie.dev" description={t.directory.intro} wordmark="hackie.dev">
@@ -21,13 +20,13 @@ const gridClass = projects.length === 1
     <h1 class="text-5xl font-bold tracking-tight text-fg sm:text-6xl lg:text-7xl">
       Xavi Moreno<span class="text-lime">.</span>
     </h1>
-    <p class="mt-5 max-w-xl text-xl text-muted sm:text-2xl">
-      {t.directory.intro}
-    </p>
+    <p class="mt-5 max-w-xl text-xl text-muted sm:text-2xl">{t.directory.intro}</p>
     <div class="mt-8 flex items-center gap-3">
       <span class="h-px w-6 shrink-0 bg-lime" aria-hidden="true"></span>
       <span class="text-sm text-muted">Barcelona</span>
-      <span class="text-lime" aria-hidden="true">·</span>
+      <span class="text-lime" aria-hidden="true">
+        ·
+      </span>
       <span class="text-sm text-muted">{t.directory.bio}</span>
     </div>
   </section>
@@ -36,7 +35,9 @@ const gridClass = projects.length === 1
   <section class="mx-auto max-w-5xl px-5 pb-28 sm:px-8">
     <p class="eyebrow mb-8">{t.directory.work}</p>
     <div class={gridClass}>
-      {projects.map((p) => <ProjectCard project={p} locale={locale} />)}
+      {projects.map((p) => (
+        <ProjectCard project={p} locale={locale} />
+      ))}
     </div>
   </section>
 </Base>

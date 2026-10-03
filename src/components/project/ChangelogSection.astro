@@ -1,10 +1,18 @@
 ---
-interface Entry { version: string; date: string; notes: string[] }
-interface Props { changelog: Entry[]; defaultShown?: number }
-const { changelog, defaultShown = 5 } = Astro.props;
-const visible = changelog.slice(0, defaultShown);
-const hidden = changelog.slice(defaultShown);
+interface Entry {
+  version: string
+  date: string
+  notes: string[]
+}
+interface Props {
+  changelog: Entry[]
+  defaultShown?: number
+}
+const { changelog, defaultShown = 5 } = Astro.props
+const visible = changelog.slice(0, defaultShown)
+const hidden = changelog.slice(defaultShown)
 ---
+
 <section class="mx-auto max-w-6xl px-5 py-16 sm:px-8">
   <h2 class="mb-8 text-2xl font-semibold text-fg">Changelog</h2>
   {changelog.length === 0 && <p class="text-muted">No releases yet.</p>}
@@ -17,7 +25,11 @@ const hidden = changelog.slice(defaultShown);
           <time class="text-sm text-muted">{e.date}</time>
         </div>
         <ul class="mt-1 space-y-0.5">
-          {e.notes.map((n) => <li class="text-sm text-muted before:content-['•_'] before:text-[var(--project-accent,var(--lime))]">{n}</li>)}
+          {e.notes.map((n) => (
+            <li class="text-sm text-muted before:content-['•_'] before:text-[var(--project-accent,var(--lime))]">
+              {n}
+            </li>
+          ))}
         </ul>
       </li>
     ))}
@@ -34,7 +46,11 @@ const hidden = changelog.slice(defaultShown);
                 <time class="text-sm text-muted">{e.date}</time>
               </div>
               <ul class="mt-1 space-y-0.5">
-                {e.notes.map((n) => <li class="text-sm text-muted before:content-['•_'] before:text-[var(--project-accent,var(--lime))]">{n}</li>)}
+                {e.notes.map((n) => (
+                  <li class="text-sm text-muted before:content-['•_'] before:text-[var(--project-accent,var(--lime))]">
+                    {n}
+                  </li>
+                ))}
               </ul>
             </li>
           ))}
@@ -47,6 +63,15 @@ const hidden = changelog.slice(defaultShown);
   )}
 </section>
 <style>
-  .changelog-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 1.5rem; }
-  .changelog-entry { border-left: 2px solid var(--line); padding-left: 1.25rem; }
+  .changelog-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .changelog-entry {
+    border-left: 2px solid var(--line);
+    padding-left: 1.25rem;
+  }
 </style>

@@ -2,7 +2,7 @@ version: 1
 
 project:
   name: hackie.dev
-  summary: "Product landing page for a gym-tracker iOS app (Alterio/Hackie). Astro 7 · TypeScript · Tailwind v4 · static output · 3 locales (en/es/ca) · deployed to GitHub Pages."
+  summary: 'Product landing page for a gym-tracker iOS app (Alterio/Hackie). Astro 7 · TypeScript · Tailwind v4 · static output · 3 locales (en/es/ca) · deployed to GitHub Pages.'
   stack: [astro, typescript, tailwind, node]
   platforms: [web]
 
@@ -22,16 +22,22 @@ setup:
   - npm ci
 
 gates:
-  - {id: typecheck, run: "npm run check", stage: implement}
-  - {id: build,     run: "npm run build", stage: implement}
-  - {id: format,    run: "npm run format:check", stage: implement, planned: true}
-  - {id: lint,      run: "npm run lint", stage: implement, planned: true}
-  - {id: unit,      run: "npm run test:unit", stage: implement, planned: true}
-  - {id: e2e,       run: "npx playwright test {targets}", all: "npx playwright test", stage: validate, planned: true}
+  - { id: typecheck, run: 'npm run check', stage: implement }
+  - { id: build, run: 'npm run build', stage: implement }
+  - { id: format, run: 'npm run format:check', stage: implement, planned: true }
+  - { id: lint, run: 'npm run lint', stage: implement, planned: true }
+  - { id: unit, run: 'npm run test:unit', stage: implement, planned: true }
+  - {
+      id: e2e,
+      run: 'npx playwright test {targets}',
+      all: 'npx playwright test',
+      stage: validate,
+      planned: true,
+    }
 
 tests:
-  - {id: unit, owner: implement, location: "src/**/*.test.ts", required_for: always}
-  - {id: e2e,  owner: validate,  location: "tests/e2e/",       required_for: user_flow_change}
+  - { id: unit, owner: implement, location: 'src/**/*.test.ts', required_for: always }
+  - { id: e2e, owner: validate, location: 'tests/e2e/', required_for: user_flow_change }
 
 design:
   trigger: lead_flag
@@ -47,11 +53,11 @@ docs:
   read_first: [CLAUDE.md, README.md]
 
 guardrails:
-  never: ["git push --force", "--no-verify"]
-  human_only: ["GitHub Pages custom domain settings"]
+  never: ['git push --force', '--no-verify']
+  human_only: ['GitHub Pages custom domain settings']
 
-waves: {max_parallel: 3, max_bounces: 3}
-models: {lead: opus, design: opus, implement: sonnet, validate: sonnet, submit: sonnet}
+waves: { max_parallel: 3, max_bounces: 3 }
+models: { lead: opus, design: opus, implement: sonnet, validate: sonnet, submit: sonnet }
 
 # role_notes are superseded by the project-level agent files in .claude/agents/.
 # Kept here for reference; the agent files are the authoritative source.
