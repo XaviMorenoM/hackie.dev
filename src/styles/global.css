@@ -72,7 +72,8 @@
   --color-transparent: transparent;
 
   --font-display: var(--font-instrument-serif), Georgia, 'Times New Roman', serif;
-  --font-sans: var(--font-inter), system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-sans:
+    var(--font-inter), system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
 
   --radius-card: 1.25rem;
   --radius-phone: 2.6rem;

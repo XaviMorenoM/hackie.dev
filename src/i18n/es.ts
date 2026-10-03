@@ -1,4 +1,4 @@
-import type { Translations } from './types';
+import type { Translations } from './types'
 
 export const es: Translations = {
   meta: {
@@ -9,7 +9,8 @@ export const es: Translations = {
     privacyDescription:
       'Cómo trata {app} tus datos: todo se queda en tu dispositivo y en tu propio iCloud. Sin servidores, sin rastreadores, sin anuncios.',
     supportTitle: 'Soporte — {app}',
-    supportDescription: 'Respuestas a las preguntas más habituales sobre {app} y cómo ponerte en contacto.',
+    supportDescription:
+      'Respuestas a las preguntas más habituales sobre {app} y cómo ponerte en contacto.',
   },
   nav: {
     skipToContent: 'Ir al contenido',
@@ -78,7 +79,8 @@ export const es: Translations = {
     ],
     galleryEyebrow: 'Pantallas',
     galleryHeading: 'Diseñada para el rincón oscuro del gimnasio.',
-    gallerySub: 'Alto contraste, botones grandes, una sola mano. Se ve igual a las 6 de la mañana que a las 11 de la noche.',
+    gallerySub:
+      'Alto contraste, botones grandes, una sola mano. Se ve igual a las 6 de la mañana que a las 11 de la noche.',
     screenshotAlts: [
       'Pantalla Hoy de {app}: sin rutina programada, con los botones Solo entrenar y Ver biblioteca y la semana siguiente',
       'Pantalla Biblioteca de {app} con las rutinas Push, Pull, Pierna y Tren superior y su número de sesiones',
@@ -186,7 +188,8 @@ export const es: Translations = {
   support: {
     eyebrow: 'Ayuda',
     title: 'Soporte',
-    intro: 'Respuestas a las preguntas que más nos llegan. Si la tuya no está, manda un correo: responde una persona de verdad.',
+    intro:
+      'Respuestas a las preguntas que más nos llegan. Si la tuya no está, manda un correo: responde una persona de verdad.',
     faqHeading: 'Preguntas frecuentes',
     faq: [
       {
@@ -219,7 +222,8 @@ export const es: Translations = {
       },
     ],
     contactHeading: '¿Sigues atascado?',
-    contactBody: 'Escribe directamente al desarrollador. Indica tu versión de iOS y qué estabas haciendo cuando ocurrió el problema.',
+    contactBody:
+      'Escribe directamente al desarrollador. Indica tu versión de iOS y qué estabas haciendo cuando ocurrió el problema.',
     contactCta: 'Escribir a soporte',
     contactHint: 'O escribe a {email}',
   },
@@ -233,4 +237,4 @@ export const es: Translations = {
     body: 'Ese enlace no lleva a ninguna parte.',
     cta: 'Volver a {app}',
   },
-};
+}

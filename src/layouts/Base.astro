@@ -1,33 +1,33 @@
 ---
-import { Font } from 'astro:assets';
-import '../styles/global.css';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import { APP_NAME, LOCALES, LOCALE_TAGS, OG_LOCALES, SITE_URL, type Locale } from '../config';
-import { localePath, stripLocale, useTranslations, withBase } from '../i18n';
+import { Font } from 'astro:assets'
+import '../styles/global.css'
+import Header from '../components/Header.astro'
+import Footer from '../components/Footer.astro'
+import { APP_NAME, LOCALES, LOCALE_TAGS, OG_LOCALES, SITE_URL, type Locale } from '../config'
+import { localePath, stripLocale, useTranslations, withBase } from '../i18n'
 
 interface Props {
-  locale: Locale;
-  title: string;
-  description: string;
+  locale: Locale
+  title: string
+  description: string
   /** Extra JSON-LD blocks, serialised as-is. */
-  jsonLd?: Record<string, unknown>[];
+  jsonLd?: Record<string, unknown>[]
   /** `website` (default) or `article` for long-form legal pages. */
-  ogType?: 'website' | 'article';
+  ogType?: 'website' | 'article'
   /** Error/utility pages: `noindex`, no canonical/hreflang, no language switcher. */
-  noindex?: boolean;
+  noindex?: boolean
 }
 
-const { locale, title, description, jsonLd = [], ogType = 'website', noindex = false } = Astro.props;
-const t = useTranslations(locale);
+const { locale, title, description, jsonLd = [], ogType = 'website', noindex = false } = Astro.props
+const t = useTranslations(locale)
 
-const path = stripLocale(Astro.url.pathname);
-const canonical = new URL(localePath(locale, path), SITE_URL).href;
+const path = stripLocale(Astro.url.pathname)
+const canonical = new URL(localePath(locale, path), SITE_URL).href
 const alternates = LOCALES.map((l) => ({
   locale: l,
   href: new URL(localePath(l, path), SITE_URL).href,
-}));
-const ogImage = new URL(withBase('/og.png'), SITE_URL).href;
+}))
+const ogImage = new URL(withBase('/og.png'), SITE_URL).href
 ---
 
 <html lang={LOCALE_TAGS[locale]} class="h-full antialiased">
@@ -43,16 +43,19 @@ const ogImage = new URL(withBase('/og.png'), SITE_URL).href;
     {/* Stamp the stored theme before first paint so there is no flash. The only client JS on the site. */}
     <script is:inline>
       try {
-        var t = localStorage.getItem('theme');
-        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
-      } catch (e) {}
+        var t = localStorage.getItem('theme')
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t
+      } catch {}
     </script>
-    <link rel="icon" type="image/svg+xml" href={withBase("/favicon.svg")} />
+    <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
     {noindex && <meta name="robots" content="noindex" />}
     {!noindex && <link rel="canonical" href={canonical} />}
-    {!noindex && alternates.map((a) => <link rel="alternate" hreflang={LOCALE_TAGS[a.locale]} href={a.href} />)}
+    {!noindex &&
+      alternates.map((a) => (
+        <link rel="alternate" hreflang={LOCALE_TAGS[a.locale]} href={a.href} />
+      ))}
     {!noindex && <link rel="alternate" hreflang="x-default" href={alternates[0]!.href} />}
-    <link rel="sitemap" href={withBase("/sitemap-index.xml")} />
+    <link rel="sitemap" href={withBase('/sitemap-index.xml')} />
 
     <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={APP_NAME} />
@@ -63,7 +66,9 @@ const ogImage = new URL(withBase('/og.png'), SITE_URL).href;
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:locale" content={OG_LOCALES[locale]} />
-    {LOCALES.filter((l) => l !== locale).map((l) => <meta property="og:locale:alternate" content={OG_LOCALES[l]} />)}
+    {LOCALES.filter((l) => l !== locale).map((l) => (
+      <meta property="og:locale:alternate" content={OG_LOCALES[l]} />
+    ))}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
@@ -72,7 +77,9 @@ const ogImage = new URL(withBase('/og.png'), SITE_URL).href;
     <Font cssVariable="--font-instrument-serif" preload={[{ subset: 'latin' }]} />
     <Font cssVariable="--font-inter" preload={[{ subset: 'latin' }]} />
 
-    {jsonLd.map((block) => <script is:inline type="application/ld+json" set:html={JSON.stringify(block)} />)}
+    {jsonLd.map((block) => (
+      <script is:inline type="application/ld+json" set:html={JSON.stringify(block)} />
+    ))}
   </head>
   <body class="flex min-h-full flex-col bg-bg text-fg">
     <a
@@ -87,21 +94,33 @@ const ogImage = new URL(withBase('/og.png'), SITE_URL).href;
     </main>
     <Footer locale={locale} />
     <script is:inline>
-      (function (r, bs) {
+      ;(function (r, bs) {
         function sync() {
-          var c = r.dataset.theme || 'system';
-          bs.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.setTheme === c)); });
+          var c = r.dataset.theme || 'system'
+          bs.forEach(function (b) {
+            b.setAttribute('aria-pressed', String(b.dataset.setTheme === c))
+          })
         }
         bs.forEach(function (b) {
           b.onclick = function () {
-            var v = b.dataset.setTheme;
-            v === 'system' ? delete r.dataset.theme : (r.dataset.theme = v);
-            try { v === 'system' ? localStorage.removeItem('theme') : localStorage.setItem('theme', v); } catch (e) {}
-            sync();
-          };
-        });
-        sync();
-      })(document.documentElement, document.querySelectorAll('[data-set-theme]'));
+            var v = b.dataset.setTheme
+            if (v === 'system') {
+              delete r.dataset.theme
+            } else {
+              r.dataset.theme = v
+            }
+            try {
+              if (v === 'system') {
+                localStorage.removeItem('theme')
+              } else {
+                localStorage.setItem('theme', v)
+              }
+            } catch {}
+            sync()
+          }
+        })
+        sync()
+      })(document.documentElement, document.querySelectorAll('[data-set-theme]'))
     </script>
   </body>
 </html>

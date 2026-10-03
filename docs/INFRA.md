@@ -1,6 +1,7 @@
 # hackie.dev — infra notes (GitHub Pages + GoDaddy DNS)
 
 ## GitHub side (done)
+
 - Repo: https://github.com/XaviMorenoM/hackie.dev (public)
 - Pages: build_type=workflow, cname=hackie.dev, https_enforced=false (pending cert)
 - Workflow: `.github/workflows/deploy.yml` (withastro/action@v3 → deploy-pages@v4, push to main + workflow_dispatch)
@@ -9,21 +10,23 @@
 ## DNS records to set at GoDaddy (apex custom domain on GitHub Pages)
 
 Remove first:
+
 - Any parked/placeholder A record on `@`.
 - Stale `_vercel` TXT record (leftover from a previous host).
 
 Add:
-| Type  | Host | Value                   |
-|-------|------|-------------------------|
-| A     | @    | 185.199.108.153         |
-| A     | @    | 185.199.109.153         |
-| A     | @    | 185.199.110.153         |
-| A     | @    | 185.199.111.153         |
-| AAAA  | @    | 2606:50c0:8000::153     |
-| AAAA  | @    | 2606:50c0:8001::153     |
-| AAAA  | @    | 2606:50c0:8002::153     |
-| AAAA  | @    | 2606:50c0:8003::153     |
-| CNAME | www  | xavimorenom.github.io   |
+
+| Type  | Host | Value                 |
+| ----- | ---- | --------------------- |
+| A     | @    | 185.199.108.153       |
+| A     | @    | 185.199.109.153       |
+| A     | @    | 185.199.110.153       |
+| A     | @    | 185.199.111.153       |
+| AAAA  | @    | 2606:50c0:8000::153   |
+| AAAA  | @    | 2606:50c0:8001::153   |
+| AAAA  | @    | 2606:50c0:8002::153   |
+| AAAA  | @    | 2606:50c0:8003::153   |
+| CNAME | www  | xavimorenom.github.io |
 
 ## Verification commands
 

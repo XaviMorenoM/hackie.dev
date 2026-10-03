@@ -4,14 +4,14 @@
  * instant meta-refresh redirect (base-aware) so old links keep working.
  * Excluded from the sitemap and marked noindex.
  */
-import { LOCALE_TAGS, SITE_URL, type Locale } from '../../../config';
-import { localePath, localeStaticPaths } from '../../../i18n';
+import { LOCALE_TAGS, SITE_URL, type Locale } from '../../../config'
+import { localePath, localeStaticPaths } from '../../../i18n'
 
-export const getStaticPaths = localeStaticPaths;
+export const getStaticPaths = localeStaticPaths
 
-const locale = Astro.params.locale as Locale;
-const target = localePath(locale);
-const canonical = new URL(target, SITE_URL).href;
+const locale = Astro.params.locale as Locale
+const target = localePath(locale)
+const canonical = new URL(target, SITE_URL).href
 ---
 
 <html lang={LOCALE_TAGS[locale]}>

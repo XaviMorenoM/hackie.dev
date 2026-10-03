@@ -1,4 +1,4 @@
-import type { Translations } from './types';
+import type { Translations } from './types'
 
 export const en: Translations = {
   meta: {
@@ -186,7 +186,8 @@ export const en: Translations = {
   support: {
     eyebrow: 'Help',
     title: 'Support',
-    intro: 'Answers to the questions we hear most. If yours isn’t here, send an email — a real person replies.',
+    intro:
+      'Answers to the questions we hear most. If yours isn’t here, send an email — a real person replies.',
     faqHeading: 'Frequently asked questions',
     faq: [
       {
@@ -219,7 +220,8 @@ export const en: Translations = {
       },
     ],
     contactHeading: 'Still stuck?',
-    contactBody: 'Email the developer directly. Include your iOS version and what you were doing when the problem happened.',
+    contactBody:
+      'Email the developer directly. Include your iOS version and what you were doing when the problem happened.',
     contactCta: 'Email support',
     contactHint: 'Or write to {email}',
   },
@@ -233,4 +235,4 @@ export const en: Translations = {
     body: 'That link doesn’t go anywhere.',
     cta: 'Back to {app}',
   },
-};
+}

@@ -1,12 +1,12 @@
 // @ts-check
-import { defineConfig, fontProviders } from 'astro/config';
-import tailwindcss from '@tailwindcss/vite';
-import sitemap from '@astrojs/sitemap';
+import { defineConfig, fontProviders } from 'astro/config'
+import tailwindcss from '@tailwindcss/vite'
+import sitemap from '@astrojs/sitemap'
 
 // https://astro.build/config
 // Preview builds (workflow_dispatch) override these to serve from <user>.github.io/<repo>/.
-const SITE_URL = process.env.SITE_URL ?? 'https://hackie.dev';
-const SITE_BASE = process.env.SITE_BASE ?? '/';
+const SITE_URL = process.env.SITE_URL ?? 'https://hackie.dev'
+const SITE_BASE = process.env.SITE_BASE ?? '/'
 
 export default defineConfig({
   site: SITE_URL,
@@ -57,4 +57,4 @@ export default defineConfig({
       },
     }),
   ],
-});
+})
