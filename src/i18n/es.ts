@@ -243,10 +243,34 @@ export const es: Translations = {
     cta: 'Volver a {app}',
   },
   directory: {
-    intro: 'Apps y herramientas, creadas con IA.',
-    work: 'Proyectos', // TODO: translate
-    bio: 'desarrollador indie', // TODO: translate
-    platformBadge: { ios: 'iOS', macos: 'macOS', cli: 'CLI' },
+    intro:
+      'Hago apps pequeñas y útiles para problemas que tengo de verdad: las diseño yo y las construyo mano a mano con IA.',
+    work: 'Proyectos',
+    bio: 'desarrollador indie',
+    platformBadge: {
+      alterio: 'Disponible en el App Store',
+      diskspace: 'Disponible en el App Store',
+    },
+    howHeading: 'Cómo trabajo',
+    howIntro: 'Un desarrollador, unos cuantos agentes de IA y opiniones firmes sobre los detalles.',
+    howSteps: [
+      {
+        title: 'Partir de algo real',
+        body: 'Cada app empieza por algo que me molestaba. Si no la voy a usar cada semana, no la hago.',
+      },
+      {
+        title: 'Construir con IA',
+        body: 'Los agentes de IA escriben, prueban y revisan el código conmigo. Yo marco el rumbo y decido qué se publica.',
+      },
+      {
+        title: 'Cuidar cada detalle',
+        body: 'Accesibilidad, modo oscuro, tres idiomas, el último píxel. La IA lo hace rápido; el criterio sigue siendo cosa mía.',
+      },
+    ],
+    contactHeading: 'Escríbeme',
+    contactBody:
+      '¿Estás creando algo con IA o tienes una idea de app atascada? Siempre me apetece hablar del tema.',
+    contactLinkedin: 'LinkedIn',
   },
   projects: {
     alterio: {

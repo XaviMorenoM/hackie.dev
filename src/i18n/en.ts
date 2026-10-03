@@ -241,10 +241,34 @@ export const en: Translations = {
     cta: 'Back to {app}',
   },
   directory: {
-    intro: 'Apps and tools, built with AI.',
+    intro:
+      'I make small, useful apps for problems I actually have — designed by me, built hand in hand with AI.',
     work: 'Work',
     bio: 'indie developer',
-    platformBadge: { ios: 'iOS', macos: 'macOS', cli: 'CLI' },
+    platformBadge: {
+      alterio: 'Available on the App Store',
+      diskspace: 'Available on the App Store',
+    },
+    howHeading: 'How I build',
+    howIntro: 'One developer, a few AI agents, and strong opinions about the details.',
+    howSteps: [
+      {
+        title: 'Start from a real itch',
+        body: "Every app begins as something that annoyed me. If I won't use it every week, I don't build it.",
+      },
+      {
+        title: 'Build with AI',
+        body: 'AI agents draft, test and review the code alongside me. I set the direction and decide what ships.',
+      },
+      {
+        title: 'Sweat the details',
+        body: 'Accessibility, dark mode, three languages, the last pixel. AI makes it fast; taste is still my job.',
+      },
+    ],
+    contactHeading: 'Say hi',
+    contactBody:
+      "Building something with AI, or stuck on an app idea? I'm always up for talking shop.",
+    contactLinkedin: 'LinkedIn',
   },
   projects: {
     alterio: {
