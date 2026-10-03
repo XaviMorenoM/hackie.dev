@@ -20,7 +20,7 @@ describe('LiquidGlassBubble', () => {
       expect(html).toContain('data-testid="site-bubble"')
     })
 
-    it(`${locale}: bubble-projects href points to home and has no aria-current on non-home path`, async () => {
+    it(`${locale}: bubble-projects href points to home and has aria-current="true" on project page`, async () => {
       const t = useTranslations(locale)
       const html = await container.renderToString(LiquidGlassBubble, {
         props: { locale },
@@ -29,18 +29,21 @@ describe('LiquidGlassBubble', () => {
       const home = localePath(locale)
       expect(html).toContain(`href="${home}"`)
       expect(html).toContain('data-testid="bubble-projects"')
-      // aria-current present on a project page (active section indicator)
-      expect(html).toContain('aria-current="page"')
+      // section indicator — link points into the current section but is not the exact page
+      expect(html).toContain('aria-current="true"')
+      expect(html).not.toContain('aria-current="page"')
       // label comes from locale
       expect(html).toContain(t.nav.bubble.projects)
     })
 
-    it(`${locale}: bubble-projects has no aria-current="page" on directory (home) path`, async () => {
+    it(`${locale}: bubble-projects has aria-current="page" on the directory (home) path`, async () => {
       const html = await container.renderToString(LiquidGlassBubble, {
         props: { locale },
         request: new Request(`http://localhost/${locale}/`),
       })
-      expect(html).not.toContain('aria-current="page"')
+      // directory page — the link IS the current page
+      expect(html).toContain('aria-current="page"')
+      expect(html).not.toContain('aria-current="true"')
     })
 
     it(`${locale}: bubble-profile href equals DEVELOPER_LINKEDIN`, async () => {

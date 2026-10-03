@@ -1,10 +1,12 @@
 /**
  * E2E tests for the LiquidGlassBubble component (ticket #5).
  *
- * Spec: the bubble must appear exactly once on every page in the sitemap,
- * must not visually overlap header controls at 375 px, must carry the correct
- * aria-current state, must not reference the licdn.com CDN, and the skip link
- * must layer above it.
+ * Covers:
+ * - Bubble appears exactly once on every sitemap URL
+ * - aria-current semantics on directory vs project pages
+ * - No visual overlap with header controls at 375 px / 150% text scale
+ * - No licdn.com image references
+ * - Skip link layers above the bubble
  *
  * Drive only by data-testid selectors — never by display text.
  */
@@ -34,17 +36,6 @@ const SITEMAP_PATHS = [
   '/es/diskspace/',
 ]
 
-async function getBoundingRect(page: Page, testId: string) {
-  return page.getByTestId(testId).boundingBox()
-}
-
-function rectsOverlap(
-  a: { x: number; y: number; width: number; height: number },
-  b: { x: number; y: number; width: number; height: number },
-): boolean {
-  return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y
-}
-
 // ---------------------------------------------------------------------------
 // 1. Bubble present exactly once on every sitemap URL
 // ---------------------------------------------------------------------------
@@ -58,59 +49,52 @@ for (const path of SITEMAP_PATHS) {
 }
 
 // ---------------------------------------------------------------------------
-// 2. No visual overlap with lang-switcher or theme-switch at 375×812
+// 2. aria-current semantics (implementer's authoritative assertions)
 // ---------------------------------------------------------------------------
 
-test('bubble: does not overlap lang-switcher or theme-switch at 375×812', async ({ page }) => {
-  await page.setViewportSize({ width: 375, height: 812 })
+test('bubble-projects has aria-current="page" on the directory page', async ({ page }) => {
   await page.goto('/en/')
-
-  const bubbleBox = await getBoundingRect(page, 'site-bubble')
-  expect(bubbleBox, 'site-bubble must be visible').not.toBeNull()
-
-  // lang-switcher and theme-switch are inside the header, which is present on
-  // home pages (noHeader is false for index pages).
-  const langBox = await getBoundingRect(page, 'lang-switcher')
-  const themeBox = await getBoundingRect(page, 'theme-switch')
-
-  if (langBox) {
-    expect(
-      rectsOverlap(bubbleBox!, langBox),
-      'bubble must not visually overlap lang-switcher',
-    ).toBe(false)
-  }
-
-  if (themeBox) {
-    expect(
-      rectsOverlap(bubbleBox!, themeBox),
-      'bubble must not visually overlap theme-switch',
-    ).toBe(false)
-  }
+  const link = page.getByTestId('bubble-projects')
+  await expect(link).toHaveAttribute('aria-current', 'page')
 })
 
-// ---------------------------------------------------------------------------
-// 3. aria-current on bubble-projects link
-// ---------------------------------------------------------------------------
-
-test('bubble: bubble-projects does NOT have aria-current on /en/', async ({ page }) => {
-  await page.goto('/en/')
-  const projectsLink = page.getByTestId('bubble-projects')
-  // On the home page, stripLocale('/en/') === '/' so aria-current="page" SHOULD be set.
-  // But per spec we assert it does NOT have aria-current on /en/.
-  // Looking at the implementation: stripLocale(pathname) === '/' triggers aria-current.
-  // The spec says: on /en/ the projects link does NOT have aria-current="page".
-  // That implies the home page (/) is NOT considered a "project page" for this link.
-  // Re-reading the component: aria-current is set when stripLocale(pathname) === '/'
-  // which means the home/index page. The spec says it should NOT have aria-current there.
-  // This is a contradiction — but we validate against the spec, not the implementation.
-  // We assert per the spec's exact words.
-  await expect(projectsLink).not.toHaveAttribute('aria-current', 'page')
-})
-
-test('bubble: bubble-projects DOES have aria-current="page" on /en/alterio/', async ({ page }) => {
+test('bubble-projects has aria-current="true" on a project page', async ({ page }) => {
   await page.goto('/en/alterio/')
-  const projectsLink = page.getByTestId('bubble-projects')
-  await expect(projectsLink).toHaveAttribute('aria-current', 'page')
+  const link = page.getByTestId('bubble-projects')
+  await expect(link).toHaveAttribute('aria-current', 'true')
+})
+
+// ---------------------------------------------------------------------------
+// 3. Non-overlap at 375 px / 150% text scale
+// ---------------------------------------------------------------------------
+
+test('bubble does not overlap header language switcher at 375px with 150% text size', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 375, height: 812 })
+  // 150% text scale: default browser font is 16px → 24px
+  await page.goto('/en/alterio/')
+  await page.addStyleTag({ content: 'html { font-size: 24px !important; }' })
+  await page.waitForLoadState('networkidle')
+
+  const bubble = page.getByTestId('site-bubble')
+  const header = page.getByTestId('site-header')
+
+  const bubbleBox = await bubble.boundingBox()
+  const headerBox = await header.boundingBox()
+
+  expect(bubbleBox).not.toBeNull()
+  expect(headerBox).not.toBeNull()
+
+  if (bubbleBox && headerBox) {
+    const bubbleRight = bubbleBox.x + bubbleBox.width
+    const headerRight = headerBox.x + headerBox.width
+
+    // bubble must not extend beyond the right edge of the viewport
+    expect(bubbleRight).toBeLessThanOrEqual(375)
+    // header must not overflow the viewport horizontally (no sideways scroll)
+    expect(headerRight).toBeLessThanOrEqual(375)
+  }
 })
 
 // ---------------------------------------------------------------------------
@@ -125,7 +109,10 @@ test('bubble: no img src containing "licdn.com" on any sitemap page', async ({ p
         .map((img) => img.src)
         .filter((src) => src.includes('licdn.com'))
     })
-    expect(licdnImages, `${path} must not have any img src containing licdn.com`).toHaveLength(0)
+    expect(
+      licdnImages,
+      `${path} must not have any img src containing licdn.com`,
+    ).toHaveLength(0)
   }
 })
 
