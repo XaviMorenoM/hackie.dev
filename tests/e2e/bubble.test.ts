@@ -107,11 +107,11 @@ for (const locale of SWEEP_LOCALES) {
         ] as const) {
           if (!controlBox) continue
 
-          // control must not overflow viewport
+          // control must not overflow viewport and must have minimum 16px left gutter
           expect(
             controlBox.x,
             `${name} left off-screen at ${width}px/${fontSize}px`,
-          ).toBeGreaterThanOrEqual(0)
+          ).toBeGreaterThanOrEqual(16)
           expect(
             controlBox.x + controlBox.width,
             `${name} right overflows at ${width}px/${fontSize}px`,
