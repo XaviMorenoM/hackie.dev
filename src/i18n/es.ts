@@ -236,6 +236,7 @@ export const es: Translations = {
     byline: 'Una app indie de hackie.dev',
     privacy: 'Privacidad',
     support: 'Soporte',
+    portfolioTagline: 'Hecho por Xavi Moreno',
   },
   notFound: {
     title: 'Página no encontrada',
