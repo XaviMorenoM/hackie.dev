@@ -189,10 +189,7 @@ test('bubble: no img src containing "licdn.com" on any sitemap page', async ({ p
         .map((img) => img.src)
         .filter((src) => src.includes('licdn.com'))
     })
-    expect(
-      licdnImages,
-      `${path} must not have any img src containing licdn.com`,
-    ).toHaveLength(0)
+    expect(licdnImages, `${path} must not have any img src containing licdn.com`).toHaveLength(0)
   }
 })
 
