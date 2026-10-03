@@ -29,18 +29,18 @@ describe('LiquidGlassBubble', () => {
       const home = localePath(locale)
       expect(html).toContain(`href="${home}"`)
       expect(html).toContain('data-testid="bubble-projects"')
-      // no aria-current on a non-home page
-      expect(html).not.toContain('aria-current="page"')
+      // aria-current present on a project page (active section indicator)
+      expect(html).toContain('aria-current="page"')
       // label comes from locale
       expect(html).toContain(t.nav.bubble.projects)
     })
 
-    it(`${locale}: bubble-projects has aria-current="page" on home path`, async () => {
+    it(`${locale}: bubble-projects has no aria-current="page" on directory (home) path`, async () => {
       const html = await container.renderToString(LiquidGlassBubble, {
         props: { locale },
         request: new Request(`http://localhost/${locale}/`),
       })
-      expect(html).toContain('aria-current="page"')
+      expect(html).not.toContain('aria-current="page"')
     })
 
     it(`${locale}: bubble-profile href equals DEVELOPER_LINKEDIN`, async () => {
