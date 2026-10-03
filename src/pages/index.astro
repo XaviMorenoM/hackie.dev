@@ -1,4 +1,30 @@
 ---
-// Intentionally empty. Astro i18n (prefixDefaultLocale + redirectToDefaultLocale) refuses to build
-// without a root index route; its injected `/` → `/en/` redirect takes priority over this file.
+// Root: detect browser language and redirect. Falls back to /en/ without JS.
 ---
+
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Redirecting…</title>
+    <script is:inline>
+      ;(function () {
+        var saved = ''
+        try {
+          saved = localStorage.lang || ''
+        } catch {}
+        var lang = saved || navigator.language || 'en'
+        var map = { es: 'es', ca: 'ca' }
+        var k =
+          Object.keys(map).find(function (k) {
+            return lang.startsWith(k)
+          }) || 'en'
+        location.replace('/' + k + '/')
+      })()
+    </script>
+    <noscript>
+      <meta http-equiv="refresh" content="0;url=/en/" />
+    </noscript>
+  </head>
+  <body></body>
+</html>

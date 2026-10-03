@@ -18,7 +18,7 @@ export default defineConfig({
     locales: ['en', 'es', 'ca'],
     routing: {
       prefixDefaultLocale: true,
-      redirectToDefaultLocale: true,
+      redirectToDefaultLocale: false,
     },
   },
   // Self-hosted at build time (no runtime request to Google), preloaded from Base.astro.
@@ -46,11 +46,14 @@ export default defineConfig({
   ],
   vite: {
     plugins: [tailwindcss()],
+    server: {
+      allowedHosts: ['mac-mini'],
+    },
   },
   integrations: [
     sitemap({
       // `/` and `/<locale>/alterio/` are only meta-refresh redirects.
-      filter: (page) => page !== new URL(SITE_BASE, SITE_URL).href && !/\/alterio\/$/.test(page),
+      filter: (page) => page !== new URL(SITE_BASE, SITE_URL).href,
       i18n: {
         defaultLocale: 'en',
         locales: { en: 'en', es: 'es', ca: 'ca' },
