@@ -88,6 +88,19 @@ test('site-bubble is present on /en/', async ({ page }) => {
 })
 
 // ---------------------------------------------------------------------------
+// Portfolio footer variant — /en/ directory page
+// ---------------------------------------------------------------------------
+
+test('footer on /en/ shows portfolio tagline, not project nav links', async ({ page }) => {
+  await page.goto('/en/')
+  const footer = page.locator('footer')
+  // Portfolio variant suppresses the Privacy/Support <nav>
+  await expect(footer.locator('nav')).toHaveCount(0)
+  // Portfolio variant shows the portfolioTagline byline
+  await expect(footer.locator('p').first()).toContainText('Xavi Moreno')
+})
+
+// ---------------------------------------------------------------------------
 // Responsive — no horizontal scrollbar at 375×812 on /en/
 // ---------------------------------------------------------------------------
 
