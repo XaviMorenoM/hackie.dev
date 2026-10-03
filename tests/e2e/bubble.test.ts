@@ -4,7 +4,7 @@
  * Covers:
  * - Bubble appears exactly once on every sitemap URL
  * - aria-current semantics on directory vs project pages
- * - No visual overlap with header controls at 375 px / 150% text scale (all locales)
+ * - No visual overlap / no viewport overflow across widths, fonts and locales
  * - No licdn.com image references
  * - Skip link layers above the bubble
  *
@@ -65,7 +65,78 @@ test('bubble-projects has aria-current="true" on a project page', async ({ page 
 })
 
 // ---------------------------------------------------------------------------
-// 3. Non-overlap at 375 px / 150% text scale — all three locales
+// 3. Sweep: no 2D overlap and no viewport overflow across widths × fonts × locales
+// ---------------------------------------------------------------------------
+
+const SWEEP_WIDTHS = [375, 520, 600, 1280]
+const SWEEP_FONT_SIZES = [16, 24]
+const SWEEP_LOCALES = ['en', 'ca'] as const
+
+for (const locale of SWEEP_LOCALES) {
+  for (const width of SWEEP_WIDTHS) {
+    for (const fontSize of SWEEP_FONT_SIZES) {
+      test(`bubble/controls: no overlap, no overflow — ${width}px/${fontSize}px root — /${locale}/`, async ({
+        page,
+      }) => {
+        await page.setViewportSize({ width, height: 900 })
+        await page.goto(`/${locale}/`)
+        await page.addStyleTag({ content: `html { font-size: ${fontSize}px !important; }` })
+        await page.waitForLoadState('networkidle')
+
+        const bubbleBox = await page.getByTestId('site-bubble').boundingBox()
+        const langBox = await page.getByTestId('lang-switcher').boundingBox()
+        const themeBox = await page.getByTestId('theme-switch').boundingBox()
+
+        expect(bubbleBox).not.toBeNull()
+
+        if (bubbleBox) {
+          // bubble itself must not overflow the viewport
+          expect(
+            bubbleBox.x,
+            `bubble left off-screen at ${width}px/${fontSize}px`,
+          ).toBeGreaterThanOrEqual(0)
+          expect(
+            bubbleBox.x + bubbleBox.width,
+            `bubble right overflows at ${width}px/${fontSize}px`,
+          ).toBeLessThanOrEqual(width)
+        }
+
+        for (const [name, controlBox] of [
+          ['lang-switcher', langBox],
+          ['theme-switch', themeBox],
+        ] as const) {
+          if (!controlBox) continue
+
+          // control must not overflow viewport
+          expect(
+            controlBox.x,
+            `${name} left off-screen at ${width}px/${fontSize}px`,
+          ).toBeGreaterThanOrEqual(0)
+          expect(
+            controlBox.x + controlBox.width,
+            `${name} right overflows at ${width}px/${fontSize}px`,
+          ).toBeLessThanOrEqual(width)
+
+          if (bubbleBox) {
+            const xOverlap =
+              bubbleBox.x + bubbleBox.width > controlBox.x &&
+              controlBox.x + controlBox.width > bubbleBox.x
+            const yOverlap =
+              bubbleBox.y + bubbleBox.height > controlBox.y &&
+              controlBox.y + controlBox.height > bubbleBox.y
+            expect(
+              xOverlap && yOverlap,
+              `bubble must not visually overlap ${name} at ${width}px/${fontSize}px on /${locale}/`,
+            ).toBe(false)
+          }
+        }
+      })
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 4. Non-overlap at 375 px / 150% text scale — all three locales (incl. /es/)
 // ---------------------------------------------------------------------------
 
 for (const locale of ['en', 'es', 'ca'] as const) {
@@ -107,7 +178,7 @@ for (const locale of ['en', 'es', 'ca'] as const) {
 }
 
 // ---------------------------------------------------------------------------
-// 4. No licdn.com image sources on any page
+// 5. No licdn.com image sources on any page
 // ---------------------------------------------------------------------------
 
 test('bubble: no img src containing "licdn.com" on any sitemap page', async ({ page }) => {
@@ -118,12 +189,15 @@ test('bubble: no img src containing "licdn.com" on any sitemap page', async ({ p
         .map((img) => img.src)
         .filter((src) => src.includes('licdn.com'))
     })
-    expect(licdnImages, `${path} must not have any img src containing licdn.com`).toHaveLength(0)
+    expect(
+      licdnImages,
+      `${path} must not have any img src containing licdn.com`,
+    ).toHaveLength(0)
   }
 })
 
 // ---------------------------------------------------------------------------
-// 5. Skip link appears above the bubble (z-index check)
+// 6. Skip link appears above the bubble (z-index check)
 // ---------------------------------------------------------------------------
 
 test('bubble: skip link z-index is above bubble z-index', async ({ page }) => {
