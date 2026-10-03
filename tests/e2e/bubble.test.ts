@@ -88,16 +88,16 @@ for (const locale of ['en', 'es', 'ca'] as const) {
     expect(controlsBox).not.toBeNull()
 
     if (bubbleBox && controlsBox) {
-      // 2-D bounding-box intersection: true iff they visually overlap.
-      // The flex-wrap layout intentionally wraps controls to a second row
-      // below the fixed bubble, so an x-only check is insufficient.
-      const overlaps =
-        bubbleBox.x < controlsBox.x + controlsBox.width &&
+      const xOverlap =
         bubbleBox.x + bubbleBox.width > controlsBox.x &&
-        bubbleBox.y < controlsBox.y + controlsBox.height &&
-        bubbleBox.y + bubbleBox.height > controlsBox.y
-
-      expect(overlaps, 'bubble must not visually overlap lang-switcher').toBe(false)
+        controlsBox.x + controlsBox.width > bubbleBox.x
+      const yOverlap =
+        bubbleBox.y + bubbleBox.height > controlsBox.y &&
+        controlsBox.y + controlsBox.height > bubbleBox.y
+      expect(
+        xOverlap && yOverlap,
+        `bubble must not visually overlap lang-switcher on /${locale}/`,
+      ).toBe(false)
 
       // no horizontal scroll: neither element overflows the 375px viewport
       expect(bubbleBox.x + bubbleBox.width).toBeLessThanOrEqual(375)
@@ -118,7 +118,10 @@ test('bubble: no img src containing "licdn.com" on any sitemap page', async ({ p
         .map((img) => img.src)
         .filter((src) => src.includes('licdn.com'))
     })
-    expect(licdnImages, `${path} must not have any img src containing licdn.com`).toHaveLength(0)
+    expect(
+      licdnImages,
+      `${path} must not have any img src containing licdn.com`,
+    ).toHaveLength(0)
   }
 })
 
