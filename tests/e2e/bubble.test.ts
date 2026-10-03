@@ -12,6 +12,73 @@ test('bubble-projects has aria-current="true" on a project page', async ({ page 
   await expect(link).toHaveAttribute('aria-current', 'true')
 })
 
+const SWEEP_WIDTHS = [375, 520, 600, 1280]
+const SWEEP_FONT_SIZES = [16, 24]
+const SWEEP_LOCALES = ['en', 'ca'] as const
+
+for (const locale of SWEEP_LOCALES) {
+  for (const width of SWEEP_WIDTHS) {
+    for (const fontSize of SWEEP_FONT_SIZES) {
+      test(`bubble/controls: no overlap, no overflow — ${width}px/${fontSize}px root — /${locale}/`, async ({
+        page,
+      }) => {
+        await page.setViewportSize({ width, height: 900 })
+        await page.goto(`/${locale}/`)
+        await page.addStyleTag({ content: `html { font-size: ${fontSize}px !important; }` })
+        await page.waitForLoadState('networkidle')
+
+        const bubbleBox = await page.getByTestId('site-bubble').boundingBox()
+        const langBox = await page.getByTestId('lang-switcher').boundingBox()
+        const themeBox = await page.getByTestId('theme-switch').boundingBox()
+
+        expect(bubbleBox).not.toBeNull()
+
+        if (bubbleBox) {
+          // bubble itself must not overflow the viewport
+          expect(
+            bubbleBox.x,
+            `bubble left off-screen at ${width}px/${fontSize}px`,
+          ).toBeGreaterThanOrEqual(0)
+          expect(
+            bubbleBox.x + bubbleBox.width,
+            `bubble right overflows at ${width}px/${fontSize}px`,
+          ).toBeLessThanOrEqual(width)
+        }
+
+        for (const [name, controlBox] of [
+          ['lang-switcher', langBox],
+          ['theme-switch', themeBox],
+        ] as const) {
+          if (!controlBox) continue
+
+          // control must not overflow viewport
+          expect(
+            controlBox.x,
+            `${name} left off-screen at ${width}px/${fontSize}px`,
+          ).toBeGreaterThanOrEqual(0)
+          expect(
+            controlBox.x + controlBox.width,
+            `${name} right overflows at ${width}px/${fontSize}px`,
+          ).toBeLessThanOrEqual(width)
+
+          if (bubbleBox) {
+            const xOverlap =
+              bubbleBox.x + bubbleBox.width > controlBox.x &&
+              controlBox.x + controlBox.width > bubbleBox.x
+            const yOverlap =
+              bubbleBox.y + bubbleBox.height > controlBox.y &&
+              controlBox.y + controlBox.height > bubbleBox.y
+            expect(
+              xOverlap && yOverlap,
+              `bubble must not visually overlap ${name} at ${width}px/${fontSize}px on /${locale}/`,
+            ).toBe(false)
+          }
+        }
+      })
+    }
+  }
+}
+
 for (const locale of ['en', 'es', 'ca'] as const) {
   test(`bubble does not overlap header controls at 375px/150% text — /${locale}/`, async ({
     page,
