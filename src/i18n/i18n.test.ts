@@ -13,7 +13,16 @@ describe('i18n translations', () => {
 
   // control: the translation object structure must not drift — all top-level keys must exist
   it('each locale has all required top-level keys', () => {
-    const requiredKeys = ['meta', 'nav', 'product', 'privacy', 'support', 'footer', 'notFound']
+    const requiredKeys = [
+      'meta',
+      'nav',
+      'product',
+      'privacy',
+      'support',
+      'footer',
+      'notFound',
+      'directory',
+    ]
     for (const locale of LOCALES) {
       const t = useTranslations(locale)
       for (const key of requiredKeys) {
@@ -21,6 +30,23 @@ describe('i18n translations', () => {
       }
     }
   })
+
+  for (const locale of LOCALES) {
+    it(`${locale}: directory.howSteps has exactly 3 items`, () => {
+      const t = useTranslations(locale)
+      expect(t.directory.howSteps).toHaveLength(3)
+    })
+
+    it(`${locale}: directory.howSteps items each have title and body`, () => {
+      const t = useTranslations(locale)
+      for (const step of t.directory.howSteps) {
+        expect(typeof step.title).toBe('string')
+        expect(step.title.length).toBeGreaterThan(0)
+        expect(typeof step.body).toBe('string')
+        expect(step.body.length).toBeGreaterThan(0)
+      }
+    })
+  }
 
   for (const locale of LOCALES) {
     it(`${locale}: nav.bubble.label is non-empty`, () => {
