@@ -1,0 +1,70 @@
+version: 1
+
+project:
+  name: hackie.dev
+  summary: "Product landing page for a gym-tracker iOS app (Alterio/Hackie). Astro 7 · TypeScript · Tailwind v4 · static output · 3 locales (en/es/ca) · deployed to GitHub Pages."
+  stack: [astro, typescript, tailwind, node]
+  platforms: [web]
+
+# Project-level agent files are in .claude/agents/ and are authoritative.
+# This YAML is documentation. /teamwork uses the agent files, not these roles.
+# Pipeline: lead → ux (UI tickets) → design → implement → validate → submit
+roles: [lead, ux, design, implement, validate, submit]
+
+vcs:
+  base: main
+  branch_prefixes: [feat, fix, chore, refactor]
+  pr: gh
+  merge: squash
+  replay: cherry-pick
+
+setup:
+  - npm ci
+
+gates:
+  - {id: typecheck, run: "npm run check", stage: implement}
+  - {id: build,     run: "npm run build", stage: implement}
+  - {id: format,    run: "npm run format:check", stage: implement, planned: true}
+  - {id: lint,      run: "npm run lint", stage: implement, planned: true}
+  - {id: unit,      run: "npm run test:unit", stage: implement, planned: true}
+  - {id: e2e,       run: "npx playwright test {targets}", all: "npx playwright test", stage: validate, planned: true}
+
+tests:
+  - {id: unit, owner: implement, location: "src/**/*.test.ts", required_for: always}
+  - {id: e2e,  owner: validate,  location: "tests/e2e/",       required_for: user_flow_change}
+
+design:
+  trigger: lead_flag
+  mockups: figma
+  checks: [dark mode, mobile layout, locale text overflow, contrast, reduced motion]
+
+tracker:
+  kind: github
+  repo: XaviMorenoM/hackie.dev
+  done: close
+
+docs:
+  read_first: [CLAUDE.md, README.md]
+
+guardrails:
+  never: ["git push --force", "--no-verify"]
+  human_only: ["GitHub Pages custom domain settings"]
+
+waves: {max_parallel: 3, max_bounces: 3}
+models: {lead: opus, design: opus, implement: sonnet, validate: sonnet, submit: sonnet}
+
+# role_notes are superseded by the project-level agent files in .claude/agents/.
+# Kept here for reference; the agent files are the authoritative source.
+role_notes:
+  lead: >
+    For UI tickets, spawn the `ux` agent with your draft spec before finalising.
+    Incorporate UX feedback. Add ux_brief: to your output.
+  ux: >
+    UX analyst. Called by lead (full spec review) or design (specific question).
+    verdict: approved | approved_with_recommendations | concerns_require_revision.
+  design: >
+    Generate 2-3 distinct proposals. Post to GitHub issue with pending_user_selection: true.
+    Spawn `ux` if uncertain about direction. Do not produce a single-option spec.
+  implement: >
+    Implement the SELECTED design proposal (Organiser tells you which).
+    Dev server: npm run dev -- --port <4322+>. Include preview URL in report.
