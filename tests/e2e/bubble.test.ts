@@ -32,13 +32,19 @@ for (const locale of ['en', 'es', 'ca'] as const) {
     expect(controlsBox).not.toBeNull()
 
     if (bubbleBox && controlsBox) {
-      const bubbleRight = bubbleBox.x + bubbleBox.width
-
-      // bubble must end before the controls begin — no intersection allowed
-      expect(bubbleRight).toBeLessThanOrEqual(controlsBox.x)
+      const xOverlap =
+        bubbleBox.x + bubbleBox.width > controlsBox.x &&
+        controlsBox.x + controlsBox.width > bubbleBox.x
+      const yOverlap =
+        bubbleBox.y + bubbleBox.height > controlsBox.y &&
+        controlsBox.y + controlsBox.height > bubbleBox.y
+      expect(
+        xOverlap && yOverlap,
+        `bubble must not visually overlap lang-switcher on /${locale}/`,
+      ).toBe(false)
 
       // no horizontal scroll: neither element overflows the 375px viewport
-      expect(bubbleRight).toBeLessThanOrEqual(375)
+      expect(bubbleBox.x + bubbleBox.width).toBeLessThanOrEqual(375)
       expect(controlsBox.x + controlsBox.width).toBeLessThanOrEqual(375)
     }
   })

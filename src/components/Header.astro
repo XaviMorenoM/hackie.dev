@@ -16,7 +16,7 @@ const { locale, showLangSwitcher = true } = Astro.props
 >
   <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-end py-4 pr-5 sm:flex-nowrap sm:pr-8">
     <!-- spacer: 144px fixed width reserves room for the fixed-position bubble at all text scales -->
-    <div class="h-0 basis-[144px] shrink-0" aria-hidden="true"></div>
+    <div class="h-[2rem] basis-[144px] shrink-0" aria-hidden="true"></div>
     <div class="flex items-center gap-4 sm:gap-6">
       {showLangSwitcher && <LangSwitcher locale={locale} />}
       <ThemeSwitch locale={locale} />
