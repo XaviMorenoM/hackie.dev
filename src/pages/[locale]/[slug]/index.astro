@@ -22,8 +22,6 @@ const t = useTranslations(locale);
 const pt = (t.projects as Record<string, { tagline: string; description: string }>)[project.slug] ?? { tagline: '', description: '' };
 ---
 <ProjectLayout project={project} locale={locale} title={`${project.name} — ${pt.tagline}`} description={pt.description}>
-  <main id="content">
-    <ProjectHero project={project} locale={locale} />
-    {project.changelog.length > 0 && <ChangelogSection changelog={project.changelog} />}
-  </main>
+  <ProjectHero project={project} locale={locale} />
+  {project.changelog.length > 0 && <ChangelogSection changelog={project.changelog} />}
 </ProjectLayout>

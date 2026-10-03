@@ -2,7 +2,9 @@ import { registerProject } from '../index';
 
 registerProject({
   slug: 'diskspace',
-  name: 'diskspace',
+  name: 'Diskspace',
+  screenshot: '/projects/diskspace/screenshot.png',
+  screenshotDark: '/projects/diskspace/screenshot-dark.png',
   platform: ['cli', 'macos'],
   accent: '#4E79A7',
   accentDark: '#4E79A7',
