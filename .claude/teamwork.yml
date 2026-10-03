@@ -6,7 +6,10 @@ project:
   stack: [astro, typescript, tailwind, node]
   platforms: [web]
 
-roles: [lead, design, implement, validate, submit]
+# Project-level agent files are in .claude/agents/ and are authoritative.
+# This YAML is documentation. /teamwork uses the agent files, not these roles.
+# Pipeline: lead → ux (UI tickets) → design → implement → validate → submit
+roles: [lead, ux, design, implement, validate, submit]
 
 vcs:
   base: main
@@ -50,18 +53,18 @@ guardrails:
 waves: {max_parallel: 3, max_bounces: 3}
 models: {lead: opus, design: opus, implement: sonnet, validate: sonnet, submit: sonnet}
 
+# role_notes are superseded by the project-level agent files in .claude/agents/.
+# Kept here for reference; the agent files are the authoritative source.
 role_notes:
   lead: >
-    For UI-change tickets, run a design-prep phase BEFORE writing the implementation
-    spec: spawn a UX analysis agent and a design agent to generate 2-3 design proposals.
-    Post rendered screenshots or Figma links to the GitHub issue and wait for the user
-    to select one before finalising the spec.
+    For UI tickets, spawn the `ux` agent with your draft spec before finalising.
+    Incorporate UX feedback. Add ux_brief: to your output.
+  ux: >
+    UX analyst. Called by lead (full spec review) or design (specific question).
+    verdict: approved | approved_with_recommendations | concerns_require_revision.
   design: >
-    Your role starts BEFORE implementation. Generate 2-3 distinct design proposals
-    (layout, colour, or copy variations) and post them to the GitHub issue as screenshots
-    or Figma links. Implementation does not start until the user selects a proposal.
+    Generate 2-3 distinct proposals. Post to GitHub issue with pending_user_selection: true.
+    Spawn `ux` if uncertain about direction. Do not produce a single-option spec.
   implement: >
-    When running the dev server for live review, use a unique port to avoid collisions:
-    `npm run dev -- --port <PORT>`. Choose 4322+ and include the URL in your report
-    labeled with your branch name, e.g.
-    "Preview: http://localhost:4325 (feat/hero-redesign)".
+    Implement the SELECTED design proposal (Organiser tells you which).
+    Dev server: npm run dev -- --port <4322+>. Include preview URL in report.
