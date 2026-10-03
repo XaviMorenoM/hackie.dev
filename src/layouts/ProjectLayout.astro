@@ -1,6 +1,5 @@
 ---
 import Base from './Base.astro'
-import LiquidGlassBubble from '../components/project/LiquidGlassBubble.astro'
 import type { Project } from '../content/projects/index'
 import type { Locale } from '../config'
 
@@ -27,6 +26,5 @@ const { project, locale, title, description } = Astro.props
       --project-accent-ink: var(--project-accent-ink);
     }
   </style>
-  <LiquidGlassBubble locale={locale} />
   <slot />
 </Base>

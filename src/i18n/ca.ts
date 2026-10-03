@@ -20,6 +20,11 @@ export const ca: Translations = {
     theme: { label: 'Tema', system: 'Tema del sistema', light: 'Tema clar', dark: 'Tema fosc' },
     footerAria: 'Peu de pàgina',
     homeAria: 'Inici {dApp}',
+    bubble: {
+      label: 'Navegació del lloc',
+      projects: 'Projectes',
+      linkedinAria: "{developer} a LinkedIn (s'obre en una pestanya nova)",
+    },
   },
   product: {
     eyebrow: 'Registre d’entrenaments per a iPhone',

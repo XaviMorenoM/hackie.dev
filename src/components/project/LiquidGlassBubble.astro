@@ -1,36 +1,59 @@
 ---
-import { localePath } from '../../i18n'
-import type { Locale } from '../../config'
+import { Image } from 'astro:assets'
+import { localePath, stripLocale, useTranslations } from '../../i18n'
+import { DEVELOPER_LINKEDIN, DEVELOPER_NAME, type Locale } from '../../config'
+import { projectSlugs } from '../../content/projects/index'
+import avatar from '../../assets/avatar/xavi.jpg'
+
 interface Props {
   locale: Locale
 }
 const { locale } = Astro.props
-const PHOTO =
-  'https://media.licdn.com/dms/image/v2/C4D03AQF6SwLPg9_rcQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1573058109252?e=1792627200&v=beta&t=pw0VAgDh_DkNAp8y3IiJKppN3iRnuYVW1OHQbCWLwrU'
+const t = useTranslations(locale)
+const _p = stripLocale(Astro.url.pathname)
+const _isDirectory = _p === '/'
+// Trailing slash is always present in Astro static output, including the 404 page (/404/).
+// Check against registered project slugs so error pages are never marked active.
+const _isProjectPage = !_isDirectory && projectSlugs.some((s) => _p.startsWith(`/${s}/`))
 ---
 
-<nav class="bubble" aria-label="Site navigation">
-  <a href={localePath(locale, '/')} class="bubble__nav">
+<nav class="bubble" aria-label={t.nav.bubble.label} data-testid="site-bubble">
+  <a
+    href={localePath(locale)}
+    class="bubble__nav"
+    data-testid="bubble-projects"
+    aria-current={_isDirectory ? 'page' : _isProjectPage ? 'true' : undefined}
+  >
     <svg width="15" height="15" viewBox="0 0 14 14" fill="none" aria-hidden="true">
       <rect x="0" y="0" width="6" height="6" rx="1.5" fill="currentColor" opacity=".9" />
       <rect x="8" y="0" width="6" height="6" rx="1.5" fill="currentColor" opacity=".9" />
       <rect x="0" y="8" width="6" height="6" rx="1.5" fill="currentColor" opacity=".9" />
       <rect x="8" y="8" width="6" height="6" rx="1.5" fill="currentColor" opacity=".9" />
     </svg>
-    <span class="bubble__label">Projects</span>
+    <span class="bubble__label">{t.nav.bubble.projects}</span>
   </a>
 
   <div class="bubble__sep" aria-hidden="true"></div>
 
   <a
-    href="https://www.linkedin.com/in/xavimorenom"
+    href={DEVELOPER_LINKEDIN}
     target="_blank"
     rel="noopener noreferrer"
     class="bubble__profile"
-    aria-label="Xavi Moreno on LinkedIn"
+    aria-label={t.nav.bubble.linkedinAria}
+    data-testid="bubble-profile"
   >
-    <img src={PHOTO} alt="" class="bubble__avatar" width="28" height="28" loading="eager" />
-    <span class="bubble__name">Xavi</span>
+    <Image
+      src={avatar}
+      alt=""
+      width={28}
+      height={28}
+      densities={[1, 2]}
+      loading="eager"
+      class="bubble__avatar"
+      data-testid="bubble-avatar"
+    />
+    <span class="bubble__name">{DEVELOPER_NAME.split(' ')[0]}</span>
     <span class="bubble__li-logo" aria-hidden="true">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
         <rect width="24" height="24" rx="5" fill="#0A66C2" />
@@ -46,7 +69,7 @@ const PHOTO =
 <style>
   .bubble {
     position: fixed;
-    top: 1.25rem;
+    top: 0.8125rem;
     left: 1.25rem;
     z-index: 50;
     display: flex;
@@ -176,11 +199,19 @@ const PHOTO =
     opacity: 0.9;
   }
 
-  @media (max-width: 480px) {
+  @media (max-width: 639px) {
     .bubble__label {
-      display: none;
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
     }
     .bubble__name {
+      display: none;
+    }
+    .bubble__li-logo {
       display: none;
     }
   }
