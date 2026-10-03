@@ -19,6 +19,8 @@ interface Props {
   noindex?: boolean
   /** Hide the sticky header entirely (project pages use the LiquidGlassBubble instead). */
   noHeader?: boolean
+  /** Footer variant: 'project' (default) or 'portfolio' (directory page). */
+  footerVariant?: 'portfolio' | 'project'
 }
 
 const {
@@ -29,6 +31,7 @@ const {
   ogType = 'website',
   noindex = false,
   noHeader = false,
+  footerVariant = 'project',
 } = Astro.props
 const t = useTranslations(locale)
 
@@ -104,7 +107,7 @@ const ogImage = new URL(withBase('/og.png'), SITE_URL).href
     <main id="main" class="flex-1">
       <slot />
     </main>
-    <Footer locale={locale} />
+    <Footer locale={locale} variant={footerVariant} />
     <script is:inline>
       ;(function (r, bs) {
         function sync() {

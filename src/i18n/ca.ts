@@ -236,6 +236,7 @@ export const ca: Translations = {
     byline: 'Una app indie de hackie.dev',
     privacy: 'Privacitat',
     support: 'Suport',
+    portfolioTagline: 'Fet per Xavi Moreno',
   },
   notFound: {
     title: 'Pàgina no trobada',
@@ -243,10 +244,31 @@ export const ca: Translations = {
     cta: 'Torna a {app}',
   },
   directory: {
-    intro: 'Apps i eines, fetes amb IA.',
-    work: 'Projectes', // TODO: translate
-    bio: 'desenvolupador indie', // TODO: translate
+    intro:
+      'Faig apps petites i útils per a problemes que tinc de debò: les dissenyo jo i les construeixo colze a colze amb la IA.',
+    work: 'Projectes',
+    bio: 'desenvolupador indie',
     platformBadge: { ios: 'iOS', macos: 'macOS', cli: 'CLI' },
+    howHeading: 'Com treballo',
+    howIntro: "Un desenvolupador, uns quants agents d'IA i opinions fermes sobre els detalls.",
+    howSteps: [
+      {
+        title: "Partir d'alguna cosa real",
+        body: "Cada app neix d'alguna cosa que m'emprenyava. Si no la faré servir cada setmana, no la faig.",
+      },
+      {
+        title: 'Construir amb IA',
+        body: "Els agents d'IA escriuen, proven i revisen el codi amb mi. Jo marco el rumb i decideixo què es publica.",
+      },
+      {
+        title: 'Cuidar cada detall',
+        body: "Accessibilitat, mode fosc, tres idiomes, l'últim píxel. La IA ho fa ràpid; el criteri continua sent cosa meva.",
+      },
+    ],
+    contactHeading: 'Escriu-me',
+    contactBody:
+      "Estàs creant alguna cosa amb IA o tens una idea d'app encallada? Sempre m'agrada parlar-ne.",
+    contactLinkedin: 'LinkedIn',
   },
   projects: {
     alterio: {

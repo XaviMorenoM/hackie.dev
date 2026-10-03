@@ -102,6 +102,8 @@ export interface Translations {
     byline: string
     privacy: string
     support: string
+    /** Shown in `variant="portfolio"` in place of the "An indie app" line. */
+    portfolioTagline: string
   }
   notFound: {
     title: string
@@ -113,6 +115,12 @@ export interface Translations {
     work: string
     bio: string
     platformBadge: Record<'ios' | 'macos' | 'cli', string>
+    howHeading: string
+    howIntro: string
+    howSteps: { title: string; body: string }[]
+    contactHeading: string
+    contactBody: string
+    contactLinkedin: string
   }
   projects: Record<string, { tagline: string; description: string }>
 }
