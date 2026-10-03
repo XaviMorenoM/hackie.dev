@@ -112,7 +112,7 @@ export interface Translations {
     intro: string
     work: string
     bio: string
-    platformBadge: Record<string, string>
+    platformBadge: Record<'ios' | 'macos' | 'cli', string>
     howHeading: string
     howIntro: string
     howSteps: { title: string; body: string }[]

@@ -247,10 +247,7 @@ export const es: Translations = {
       'Hago apps pequeñas y útiles para problemas que tengo de verdad: las diseño yo y las construyo mano a mano con IA.',
     work: 'Proyectos',
     bio: 'desarrollador indie',
-    platformBadge: {
-      alterio: 'Disponible en el App Store',
-      diskspace: 'Disponible en el App Store',
-    },
+    platformBadge: { ios: 'iOS', macos: 'macOS', cli: 'CLI' },
     howHeading: 'Cómo trabajo',
     howIntro: 'Un desarrollador, unos cuantos agentes de IA y opiniones firmes sobre los detalles.',
     howSteps: [

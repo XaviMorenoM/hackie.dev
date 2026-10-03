@@ -245,10 +245,7 @@ export const en: Translations = {
       'I make small, useful apps for problems I actually have — designed by me, built hand in hand with AI.',
     work: 'Work',
     bio: 'indie developer',
-    platformBadge: {
-      alterio: 'Available on the App Store',
-      diskspace: 'Available on the App Store',
-    },
+    platformBadge: { ios: 'iOS', macos: 'macOS', cli: 'CLI' },
     howHeading: 'How I build',
     howIntro: 'One developer, a few AI agents, and strong opinions about the details.',
     howSteps: [
