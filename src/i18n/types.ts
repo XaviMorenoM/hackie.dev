@@ -102,6 +102,8 @@ export interface Translations {
     byline: string
     privacy: string
     support: string
+    /** Shown in `variant="portfolio"` in place of the "An indie app" line. */
+    portfolioTagline: string
   }
   notFound: {
     title: string

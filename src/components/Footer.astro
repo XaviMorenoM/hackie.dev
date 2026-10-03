@@ -5,8 +5,11 @@ import { localePath, useTranslations } from '../i18n'
 
 interface Props {
   locale: Locale
+  /** 'project' (default) shows the "An indie app" byline + Privacy/Support links.
+   *  'portfolio' shows the portfolioTagline and omits product-specific links. */
+  variant?: 'portfolio' | 'project'
 }
-const { locale } = Astro.props
+const { locale, variant = 'project' } = Astro.props
 const t = useTranslations(locale)
 const year = new Date().getFullYear()
 const [bylineBefore = '', bylineAfter = ''] = t.footer.byline.split(SITE_NAME)
@@ -18,36 +21,42 @@ const [bylineBefore = '', bylineAfter = ''] = t.footer.byline.split(SITE_NAME)
       <a href={localePath(locale)} class="display text-3xl text-fg">
         hackie<span class="text-lime">.</span>
       </a>
-      <p class="mt-2">
-        {bylineBefore}
-        <a href={localePath(locale)} class="text-fg transition-colors hover:text-lime">
-          {SITE_NAME}
-        </a>
-        {bylineAfter}
-      </p>
+      {variant === 'portfolio' ? (
+        <p class="mt-2">{t.footer.portfolioTagline}</p>
+      ) : (
+        <p class="mt-2">
+          {bylineBefore}
+          <a href={localePath(locale)} class="text-fg transition-colors hover:text-lime">
+            {SITE_NAME}
+          </a>
+          {bylineAfter}
+        </p>
+      )}
       <p class="mt-1">
         © {year} {DEVELOPER_NAME}
       </p>
     </div>
-    <nav aria-label={t.nav.footerAria}>
-      <ul class="flex flex-wrap gap-x-6 gap-y-2">
-        <li>
-          <a
-            class="transition-colors hover:text-fg"
-            href={localePath(locale, `${APP_SLUG}/privacy`)}
-          >
-            {t.footer.privacy}
-          </a>
-        </li>
-        <li>
-          <a
-            class="transition-colors hover:text-fg"
-            href={localePath(locale, `${APP_SLUG}/support`)}
-          >
-            {t.footer.support}
-          </a>
-        </li>
-      </ul>
-    </nav>
+    {variant === 'project' && (
+      <nav aria-label={t.nav.footerAria}>
+        <ul class="flex flex-wrap gap-x-6 gap-y-2">
+          <li>
+            <a
+              class="transition-colors hover:text-fg"
+              href={localePath(locale, `${APP_SLUG}/privacy`)}
+            >
+              {t.footer.privacy}
+            </a>
+          </li>
+          <li>
+            <a
+              class="transition-colors hover:text-fg"
+              href={localePath(locale, `${APP_SLUG}/support`)}
+            >
+              {t.footer.support}
+            </a>
+          </li>
+        </ul>
+      </nav>
+    )}
   </div>
 </footer>

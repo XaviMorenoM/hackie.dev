@@ -234,6 +234,7 @@ export const en: Translations = {
     byline: 'An indie app by hackie.dev',
     privacy: 'Privacy',
     support: 'Support',
+    portfolioTagline: 'Made by Xavi Moreno',
   },
   notFound: {
     title: 'Page not found',
