@@ -247,7 +247,7 @@ export const ca: Translations = {
       'Faig apps petites i útils per a problemes que tinc de debò: les dissenyo jo i les construeixo colze a colze amb la IA.',
     work: 'Projectes',
     bio: 'desenvolupador indie',
-    platformBadge: { alterio: "Disponible a l'App Store", diskspace: "Disponible a l'App Store" },
+    platformBadge: { ios: 'iOS', macos: 'macOS', cli: 'CLI' },
     howHeading: 'Com treballo',
     howIntro: "Un desenvolupador, uns quants agents d'IA i opinions fermes sobre els detalls.",
     howSteps: [
@@ -261,7 +261,7 @@ export const ca: Translations = {
       },
       {
         title: 'Cuidar cada detall',
-        body: "Accessibilitat, mode fosc, tres idiomes, l'últim píxel. La IA ho fa ràpid; el criterio continua sent cosa meva.",
+        body: "Accessibilitat, mode fosc, tres idiomes, l'últim píxel. La IA ho fa ràpid; el criteri continua sent cosa meva.",
       },
     ],
     contactHeading: 'Escriu-me',
