@@ -9,6 +9,10 @@ export interface Project {
   appStoreUrl?: string;
   testflightUrl?: string;
   installCommand?: string;
+  /** URL path under /public — shown in the hero right column (light mode). */
+  screenshot?: string;
+  /** Dark-mode variant of screenshot; falls back to screenshot if omitted. */
+  screenshotDark?: string;
   changelog: { version: string; date: string; notes: string[] }[];
 }
 
