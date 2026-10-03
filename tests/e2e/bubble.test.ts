@@ -68,8 +68,8 @@ test('bubble-projects has aria-current="true" on a project page', async ({ page 
 // 3. Sweep: no 2D overlap and no viewport overflow across widths × fonts × locales
 // ---------------------------------------------------------------------------
 
-const SWEEP_WIDTHS = [375, 520, 600, 1280]
-const SWEEP_FONT_SIZES = [16, 24]
+const SWEEP_WIDTHS = [375, 520, 600, 640, 700, 768, 1280]
+const SWEEP_FONT_SIZES = [16, 24, 32]
 const SWEEP_LOCALES = ['en', 'ca'] as const
 
 for (const locale of SWEEP_LOCALES) {
