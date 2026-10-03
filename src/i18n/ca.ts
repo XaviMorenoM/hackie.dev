@@ -1,4 +1,4 @@
-import type { Translations } from './types';
+import type { Translations } from './types'
 
 export const ca: Translations = {
   meta: {
@@ -9,7 +9,8 @@ export const ca: Translations = {
     privacyDescription:
       'Com tracta {app} les teves dades: tot es queda al teu dispositiu i al teu propi iCloud. Sense servidors, sense rastrejadors, sense anuncis.',
     supportTitle: 'Suport — {app}',
-    supportDescription: 'Respostes a les preguntes més habituals sobre {app} i com posar-t’hi en contacte.',
+    supportDescription:
+      'Respostes a les preguntes més habituals sobre {app} i com posar-t’hi en contacte.',
   },
   nav: {
     skipToContent: 'Ves al contingut',
@@ -78,7 +79,8 @@ export const ca: Translations = {
     ],
     galleryEyebrow: 'Pantalles',
     galleryHeading: 'Dissenyada per al racó fosc del gimnàs.',
-    gallerySub: 'Alt contrast, botons grans, una sola mà. Es veu igual a les 6 del matí que a les 11 de la nit.',
+    gallerySub:
+      'Alt contrast, botons grans, una sola mà. Es veu igual a les 6 del matí que a les 11 de la nit.',
     screenshotAlts: [
       'Pantalla Avui {dApp}: sense rutina programada, amb els botons Només entrenar i Veure biblioteca i la setmana següent',
       'Pantalla Biblioteca {dApp} amb les rutines Push, Pull, Cama i Tren superior i el nombre de sessions',
@@ -186,7 +188,8 @@ export const ca: Translations = {
   support: {
     eyebrow: 'Ajuda',
     title: 'Suport',
-    intro: 'Respostes a les preguntes que més ens arriben. Si la teva no hi és, envia un correu: respon una persona de debò.',
+    intro:
+      'Respostes a les preguntes que més ens arriben. Si la teva no hi és, envia un correu: respon una persona de debò.',
     faqHeading: 'Preguntes freqüents',
     faq: [
       {
@@ -219,7 +222,8 @@ export const ca: Translations = {
       },
     ],
     contactHeading: 'Encara encallat?',
-    contactBody: 'Escriu directament al desenvolupador. Indica la teva versió d’iOS i què estaves fent quan ha passat el problema.',
+    contactBody:
+      'Escriu directament al desenvolupador. Indica la teva versió d’iOS i què estaves fent quan ha passat el problema.',
     contactCta: 'Escriu a suport',
     contactHint: 'O escriu a {email}',
   },
@@ -233,4 +237,4 @@ export const ca: Translations = {
     body: 'Aquest enllaç no porta enlloc.',
     cta: 'Torna a {app}',
   },
-};
+}

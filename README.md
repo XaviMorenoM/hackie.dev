@@ -21,13 +21,12 @@ The site is the product's standalone landing — the `hackie.dev` brand appears 
 | Path                           | What                                                        |
 | ------------------------------ | ----------------------------------------------------------- |
 | `/{en,es,ca}/`                 | Product landing (hero, features, screens, video, data, CTA) |
-| `/{en,es,ca}/alterio/`         | Legacy URL → instant redirect to `/{locale}/` (noindex)      |
-| `/{en,es,ca}/alterio/privacy/` | Privacy policy (App Store Connect "Privacy Policy URL")      |
-| `/{en,es,ca}/alterio/support/` | FAQ + mailto (App Store Connect "Support URL")               |
-| `/404`                         | Not-found page (English)                                     |
+| `/{en,es,ca}/alterio/`         | Legacy URL → instant redirect to `/{locale}/` (noindex)     |
+| `/{en,es,ca}/alterio/privacy/` | Privacy policy (App Store Connect "Privacy Policy URL")     |
+| `/{en,es,ca}/alterio/support/` | FAQ + mailto (App Store Connect "Support URL")              |
+| `/404`                         | Not-found page (English)                                    |
 
 Sitemap lists the 9 real pages; redirects are excluded.
-
 
 ## Renaming the app
 
@@ -63,8 +62,8 @@ To wire them into the site:
    - `ca` reuses `es`;
    - an empty locale folder falls back to `en`;
    - no screenshots anywhere → CSS phone-frame placeholders.
-   Alt texts live in `product.screenshotAlts` (one per screenshot, in order).
-   **Dark-mode screenshots** go in `src/assets/screenshots-dark/{en,es}/` with the *same filenames*. When a locale has both sets, both are rendered and CSS shows the one matching the resolved theme (`.shot-light` / `.shot-dark`, driven by the `--shot-*` tokens); the hidden set is `display:none` + `loading="lazy"`, so it isn't fetched. The dark set is read from the same folder the light set resolved to (so `ca` gets `es` dark, and an `en`-fallback locale gets `en` dark). If the dark folder is missing, the light set is used for every theme.
+     Alt texts live in `product.screenshotAlts` (one per screenshot, in order).
+     **Dark-mode screenshots** go in `src/assets/screenshots-dark/{en,es}/` with the _same filenames_. When a locale has both sets, both are rendered and CSS shows the one matching the resolved theme (`.shot-light` / `.shot-dark`, driven by the `--shot-*` tokens); the hidden set is `display:none` + `loading="lazy"`, so it isn't fetched. The dark set is read from the same folder the light set resolved to (so `ca` gets `es` dark, and an `en`-fallback locale gets `en` dark). If the dark folder is missing, the light set is used for every theme.
 2. **Video** → copy into `public/video/` (`.webm` preferred, `.mp4` fallback; both are picked up) plus an optional `public/video/poster.{jpg,png,webp}`. `DemoVideo.astro` renders a muted, looping, `playsinline`, `preload="none"` `<video>` inside the phone frame; with no file present it shows a placeholder. Files ending in `-dark.<ext>` (e.g. `alterio-demo-dark.webm`, `poster-dark.jpg`) form an optional dark set, switched the same way as screenshots.
 
 Both components are the only place media is referenced — nothing else needs to change. Search for `TODO(media)` to find them.
@@ -82,16 +81,16 @@ Dark-first with a light theme. Three states on `<html>`: nothing stamped (follow
 
 Tokens live in `src/styles/global.css`: the full dark palette on bare `:root`, the light palette repeated under `@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) }` and `:root[data-theme="light"]`, then mapped onto Tailwind via `@theme inline`. Every colour goes through a token — never hard-code a hex in a component.
 
-| Token        | Dark      | Light     | Use                                             |
-| ------------ | --------- | --------- | ----------------------------------------------- |
-| `bg`         | `#0B0B0C` | `#F6F4EE` | page ground (warm off-white in light)           |
-| `surface`    | `#141416` | `#FFFFFF` | cards, header                                   |
-| `line`       | `#232326` | `#E3DFD5` | borders, rules                                  |
-| `fg`         | `#F5F5F5` | `#141413` | text                                            |
-| `muted`      | `#9A9A9A` | `#5C5A54` | secondary text (≥ 6:1 on ground in both)        |
-| `lime`       | `#C6FF3D` | `#4A6600` | accent for text/icons/links (≈ 6:1 on light)    |
-| `lime-fill`  | `#C6FF3D` | `#C6FF3D` | filled buttons/badges, always with `lime-ink`   |
-| `lime-ink`   | `#101400` | `#101400` | text on `lime-fill`                             |
+| Token       | Dark      | Light     | Use                                           |
+| ----------- | --------- | --------- | --------------------------------------------- |
+| `bg`        | `#0B0B0C` | `#F6F4EE` | page ground (warm off-white in light)         |
+| `surface`   | `#141416` | `#FFFFFF` | cards, header                                 |
+| `line`      | `#232326` | `#E3DFD5` | borders, rules                                |
+| `fg`        | `#F5F5F5` | `#141413` | text                                          |
+| `muted`     | `#9A9A9A` | `#5C5A54` | secondary text (≥ 6:1 on ground in both)      |
+| `lime`      | `#C6FF3D` | `#4A6600` | accent for text/icons/links (≈ 6:1 on light)  |
+| `lime-fill` | `#C6FF3D` | `#C6FF3D` | filled buttons/badges, always with `lime-ink` |
+| `lime-ink`  | `#101400` | `#101400` | text on `lime-fill`                           |
 
 `--shot-light` / `--shot-dark` flip in the same blocks and power the per-theme screenshot/video sets (`.shot-light` / `.shot-dark` utilities). Display type is Instrument Serif Italic (`.display`), body is Inter. `prefers-reduced-motion` disables transitions globally.
 

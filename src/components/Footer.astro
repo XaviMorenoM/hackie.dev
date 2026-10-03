@@ -1,35 +1,51 @@
 ---
 /** The only place the hackie.dev brand appears. */
-import { APP_SLUG, DEVELOPER_NAME, SITE_NAME, type Locale } from '../config';
-import { localePath, useTranslations } from '../i18n';
+import { APP_SLUG, DEVELOPER_NAME, SITE_NAME, type Locale } from '../config'
+import { localePath, useTranslations } from '../i18n'
 
 interface Props {
-  locale: Locale;
+  locale: Locale
 }
-const { locale } = Astro.props;
-const t = useTranslations(locale);
-const year = new Date().getFullYear();
-const [bylineBefore = '', bylineAfter = ''] = t.footer.byline.split(SITE_NAME);
+const { locale } = Astro.props
+const t = useTranslations(locale)
+const year = new Date().getFullYear()
+const [bylineBefore = '', bylineAfter = ''] = t.footer.byline.split(SITE_NAME)
 ---
 
 <footer class="border-t border-line/60">
-  <div
-    class="mx-auto flex max-w-6xl flex-col gap-8 px-5 py-12 text-sm text-muted sm:flex-row sm:items-end sm:justify-between sm:px-8"
-  >
+  <div class="mx-auto flex max-w-6xl flex-col gap-8 px-5 py-12 text-sm text-muted sm:flex-row sm:items-end sm:justify-between sm:px-8">
     <div>
-      <a href={localePath(locale)} class="display text-3xl text-fg">hackie<span class="text-lime">.</span></a>
+      <a href={localePath(locale)} class="display text-3xl text-fg">
+        hackie<span class="text-lime">.</span>
+      </a>
       <p class="mt-2">
-        {bylineBefore}<a href={localePath(locale)} class="text-fg transition-colors hover:text-lime">{SITE_NAME}</a>{bylineAfter}
+        {bylineBefore}
+        <a href={localePath(locale)} class="text-fg transition-colors hover:text-lime">
+          {SITE_NAME}
+        </a>
+        {bylineAfter}
       </p>
-      <p class="mt-1">© {year} {DEVELOPER_NAME}</p>
+      <p class="mt-1">
+        © {year} {DEVELOPER_NAME}
+      </p>
     </div>
     <nav aria-label={t.nav.footerAria}>
       <ul class="flex flex-wrap gap-x-6 gap-y-2">
         <li>
-          <a class="transition-colors hover:text-fg" href={localePath(locale, `${APP_SLUG}/privacy`)}>{t.footer.privacy}</a>
+          <a
+            class="transition-colors hover:text-fg"
+            href={localePath(locale, `${APP_SLUG}/privacy`)}
+          >
+            {t.footer.privacy}
+          </a>
         </li>
         <li>
-          <a class="transition-colors hover:text-fg" href={localePath(locale, `${APP_SLUG}/support`)}>{t.footer.support}</a>
+          <a
+            class="transition-colors hover:text-fg"
+            href={localePath(locale, `${APP_SLUG}/support`)}
+          >
+            {t.footer.support}
+          </a>
         </li>
       </ul>
     </nav>

@@ -11,7 +11,11 @@
     "preview": "astro preview",
     "astro": "astro",
     "og": "node scripts/og-image.mjs",
-    "check": "astro check"
+    "check": "astro check",
+    "format:check": "prettier --check .",
+    "format": "prettier --write .",
+    "lint": "eslint .",
+    "test:unit": "vitest run"
   },
   "dependencies": {
     "@astrojs/sitemap": "3.7.4",
@@ -25,6 +29,14 @@
   "private": true,
   "devDependencies": {
     "@astrojs/check": "0.9.10",
-    "typescript": "6.0.3"
+    "@playwright/test": "^1.63.0",
+    "@typescript-eslint/eslint-plugin": "^8.71.0",
+    "@typescript-eslint/parser": "^8.71.0",
+    "eslint": "^10.12.0",
+    "eslint-plugin-astro": "^3.2.1",
+    "prettier": "^3.9.9",
+    "prettier-plugin-astro": "^1.1.0",
+    "typescript": "6.0.3",
+    "vitest": "^5.0.3"
   }
 }
