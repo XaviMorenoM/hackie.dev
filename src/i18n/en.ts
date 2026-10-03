@@ -19,6 +19,11 @@ export const en: Translations = {
     theme: { label: 'Theme', system: 'System theme', light: 'Light theme', dark: 'Dark theme' },
     footerAria: 'Footer',
     homeAria: '{app} home',
+    bubble: {
+      label: 'Site navigation',
+      projects: 'Projects',
+      linkedinAria: '{developer} on LinkedIn (opens in a new tab)',
+    },
   },
   product: {
     eyebrow: 'Gym tracker for iPhone',

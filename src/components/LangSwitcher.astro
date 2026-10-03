@@ -10,7 +10,7 @@ const t = useTranslations(locale)
 const path = stripLocale(Astro.url.pathname)
 ---
 
-<nav aria-label={t.nav.language}>
+<nav aria-label={t.nav.language} data-testid="lang-switcher">
   <ul class="flex items-center gap-1 text-xs font-semibold tracking-wide uppercase">
     {LOCALES.map((l, i) => (
       <li class="flex items-center">

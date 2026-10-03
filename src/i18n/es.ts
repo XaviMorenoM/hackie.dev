@@ -20,6 +20,11 @@ export const es: Translations = {
     theme: { label: 'Tema', system: 'Tema del sistema', light: 'Tema claro', dark: 'Tema oscuro' },
     footerAria: 'Pie de página',
     homeAria: 'Inicio de {app}',
+    bubble: {
+      label: 'Navegación del sitio',
+      projects: 'Proyectos',
+      linkedinAria: '{developer} en LinkedIn (se abre en una pestaña nueva)',
+    },
   },
   product: {
     eyebrow: 'Registro de entrenos para iPhone',

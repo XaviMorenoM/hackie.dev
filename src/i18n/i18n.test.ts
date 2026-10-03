@@ -21,4 +21,24 @@ describe('i18n translations', () => {
       }
     }
   })
+
+  for (const locale of LOCALES) {
+    it(`${locale}: nav.bubble.label is non-empty`, () => {
+      const t = useTranslations(locale)
+      expect(typeof t.nav.bubble.label).toBe('string')
+      expect(t.nav.bubble.label.length).toBeGreaterThan(0)
+    })
+
+    it(`${locale}: nav.bubble.projects is non-empty`, () => {
+      const t = useTranslations(locale)
+      expect(typeof t.nav.bubble.projects).toBe('string')
+      expect(t.nav.bubble.projects.length).toBeGreaterThan(0)
+    })
+
+    it(`${locale}: nav.bubble.linkedinAria is non-empty`, () => {
+      const t = useTranslations(locale)
+      expect(typeof t.nav.bubble.linkedinAria).toBe('string')
+      expect(t.nav.bubble.linkedinAria.length).toBeGreaterThan(0)
+    })
+  }
 })
