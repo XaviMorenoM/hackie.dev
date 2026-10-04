@@ -1,9 +1,9 @@
 ---
 import { Font } from 'astro:assets'
 import '../styles/global.css'
-import Header from '../components/Header.astro'
 import Footer from '../components/Footer.astro'
 import LiquidGlassBubble from '../components/project/LiquidGlassBubble.astro'
+import SiteControls from '../components/SiteControls.astro'
 import { APP_NAME, LOCALES, LOCALE_TAGS, OG_LOCALES, SITE_URL, type Locale } from '../config'
 import { localePath, stripLocale, useTranslations, withBase } from '../i18n'
 
@@ -17,8 +17,10 @@ interface Props {
   ogType?: 'website' | 'article'
   /** Error/utility pages: `noindex`, no canonical/hreflang, no language switcher. */
   noindex?: boolean
-  /** Hide the sticky header entirely (project pages use the LiquidGlassBubble instead). */
-  noHeader?: boolean
+  /** Show the theme bubble in SiteControls. Defaults to true. */
+  showThemeBubble?: boolean
+  /** Per-project accent colours injected on <html> as CSS custom properties. */
+  projectAccent?: { accent: string; accentDark: string; accentInk: string }
   /** Footer variant: 'project' (default) or 'portfolio' (directory page). */
   footerVariant?: 'portfolio' | 'project'
 }
@@ -30,7 +32,8 @@ const {
   jsonLd = [],
   ogType = 'website',
   noindex = false,
-  noHeader = false,
+  showThemeBubble = true,
+  projectAccent,
   footerVariant = 'project',
 } = Astro.props
 const t = useTranslations(locale)
@@ -44,7 +47,15 @@ const alternates = LOCALES.map((l) => ({
 const ogImage = new URL(withBase('/og.png'), SITE_URL).href
 ---
 
-<html lang={LOCALE_TAGS[locale]} class="h-full antialiased">
+<html
+  lang={LOCALE_TAGS[locale]}
+  class="h-full antialiased"
+  style={
+    projectAccent
+      ? `--project-accent:${projectAccent.accent};--project-accent-dark:${projectAccent.accentDark};--project-accent-ink:${projectAccent.accentInk}`
+      : undefined
+  }
+>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -103,7 +114,7 @@ const ogImage = new URL(withBase('/og.png'), SITE_URL).href
       {t.nav.skipToContent}
     </a>
     <LiquidGlassBubble locale={locale} />
-    {!noHeader && <Header locale={locale} showLangSwitcher={!noindex} />}
+    <SiteControls locale={locale} showTheme={showThemeBubble} />
     <main id="main" class="flex-1">
       <slot />
     </main>

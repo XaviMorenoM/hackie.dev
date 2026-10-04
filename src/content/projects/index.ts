@@ -13,6 +13,8 @@ export interface Project {
   screenshot?: string
   /** Dark-mode variant of screenshot; falls back to screenshot if omitted. */
   screenshotDark?: string
+  /** When false, the theme bubble is hidden on the project's landing page. Defaults to true. */
+  supportsTheme?: boolean
   changelog: { version: string; date: string; notes: string[] }[]
 }
 

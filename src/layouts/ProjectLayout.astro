@@ -12,19 +12,12 @@ interface Props {
 const { project, locale, title, description } = Astro.props
 ---
 
-<Base locale={locale} title={title} description={description} noHeader={true}>
-  <style
-    define:vars={{
-      'project-accent': project.accent,
-      'project-accent-dark': project.accentDark,
-      'project-accent-ink': project.accentInk,
-    }}
-  >
-    :root {
-      --project-accent: var(--project-accent);
-      --project-accent-dark: var(--project-accent-dark);
-      --project-accent-ink: var(--project-accent-ink);
-    }
-  </style>
+<Base
+  locale={locale}
+  title={title}
+  description={description}
+  projectAccent={project}
+  showThemeBubble={project.supportsTheme !== false}
+>
   <slot />
 </Base>
