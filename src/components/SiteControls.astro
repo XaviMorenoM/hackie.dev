@@ -218,8 +218,6 @@ function flagSvg(loc: Locale): string {
     height: 40px;
     padding: 0 12px;
     border-radius: 99px;
-    border: 1px solid color-mix(in srgb, var(--sc-accent) 40%, rgba(255, 255, 255, 0.09));
-    background: none;
     cursor: pointer;
     font-size: 13px;
     font-weight: 500;
@@ -228,7 +226,6 @@ function flagSvg(loc: Locale): string {
   }
   @media (prefers-color-scheme: light) {
     :root:not([data-theme='dark']) .rb__trigger {
-      border-color: color-mix(in srgb, var(--sc-accent) 55%, rgba(0, 0, 0, 0.07));
       color: rgba(0, 0, 0, 0.6);
     }
     :root:not([data-theme='dark']) .rb__trigger:hover {
@@ -236,7 +233,6 @@ function flagSvg(loc: Locale): string {
     }
   }
   :root[data-theme='light'] .rb__trigger {
-    border-color: color-mix(in srgb, var(--sc-accent) 55%, rgba(0, 0, 0, 0.07));
     color: rgba(0, 0, 0, 0.6);
   }
   :root[data-theme='light'] .rb__trigger:hover {
