@@ -1,4 +1,5 @@
 import { registerProject } from '../index'
+import cover from '../../../assets/projects/diskspace/cover.png'
 
 registerProject({
   slug: 'diskspace',
@@ -11,6 +12,7 @@ registerProject({
   accentInk: '#F5F5F5',
   githubUrl: 'https://github.com/XaviMorenoM/diskspace',
   installCommand: 'go install github.com/XaviMorenoM/diskspace/cmd/diskspace@latest',
+  cover: { src: cover, alt: '' },
   changelog: [
     {
       version: 'v0.2.2',

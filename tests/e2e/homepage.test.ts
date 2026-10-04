@@ -110,3 +110,75 @@ test('no horizontal scrollbar at 375×812 on /en/', async ({ page }) => {
   const scrollWidth: number = await page.evaluate(() => document.documentElement.scrollWidth)
   expect(scrollWidth).toBeLessThanOrEqual(375)
 })
+
+// ---------------------------------------------------------------------------
+// #13 — Project card covers + hover lift
+// ---------------------------------------------------------------------------
+
+test('#13: /en/ has 2 project cards, both with data-has-cover="true"', async ({ page }) => {
+  await page.goto('/en/')
+  const cards = page.locator('[data-testid^="project-card-"]')
+  await expect(cards).toHaveCount(2)
+  for (const card of await cards.all()) {
+    await expect(card).toHaveAttribute('data-has-cover', 'true')
+  }
+})
+
+test('#13: card-cover img is visible and has a natural width > 0', async ({ page }) => {
+  await page.goto('/en/')
+  const img = page.locator('[data-testid="card-cover"] img').first()
+  await expect(img).toBeVisible()
+  const src: string = (await img.getAttribute('src')) ?? ''
+  expect(src).toContain('/_astro/')
+  const naturalWidth: number = await img.evaluate((el: HTMLImageElement) => el.naturalWidth)
+  expect(naturalWidth).toBeGreaterThan(0)
+})
+
+test('#13: card transform is none at rest', async ({ page }) => {
+  await page.goto('/en/')
+  const card = page.locator('[data-testid="project-card-alterio"]')
+  const transform: string = await card.evaluate((el) => getComputedStyle(el).transform)
+  expect(transform).toBe('none')
+})
+
+test('#13: focused card has translateY(-4px) transform', async ({ page }) => {
+  await page.goto('/en/')
+  // Tab until project-card-alterio is focused (up to 30 presses)
+  let focused = false
+  for (let i = 0; i < 30; i++) {
+    await page.keyboard.press('Tab')
+    focused = await page.evaluate(
+      () =>
+        (document.activeElement as HTMLElement | null)?.dataset.testid === 'project-card-alterio',
+    )
+    if (focused) break
+  }
+  expect(focused).toBe(true)
+  // Wait for the 200ms CSS transition to complete before reading the final value.
+  await page.waitForTimeout(250)
+  const transform: string = await page.evaluate(() => {
+    const el = document.querySelector('[data-testid="project-card-alterio"]') as HTMLElement
+    return getComputedStyle(el).transform
+  })
+  expect(transform).toBe('matrix(1, 0, 0, 1, 0, -4)')
+})
+
+test('#13: reduced motion — focused card has transform none', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.goto('/en/')
+  let focused = false
+  for (let i = 0; i < 30; i++) {
+    await page.keyboard.press('Tab')
+    focused = await page.evaluate(
+      () =>
+        (document.activeElement as HTMLElement | null)?.dataset.testid === 'project-card-alterio',
+    )
+    if (focused) break
+  }
+  expect(focused).toBe(true)
+  const transform: string = await page.evaluate(() => {
+    const el = document.querySelector('[data-testid="project-card-alterio"]') as HTMLElement
+    return getComputedStyle(el).transform
+  })
+  expect(transform).toBe('none')
+})

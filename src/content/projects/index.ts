@@ -1,3 +1,5 @@
+import type { ImageMetadata } from 'astro'
+
 export interface Project {
   slug: string
   name: string
@@ -13,6 +15,7 @@ export interface Project {
   screenshot?: string
   /** Dark-mode variant of screenshot; falls back to screenshot if omitted. */
   screenshotDark?: string
+  cover?: { src: ImageMetadata; alt: string }
   changelog: { version: string; date: string; notes: string[] }[]
 }
 
