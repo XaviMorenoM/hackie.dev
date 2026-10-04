@@ -2,6 +2,7 @@ import { describe, it, expect, beforeAll } from 'vitest'
 import { experimental_AstroContainer as AstroContainer } from 'astro/container'
 import type { ImageMetadata } from 'astro'
 import ProjectCard from './ProjectCard.astro'
+// design-system: CardCover and ProjectMeta composition is tested via render output
 
 const mockCover: { src: ImageMetadata; alt: string } = {
   src: { src: '/mock-cover.png', width: 1200, height: 675, format: 'png' },

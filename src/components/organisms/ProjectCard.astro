@@ -1,15 +1,16 @@
 ---
-import { Image } from 'astro:assets'
-import type { Project } from '../content/projects/index'
-import { localePath, useTranslations } from '../i18n'
-import type { Locale } from '../config'
+import type { Project } from '../../content/projects/index'
+import { localePath, useTranslations } from '../../i18n'
+import type { Locale } from '../../config'
+import CardCover from '../molecules/CardCover.astro'
+import ProjectMeta from '../molecules/ProjectMeta.astro'
+
 interface Props {
   project: Project
   locale: Locale
 }
 const { project, locale } = Astro.props
 const t = useTranslations(locale)
-const projectT = (t.projects as Record<string, { tagline: string }>)[project.slug]
 ---
 
 <a
@@ -21,29 +22,9 @@ const projectT = (t.projects as Record<string, { tagline: string }>)[project.slu
   data-testid={`project-card-${project.slug}`}
   data-has-cover={project.cover ? 'true' : 'false'}
 >
-  {project.cover && (
-    <div
-      class="relative -mx-6 -mt-6 mb-5 aspect-video overflow-hidden rounded-t-[15px]"
-      data-testid="card-cover"
-    >
-      <Image
-        src={project.cover.src}
-        alt={project.cover.alt}
-        widths={[400, 800, 1200]}
-        sizes="(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw"
-        class="h-full w-full object-cover transition-[filter] duration-200 ease-out"
-      />
-      <div
-        class="pointer-events-none absolute inset-0 bg-linear-to-b from-transparent from-50% to-surface"
-        aria-hidden="true"
-      />
-    </div>
-  )}
+  {project.cover && <CardCover src={project.cover.src} alt={project.cover.alt} />}
 
-  <div class="mb-5">
-    <h3 class="text-base font-semibold tracking-tight text-fg">{project.name}</h3>
-    <p class="mt-2 text-sm leading-relaxed text-muted">{projectT?.tagline ?? ''}</p>
-  </div>
+  <ProjectMeta project={project} locale={locale} />
 
   <div class="mt-auto border-t border-line pt-4 flex items-center justify-between">
     <div class="flex flex-wrap gap-1.5">

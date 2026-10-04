@@ -1,0 +1,114 @@
+---
+/**
+ * Right-side fixed controls: language selector and theme switcher.
+ * Two 40px glass pills, 8px gap, top-right corner. Each opens a dropdown panel.
+ * Composes LangSelector + ThemeSelector molecules.
+ */
+import type { Locale } from '../../config'
+import LangSelector from '../molecules/LangSelector.astro'
+import ThemeSelector from '../molecules/ThemeSelector.astro'
+
+interface Props {
+  locale: Locale
+  showLang?: boolean
+  showTheme?: boolean
+}
+
+const { locale, showLang = true, showTheme = true } = Astro.props
+---
+
+<div class="site-controls" data-testid="site-controls">
+  {showLang !== false && <LangSelector locale={locale} />}
+  {showTheme !== false && <ThemeSelector locale={locale} />}
+</div>
+
+<style>
+  .site-controls {
+    position: fixed;
+    top: 0.8125rem;
+    right: 1.25rem;
+    z-index: 50;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    --sc-accent: var(--project-accent-dark, var(--t-lime-fill));
+    --sc-ink: var(--project-accent-ink, var(--t-lime-ink));
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme='dark']) .site-controls {
+      --sc-accent: var(--project-accent, var(--t-lime-fill));
+    }
+  }
+  :root[data-theme='light'] .site-controls {
+    --sc-accent: var(--project-accent, var(--t-lime-fill));
+  }
+</style>
+
+<script is:inline>
+  ;(function () {
+    function initBubbleHosts() {
+    var hosts = document.querySelectorAll('.bubble-host')
+    var timers = new WeakMap()
+    function close(h) {
+      clearTimeout(timers.get(h))
+      h.dataset.open = 'false'
+      var b = h.querySelector('[data-bubble-trigger]')
+      if (b) b.setAttribute('aria-expanded', 'false')
+    }
+    hosts.forEach(function (host) {
+      var trigger = host.querySelector('[data-bubble-trigger]')
+      if (!trigger) return
+      function open() {
+        hosts.forEach(function (h) {
+          if (h !== host) close(h)
+        })
+        host.dataset.open = 'true'
+        trigger.setAttribute('aria-expanded', 'true')
+      }
+      trigger.addEventListener('click', function () {
+        if (host.dataset.open === 'true') {
+          close(host)
+        } else {
+          open()
+        }
+      })
+      if (window.matchMedia('(hover: hover)').matches) {
+        host.addEventListener('mouseenter', function () {
+          clearTimeout(timers.get(host))
+          timers.set(host, setTimeout(open, 80))
+        })
+        host.addEventListener('mouseleave', function () {
+          clearTimeout(timers.get(host))
+          timers.set(
+            host,
+            setTimeout(function () {
+              close(host)
+            }, 220),
+          )
+        })
+      }
+      host.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          close(host)
+          trigger.focus()
+        }
+      })
+      host.addEventListener('focusout', function (e) {
+        if (!host.contains(e.relatedTarget)) close(host)
+      })
+      host.querySelectorAll('[data-lang-link]').forEach(function (a) {
+        a.addEventListener('click', function () {
+          try {
+            localStorage.lang = a.getAttribute('data-lang-link')
+          } catch {}
+        })
+      })
+    })
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initBubbleHosts)
+    } else {
+      initBubbleHosts()
+    }
+  })()
+</script>

@@ -237,7 +237,6 @@ test('site-controls: lang panel becomes visible when trigger receives :focus-vis
 
   // Tab to the lang-bubble trigger to give it keyboard focus (:focus-visible)
   await page.keyboard.press('Tab')
-  const trigger = page.getByTestId('lang-bubble-trigger')
   // Retry-tab until we focus the lang trigger (skip link may be first)
   let focused = false
   for (let i = 0; i < 5; i++) {

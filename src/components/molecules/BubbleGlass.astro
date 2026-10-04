@@ -1,0 +1,21 @@
+---
+/**
+ * Shared 40px glass pill host.
+ * Applies backdrop-filter glass surface and positions any dropdown panel.
+ *
+ * @slot default — pill content; add a `.bubble-panel` child for a dropdown
+ */
+interface Props {
+  /** HTML element to render. Defaults to 'div'. */
+  tag?: string
+  class?: string
+  [key: string]: unknown
+}
+
+const { tag = 'div', class: cls, ...rest } = Astro.props
+const Tag = tag
+---
+
+<Tag class:list={['bubble-glass', 'bubble-host', cls]} {...rest}>
+  <slot />
+</Tag>

@@ -15,8 +15,8 @@
  */
 import { Image } from 'astro:assets'
 import type { ImageMetadata } from 'astro'
-import type { Locale } from '../config'
-import { useTranslations } from '../i18n'
+import type { Locale } from '../../config'
+import { useTranslations } from '../../i18n'
 import PhoneFrame from './PhoneFrame.astro'
 
 interface Props {
@@ -25,12 +25,15 @@ interface Props {
 const { locale } = Astro.props
 const t = useTranslations(locale)
 
-const lightAll = import.meta.glob<ImageMetadata>('../assets/screenshots/*/*.{png,jpg,jpeg,webp}', {
-  eager: true,
-  import: 'default',
-})
+const lightAll = import.meta.glob<ImageMetadata>(
+  '../../assets/screenshots/*/*.{png,jpg,jpeg,webp}',
+  {
+    eager: true,
+    import: 'default',
+  },
+)
 const darkAll = import.meta.glob<ImageMetadata>(
-  '../assets/screenshots-dark/*/*.{png,jpg,jpeg,webp}',
+  '../../assets/screenshots-dark/*/*.{png,jpg,jpeg,webp}',
   {
     eager: true,
     import: 'default',

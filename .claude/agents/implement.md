@@ -93,6 +93,7 @@ open_questions: <or "—">
 ## Cleanup
 
 Before finishing (whether reporting done, bouncing back, or being cancelled):
+
 1. **Do NOT kill the dev server.** It runs until the ticket is fully submitted so
    validate and design-review agents can use the same preview URL.
 2. De-register from the dashboard (so the organiser can re-register you at the

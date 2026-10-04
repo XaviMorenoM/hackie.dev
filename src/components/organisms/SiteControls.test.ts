@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll } from 'vitest'
 import { experimental_AstroContainer as AstroContainer } from 'astro/container'
-import { LOCALES, LOCALE_LABELS } from '../config'
-import { useTranslations } from '../i18n'
+import { LOCALES, LOCALE_LABELS } from '../../config'
+import { useTranslations } from '../../i18n'
 import SiteControls from './SiteControls.astro'
 
 describe('SiteControls', () => {

@@ -1,0 +1,133 @@
+---
+/**
+ * Typed typography component covering the site's text scale.
+ *
+ * @slot default — text content
+ */
+type Variant =
+  | 'display' // Instrument Serif Italic, 40px, line-height 0.95
+  | 'heading-xl' // 2.5rem bold, tight tracking
+  | 'heading-lg' // 1.5rem bold, tight tracking
+  | 'heading-md' // 1.25rem semibold
+  | 'heading-sm' // 1rem semibold
+  | 'body-lg' // 1.125rem, relaxed leading
+  | 'body' // 1rem, base leading
+  | 'body-sm' // 0.875rem, relaxed leading
+  | 'eyebrow' // 0.75rem uppercase, lime, wide tracking
+  | 'muted' // body-sm in muted colour
+  | 'label' // 0.8125rem semibold
+
+type Tag = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'span' | 'div'
+
+interface Props {
+  variant?: Variant
+  /** HTML element to render. Defaults are chosen by variant; override here. */
+  as?: Tag
+  class?: string
+  id?: string
+}
+
+const { variant: variantProp = 'body', as, class: cls, id } = Astro.props
+const variant: Variant = variantProp
+
+const defaultTag: Record<Variant, Tag> = {
+  display: 'h2',
+  'heading-xl': 'h1',
+  'heading-lg': 'h2',
+  'heading-md': 'h3',
+  'heading-sm': 'h4',
+  'body-lg': 'p',
+  body: 'p',
+  'body-sm': 'p',
+  eyebrow: 'p',
+  muted: 'p',
+  label: 'span',
+}
+
+const Tag: Tag = (as ?? defaultTag[variant]) as Tag
+
+const variantClass: Record<Variant, string> = {
+  display: 'ty-display',
+  'heading-xl': 'ty-heading-xl',
+  'heading-lg': 'ty-heading-lg',
+  'heading-md': 'ty-heading-md',
+  'heading-sm': 'ty-heading-sm',
+  'body-lg': 'ty-body-lg',
+  body: 'ty-body',
+  'body-sm': 'ty-body-sm',
+  eyebrow: 'ty-eyebrow',
+  muted: 'ty-muted',
+  label: 'ty-label',
+}
+---
+
+<Tag id={id} class:list={[variantClass[variant as Variant], cls]}>
+  <slot />
+</Tag>
+
+<style>
+  .ty-display {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 400;
+    font-size: var(--t-text-display, 2.5rem);
+    line-height: var(--t-leading-tight, 1.15);
+    letter-spacing: var(--t-tracking-tight, -0.02em);
+    color: var(--color-fg);
+  }
+  .ty-heading-xl {
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: var(--t-tracking-tight, -0.02em);
+    line-height: var(--t-leading-tight, 1.15);
+    color: var(--color-fg);
+  }
+  .ty-heading-lg {
+    font-size: var(--t-text-2xl, 1.5rem);
+    font-weight: 700;
+    letter-spacing: var(--t-tracking-tight, -0.02em);
+    color: var(--color-fg);
+  }
+  .ty-heading-md {
+    font-size: var(--t-text-xl, 1.25rem);
+    font-weight: 600;
+    color: var(--color-fg);
+  }
+  .ty-heading-sm {
+    font-size: var(--t-text-base, 1rem);
+    font-weight: 600;
+    color: var(--color-fg);
+  }
+  .ty-body-lg {
+    font-size: var(--t-text-lg, 1.125rem);
+    line-height: var(--t-leading-base, 1.5);
+    color: var(--color-fg);
+  }
+  .ty-body {
+    font-size: var(--t-text-base, 1rem);
+    line-height: var(--t-leading-base, 1.5);
+    color: var(--color-fg);
+  }
+  .ty-body-sm {
+    font-size: var(--t-text-sm, 0.8125rem);
+    line-height: var(--t-leading-base, 1.5);
+    color: var(--color-fg);
+  }
+  .ty-eyebrow {
+    font-size: var(--t-text-xs, 0.75rem);
+    font-weight: 600;
+    letter-spacing: var(--t-tracking-wide, 0.14em);
+    text-transform: uppercase;
+    color: var(--color-lime);
+  }
+  .ty-muted {
+    font-size: var(--t-text-sm, 0.8125rem);
+    line-height: var(--t-leading-base, 1.5);
+    color: var(--color-muted);
+  }
+  .ty-label {
+    font-size: var(--t-text-sm, 0.8125rem);
+    font-weight: 600;
+    color: var(--color-fg);
+  }
+</style>

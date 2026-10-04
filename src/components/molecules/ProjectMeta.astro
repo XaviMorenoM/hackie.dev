@@ -1,0 +1,25 @@
+---
+/**
+ * Project name and tagline block used inside ProjectCard.
+ * Extracted from ProjectCard.
+ *
+ * @slot — (none; content is derived from props)
+ */
+import type { Project } from '../../content/projects/index'
+import type { Locale } from '../../config'
+import { useTranslations } from '../../i18n'
+
+interface Props {
+  project: Project
+  locale: Locale
+}
+
+const { project, locale } = Astro.props
+const t = useTranslations(locale)
+const projectT = (t.projects as Record<string, { tagline: string }>)[project.slug]
+---
+
+<div class="mb-5">
+  <h3 class="text-base font-semibold tracking-tight text-fg">{project.name}</h3>
+  <p class="mt-2 text-sm leading-relaxed text-muted">{projectT?.tagline ?? ''}</p>
+</div>
