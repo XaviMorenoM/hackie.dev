@@ -20,6 +20,22 @@ and build exactly that in your own worktree. A validator proves it afterwards.
 1. Rename your branch to the spec's `branch` value. If taken, append `-impl`.
 2. Run `npm ci`.
 3. Read `CLAUDE.md` and `README.md` before touching code.
+4. **Start a persistent dev server and register with the dashboard.**
+   Pick a port (4322 + ticket-number offset, e.g. ticket #11 → 4322+11 = 4333).
+   Use `nohup` + `disown` so the server keeps running after this agent exits —
+   validate and design-review agents will use the same preview URL.
+   All steps are best-effort (`|| true`); a missing dashboard never blocks.
+   ```bash
+   BRANCH=$(git rev-parse --abbrev-ref HEAD)
+   PORT=43XX   # e.g. 4333 for ticket #11
+   nohup npm run dev -- --port $PORT --host > /tmp/astro-dev-$PORT.log 2>&1 &
+   disown
+   sleep 5
+   curl -sf -X POST http://localhost:4399/api/register \
+     -H "Content-Type: application/json" \
+     -d "{\"id\":\"$BRANCH\",\"ticket\":\"<TICKET>\",\"description\":\"<one line>\",\"stage\":\"implement\",\"devPort\":$PORT}" || true
+   ```
+   Record `$PORT` — include it in your report so the organiser can pass it to validate.
 
 ## Do
 
@@ -29,9 +45,8 @@ and build exactly that in your own worktree. A validator proves it afterwards.
 - For UI tickets: implement the **selected design proposal** from the spec. The
   selected proposal id is given to you by the Organiser. If not specified, ask
   before writing any UI code.
-- When running the dev server for review: `npm run dev -- --port <PORT>` where
-  PORT is 4322+. Include the URL in your report labeled with your branch name,
-  e.g. "Preview: http://localhost:4323 (feat/hero-redesign)".
+- The dev server was started in Setup and will outlive this agent. Do not start
+  a second one. Refer to `http://localhost:<PORT>` in your report.
 - Match surrounding code: its naming, its idiom, its comment density.
 - Update `src/i18n/*.ts` for every new user-facing string in every locale
   (en, es, ca).
@@ -74,6 +89,20 @@ tests: <file: cases and gate result line for each implement-stage gate>
 deviations: <anything done differently from the spec and why>
 open_questions: <or "—">
 ```
+
+## Cleanup
+
+Before finishing (whether reporting done, bouncing back, or being cancelled):
+1. **Do NOT kill the dev server.** It runs until the ticket is fully submitted so
+   validate and design-review agents can use the same preview URL.
+2. De-register from the dashboard (so the organiser can re-register you at the
+   next stage with the correct stage label):
+   ```bash
+   curl -sf -X POST http://localhost:4399/api/done \
+     -H "Content-Type: application/json" \
+     -d "{\"id\":\"$(git rev-parse --abbrev-ref HEAD)\"}" || true
+   ```
+   The server keeps running. The organiser shuts it down after submit.
 
 ## On a bounce
 

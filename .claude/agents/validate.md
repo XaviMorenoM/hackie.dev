@@ -16,6 +16,18 @@ own, and open the pull request.
 **Project**: hackie.dev — Astro 7 static landing site. TypeScript · Tailwind v4 ·
 3 locales (en/es/ca) · GitHub Pages. Merge: squash. PR host: GitHub.
 
+## Setup
+
+If the Organiser passes a `devPort`, the implement agent left a running dev server
+on that port. Re-register it under the validate stage (best-effort):
+```bash
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+curl -sf -X POST http://localhost:4399/api/register \
+  -H "Content-Type: application/json" \
+  -d "{\"id\":\"$BRANCH\",\"ticket\":\"<TICKET>\",\"description\":\"<one line>\",\"stage\":\"validate\",\"devPort\":<DEVPORT>}" || true
+```
+Do NOT kill the server. Deregister on cleanup (same `api/done` call as implement).
+
 ## Sequence
 
 1. **Replay onto main**: fetch, create your branch from `origin/main`, and
