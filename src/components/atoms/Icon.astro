@@ -1,0 +1,39 @@
+---
+/**
+ * Generic inline SVG icon wrapper.
+ *
+ * @slot default — raw SVG path(s) passed via set:html or slot
+ */
+interface Props {
+  /** SVG viewBox width and height (square). Defaults to 24. */
+  size?: number
+  /** Explicit colour override; defaults to `currentColor`. */
+  color?: string
+  /** Extra CSS classes. */
+  class?: string
+  /** aria-label for meaningful icons; omit for decorative ones (aria-hidden="true" is the default). */
+  label?: string
+  /** Inner SVG markup passed as a string (set:html). */
+  html?: string
+}
+
+const { size = 24, color = 'currentColor', class: cls, label, html } = Astro.props
+const decorative = !label
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox={`0 0 ${size} ${size}`}
+  width={size}
+  height={size}
+  fill="none"
+  stroke={color}
+  stroke-width="1.75"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden={decorative ? 'true' : undefined}
+  aria-label={!decorative ? label : undefined}
+  focusable="false"
+  class={cls}
+  set:html={html}
+/>

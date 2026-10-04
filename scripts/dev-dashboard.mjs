@@ -5,44 +5,50 @@
  * Uses only Node.js built-ins + Server-Sent Events (no external packages).
  */
 
-import http from 'node:http';
+import http from 'node:http'
 
-const PORT = 4399;
+const PORT = 4399
 
 // ─── State ───────────────────────────────────────────────────────────────────
 
-const agents = new Map(); // id → { id, ticket, description, stage, devPort?, registeredAt }
-const sseClients = new Set(); // res objects
+const agents = new Map() // id → { id, ticket, description, stage, devPort?, registeredAt }
+const sseClients = new Set() // res objects
 
 // ─── SSE helpers ─────────────────────────────────────────────────────────────
 
 function broadcast(event, data) {
-  const payload = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+  const payload = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`
   for (const client of sseClients) {
-    try { client.write(payload); } catch {}
+    try {
+      client.write(payload)
+    } catch {}
   }
 }
 
 function broadcastState() {
-  broadcast('state', Object.fromEntries(agents));
+  broadcast('state', Object.fromEntries(agents))
 }
 
 // ─── Request router ───────────────────────────────────────────────────────────
 
 function json(res, status, data) {
-  res.writeHead(status, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-  res.end(JSON.stringify(data));
+  res.writeHead(status, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
+  res.end(JSON.stringify(data))
 }
 
 function readBody(req) {
   return new Promise((resolve, reject) => {
-    let buf = '';
-    req.on('data', chunk => buf += chunk);
+    let buf = ''
+    req.on('data', (chunk) => (buf += chunk))
     req.on('end', () => {
-      try { resolve(JSON.parse(buf || '{}')); } catch { reject(new Error('bad JSON')); }
-    });
-    req.on('error', reject);
-  });
+      try {
+        resolve(JSON.parse(buf || '{}'))
+      } catch {
+        reject(new Error('bad JSON'))
+      }
+    })
+    req.on('error', reject)
+  })
 }
 
 const DASHBOARD_HTML = `<!doctype html>
@@ -396,99 +402,127 @@ fetch('/api/state').then(r=>r.json()).then(s=>{state=s;renderPipeline();renderBo
 connect();
 </script>
 </body>
-</html>`;
+</html>`
 
 const server = http.createServer(async (req, res) => {
-  const url = new URL(req.url, 'http://localhost:' + PORT);
-  const path = url.pathname;
+  const url = new URL(req.url, 'http://localhost:' + PORT)
+  const path = url.pathname
 
   if (req.method === 'OPTIONS') {
-    res.writeHead(204, { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET,POST', 'Access-Control-Allow-Headers': 'Content-Type' });
-    return res.end();
+    res.writeHead(204, {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET,POST',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    })
+    return res.end()
   }
 
   if (req.method === 'GET' && path === '/events') {
     res.writeHead(200, {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive',
+      Connection: 'keep-alive',
       'Access-Control-Allow-Origin': '*',
-    });
-    res.write(': connected\n\n');
-    res.write('event: state\ndata: ' + JSON.stringify(Object.fromEntries(agents)) + '\n\n');
-    sseClients.add(res);
-    req.on('close', () => sseClients.delete(res));
-    return;
+    })
+    res.write(': connected\n\n')
+    res.write('event: state\ndata: ' + JSON.stringify(Object.fromEntries(agents)) + '\n\n')
+    sseClients.add(res)
+    req.on('close', () => sseClients.delete(res))
+    return
   }
 
   if (req.method === 'GET' && path === '/') {
-    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-    return res.end(DASHBOARD_HTML);
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
+    return res.end(DASHBOARD_HTML)
   }
 
   if (req.method === 'GET' && path === '/api/state') {
-    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-    return res.end(JSON.stringify(Object.fromEntries(agents)));
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
+    return res.end(JSON.stringify(Object.fromEntries(agents)))
   }
 
   if (req.method === 'POST' && path === '/api/register') {
     try {
-      const body = await readBody(req);
-      const { id, ticket, description, stage = 'lead', devPort } = body;
-      if (!id) { res.writeHead(400, {'Content-Type':'application/json'}); return res.end(JSON.stringify({error:'id required'})); }
-      const entry = { id, ticket, description, stage, registeredAt: Date.now() };
-      if (devPort) entry.devPort = devPort;
-      agents.set(id, entry);
-      broadcastState();
-      res.writeHead(200, {'Content-Type':'application/json','Access-Control-Allow-Origin':'*'});
-      return res.end(JSON.stringify({ ok: true, agent: entry }));
+      const body = await readBody(req)
+      const { id, ticket, description, stage = 'lead', devPort } = body
+      if (!id) {
+        res.writeHead(400, { 'Content-Type': 'application/json' })
+        return res.end(JSON.stringify({ error: 'id required' }))
+      }
+      const entry = { id, ticket, description, stage, registeredAt: Date.now() }
+      if (devPort) entry.devPort = devPort
+      agents.set(id, entry)
+      broadcastState()
+      res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
+      return res.end(JSON.stringify({ ok: true, agent: entry }))
     } catch (e) {
-      res.writeHead(400, {'Content-Type':'application/json'}); return res.end(JSON.stringify({error:e.message}));
+      res.writeHead(400, { 'Content-Type': 'application/json' })
+      return res.end(JSON.stringify({ error: e.message }))
     }
   }
 
   if (req.method === 'POST' && path === '/api/stage') {
     try {
-      const body = await readBody(req);
-      const { id, stage } = body;
-      if (!id || !stage) { res.writeHead(400,{'Content-Type':'application/json'}); return res.end(JSON.stringify({error:'id and stage required'})); }
-      const entry = agents.get(id);
-      if (!entry) { res.writeHead(404,{'Content-Type':'application/json'}); return res.end(JSON.stringify({error:'agent not found'})); }
-      entry.stage = stage;
-      broadcastState();
-      res.writeHead(200,{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'});
-      return res.end(JSON.stringify({ ok: true, agent: entry }));
+      const body = await readBody(req)
+      const { id, stage } = body
+      if (!id || !stage) {
+        res.writeHead(400, { 'Content-Type': 'application/json' })
+        return res.end(JSON.stringify({ error: 'id and stage required' }))
+      }
+      const entry = agents.get(id)
+      if (!entry) {
+        res.writeHead(404, { 'Content-Type': 'application/json' })
+        return res.end(JSON.stringify({ error: 'agent not found' }))
+      }
+      entry.stage = stage
+      broadcastState()
+      res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
+      return res.end(JSON.stringify({ ok: true, agent: entry }))
     } catch (e) {
-      res.writeHead(400,{'Content-Type':'application/json'}); return res.end(JSON.stringify({error:e.message}));
+      res.writeHead(400, { 'Content-Type': 'application/json' })
+      return res.end(JSON.stringify({ error: e.message }))
     }
   }
 
   if (req.method === 'POST' && path === '/api/done') {
     try {
-      const body = await readBody(req);
-      const { id } = body;
-      if (!id) { res.writeHead(400,{'Content-Type':'application/json'}); return res.end(JSON.stringify({error:'id required'})); }
-      const existed = agents.delete(id);
-      broadcastState();
-      res.writeHead(200,{'Content-Type':'application/json','Access-Control-Allow-Origin':'*'});
-      return res.end(JSON.stringify({ ok: true, removed: existed }));
+      const body = await readBody(req)
+      const { id } = body
+      if (!id) {
+        res.writeHead(400, { 'Content-Type': 'application/json' })
+        return res.end(JSON.stringify({ error: 'id required' }))
+      }
+      const existed = agents.delete(id)
+      broadcastState()
+      res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
+      return res.end(JSON.stringify({ ok: true, removed: existed }))
     } catch (e) {
-      res.writeHead(400,{'Content-Type':'application/json'}); return res.end(JSON.stringify({error:e.message}));
+      res.writeHead(400, { 'Content-Type': 'application/json' })
+      return res.end(JSON.stringify({ error: e.message }))
     }
   }
 
-  res.writeHead(404,{'Content-Type':'application/json'}); res.end(JSON.stringify({error:'not found'}));
-});
+  res.writeHead(404, { 'Content-Type': 'application/json' })
+  res.end(JSON.stringify({ error: 'not found' }))
+})
 
 server.listen(PORT, '0.0.0.0', () => {
-  import('node:os').then(os => {
-    const iface = Object.values(os.networkInterfaces()).flat().find(a => a.family === 'IPv4' && !a.internal);
-    const networkAddr = iface ? iface.address : null;
-    console.log('[dev-dashboard] running on pid ' + process.pid);
-    console.log('  local:   http://localhost:' + PORT);
-    if (networkAddr) console.log('  network: http://' + networkAddr + ':' + PORT);
-  });
-});
+  import('node:os').then((os) => {
+    const iface = Object.values(os.networkInterfaces())
+      .flat()
+      .find((a) => a.family === 'IPv4' && !a.internal)
+    const networkAddr = iface ? iface.address : null
+    console.log('[dev-dashboard] running on pid ' + process.pid)
+    console.log('  local:   http://localhost:' + PORT)
+    if (networkAddr) console.log('  network: http://' + networkAddr + ':' + PORT)
+  })
+})
 
-process.on('SIGTERM', () => { server.close(); process.exit(0); });
-process.on('SIGINT',  () => { server.close(); process.exit(0); });
+process.on('SIGTERM', () => {
+  server.close()
+  process.exit(0)
+})
+process.on('SIGINT', () => {
+  server.close()
+  process.exit(0)
+})

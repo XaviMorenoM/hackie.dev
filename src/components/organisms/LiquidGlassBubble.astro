@@ -3,6 +3,7 @@ import { Image } from 'astro:assets'
 import { localePath, stripLocale, useTranslations } from '../../i18n'
 import { DEVELOPER_LINKEDIN, DEVELOPER_NAME, type Locale } from '../../config'
 import { projectSlugs } from '../../content/projects/index'
+import Divider from '../atoms/Divider.astro'
 import avatar from '../../assets/avatar/xavi.jpg'
 
 interface Props {
@@ -12,8 +13,6 @@ const { locale } = Astro.props
 const t = useTranslations(locale)
 const _p = stripLocale(Astro.url.pathname)
 const _isDirectory = _p === '/'
-// Trailing slash is always present in Astro static output, including the 404 page (/404/).
-// Check against registered project slugs so error pages are never marked active.
 const _isProjectPage = !_isDirectory && projectSlugs.some((s) => _p.startsWith(`/${s}/`))
 ---
 
@@ -33,7 +32,7 @@ const _isProjectPage = !_isDirectory && projectSlugs.some((s) => _p.startsWith(`
     <span class="bubble__label">{t.nav.bubble.projects}</span>
   </a>
 
-  <div class="bubble__sep" aria-hidden="true"></div>
+  <Divider />
 
   <a
     href={DEVELOPER_LINKEDIN}
@@ -103,21 +102,6 @@ const _isProjectPage = !_isDirectory && projectSlugs.some((s) => _p.startsWith(`
   }
   :root[data-theme='light'] .bubble__nav:hover {
     color: #000;
-  }
-
-  .bubble__sep {
-    width: 1px;
-    height: 18px;
-    flex-shrink: 0;
-    background: rgba(255, 255, 255, 0.12);
-  }
-  @media (prefers-color-scheme: light) {
-    :root:not([data-theme='dark']) .bubble__sep {
-      background: rgba(0, 0, 0, 0.1);
-    }
-  }
-  :root[data-theme='light'] .bubble__sep {
-    background: rgba(0, 0, 0, 0.1);
   }
 
   .bubble__profile {
