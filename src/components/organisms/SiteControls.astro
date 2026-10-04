@@ -46,9 +46,11 @@ const { locale, showLang = true, showTheme = true } = Astro.props
 
 <script is:inline>
   ;(function () {
+    function initBubbleHosts() {
     var hosts = document.querySelectorAll('.bubble-host')
     var timers = new WeakMap()
     function close(h) {
+      clearTimeout(timers.get(h))
       h.dataset.open = 'false'
       var b = h.querySelector('[data-bubble-trigger]')
       if (b) b.setAttribute('aria-expanded', 'false')
@@ -102,5 +104,11 @@ const { locale, showLang = true, showTheme = true } = Astro.props
         })
       })
     })
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initBubbleHosts)
+    } else {
+      initBubbleHosts()
+    }
   })()
 </script>
