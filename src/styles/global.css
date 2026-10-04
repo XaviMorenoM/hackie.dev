@@ -266,7 +266,9 @@
 @layer components {
   /* Shared liquid-glass surface used by LiquidGlassBubble and SiteControls.
      backdrop-filter must use literal values — LightningCSS cannot add the -webkit-
-     prefix when the value is a var(), so it drops the unprefixed form. */
+     prefix when the value is a var() and drops the unprefixed form in that case.
+     Note: LightningCSS targets don't include Safari <18 so no -webkit- prefix is emitted
+     (Safari 16–17 won't get the blur; accepted as known limitation). */
   .bubble-glass {
     background: rgba(16, 16, 20, 0.68);
     backdrop-filter: blur(32px) saturate(180%) brightness(105%);
