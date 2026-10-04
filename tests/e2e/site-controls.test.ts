@@ -149,12 +149,13 @@ test('site-controls: selecting "dark" theme sets data-theme="dark" on <html>', a
 test('site-controls: selecting "system" theme removes data-theme from <html>', async ({ page }) => {
   await page.goto('/en/')
 
-  // Set dark first
+  // Open panel — clicking a theme option keeps the panel open (no close on selection)
   await page.getByTestId('theme-bubble-trigger').click()
+
+  // Set dark first (panel stays open)
   await page.getByTestId('theme-option-dark').click()
 
-  // Re-open and select system
-  await page.getByTestId('theme-bubble-trigger').click()
+  // Select system — panel is still open, no extra trigger click needed
   await page.getByTestId('theme-option-system').click()
 
   const dataTheme = await page.evaluate(() => document.documentElement.dataset.theme)
@@ -223,22 +224,17 @@ test('site-controls: theme-bubble present on /en/diskspace/ (supportsTheme unset
 })
 
 // ---------------------------------------------------------------------------
-// 9. Panel opens on keyboard focus (focus-visible CSS rule)
-//    ESC while keyboard-focused on the trigger keeps the panel visible because
-//    the CSS rule `.bubble-host:has(:focus-visible) > .bubble-panel` overrides
-//    data-open="false". This is intentional keyboard UX; the close-on-ESC JS
-//    handler is covered by unit tests.
+// 9. focus-visible on the trigger does NOT auto-open the panel.
+//    The CSS auto-open rule (.bubble-host:has(:focus-visible) > .bubble-panel)
+//    was intentionally removed in favour of data-open as the single source of
+//    truth. The panel only opens via click or programmatic open().
 // ---------------------------------------------------------------------------
 
-test('site-controls: lang panel becomes visible when trigger receives :focus-visible', async ({
-  page,
-}) => {
+test('site-controls: focus-visible on lang trigger does not auto-open panel', async ({ page }) => {
   await page.goto('/en/')
 
-  // Tab to the lang-bubble trigger to give it keyboard focus (:focus-visible)
+  // Tab to the lang-bubble trigger
   await page.keyboard.press('Tab')
-  const trigger = page.getByTestId('lang-bubble-trigger')
-  // Retry-tab until we focus the lang trigger (skip link may be first)
   let focused = false
   for (let i = 0; i < 5; i++) {
     const active = await page.evaluate(
@@ -251,11 +247,85 @@ test('site-controls: lang panel becomes visible when trigger receives :focus-vis
     await page.keyboard.press('Tab')
   }
 
-  if (focused) {
-    // With :focus-visible on the trigger, the panel should be visible
-    await expect(page.getByTestId('lang-bubble-panel')).toBeVisible()
-  } else {
-    // If Tab order doesn't reach the lang trigger in this test environment, skip
+  if (!focused) {
+    // Tab order didn't reach the trigger in this environment — skip
     test.skip()
+    return
   }
+
+  // Panel must remain hidden: data-open is the sole source of truth now
+  await expect(page.getByTestId('lang-bubble-panel')).not.toBeVisible()
+})
+
+// ---------------------------------------------------------------------------
+// 10. Escape key closes an open panel (fix: clears hover timer to prevent
+//     race condition where 80ms setTimeout re-opens after Escape)
+// ---------------------------------------------------------------------------
+
+test('site-controls: Escape key closes the lang panel', async ({ page }) => {
+  await page.goto('/en/')
+
+  const trigger = page.getByTestId('lang-bubble-trigger')
+  const panel = page.getByTestId('lang-bubble-panel')
+
+  // Open the panel
+  await trigger.click()
+  await expect(panel).toBeVisible()
+
+  // Press Escape — should close and stay closed
+  await page.keyboard.press('Escape')
+
+  // Wait longer than the 80ms hover timer to confirm no re-open
+  await page.waitForTimeout(200)
+  await expect(panel).not.toBeVisible()
+})
+
+test('site-controls: Escape key closes the theme panel', async ({ page }) => {
+  await page.goto('/en/')
+
+  const trigger = page.getByTestId('theme-bubble-trigger')
+  const panel = page.getByTestId('theme-bubble-panel')
+
+  // Open the panel
+  await trigger.click()
+  await expect(panel).toBeVisible()
+
+  // Press Escape — should close and stay closed
+  await page.keyboard.press('Escape')
+
+  // Wait longer than the 80ms hover timer to confirm no re-open
+  await page.waitForTimeout(200)
+  await expect(panel).not.toBeVisible()
+})
+
+// ---------------------------------------------------------------------------
+// 11. Visual: glass surface — trigger has non-transparent background in dark
+//     mode, and the active backdrop-filter is applied
+// ---------------------------------------------------------------------------
+
+test('site-controls: lang-bubble trigger background-color is not transparent in dark mode', async ({
+  page,
+}) => {
+  await page.goto('/en/')
+
+  // Force dark mode by setting data-theme
+  await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'))
+
+  const trigger = page.getByTestId('lang-bubble-trigger')
+  const bgColor = await trigger.evaluate((el) => getComputedStyle(el).backgroundColor)
+
+  // transparent === "rgba(0, 0, 0, 0)" — must not be that
+  expect(bgColor).not.toBe('rgba(0, 0, 0, 0)')
+  expect(bgColor).not.toBe('transparent')
+})
+
+test('site-controls: lang-bubble trigger has an active backdrop-filter', async ({ page }) => {
+  await page.goto('/en/')
+
+  const trigger = page.getByTestId('lang-bubble-trigger')
+  const backdropFilter = await trigger.evaluate((el) => getComputedStyle(el).backdropFilter)
+
+  // Must have a real blur value, not "none"
+  expect(backdropFilter).not.toBe('none')
+  expect(backdropFilter).not.toBe('')
 })
