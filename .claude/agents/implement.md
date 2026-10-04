@@ -20,6 +20,17 @@ and build exactly that in your own worktree. A validator proves it afterwards.
 1. Rename your branch to the spec's `branch` value. If taken, append `-impl`.
 2. Run `npm ci`.
 3. Read `CLAUDE.md` and `README.md` before touching code.
+4. **Register with the dev dashboard** — pick a port (4322 + ticket number offset),
+   start the dev server in the background, then register. All three steps are
+   best-effort (`|| true`) so a missing dashboard never blocks the build.
+   ```bash
+   BRANCH=$(git rev-parse --abbrev-ref HEAD)
+   PORT=43XX   # pick an unused port: 4322, 4323, 4324 …
+   npm run dev -- --port $PORT &
+   curl -sf -X POST http://localhost:4399/api/register \
+     -H "Content-Type: application/json" \
+     -d "{\"id\":\"$BRANCH\",\"ticket\":\"<TICKET>\",\"description\":\"<one line>\",\"stage\":\"implement\",\"devPort\":$PORT}" || true
+   ```
 
 ## Do
 
@@ -32,6 +43,13 @@ and build exactly that in your own worktree. A validator proves it afterwards.
 - When running the dev server for review: `npm run dev -- --port <PORT>` where
   PORT is 4322+. Include the URL in your report labeled with your branch name,
   e.g. "Preview: http://localhost:4323 (feat/hero-redesign)".
+- **Update the dashboard stage** when you move from implement → gates → done:
+  ```bash
+  BRANCH=$(git rev-parse --abbrev-ref HEAD)
+  curl -sf -X POST http://localhost:4399/api/stage \
+    -H "Content-Type: application/json" \
+    -d "{\"id\":\"$BRANCH\",\"stage\":\"validate\"}" || true
+  ```
 - Match surrounding code: its naming, its idiom, its comment density.
 - Update `src/i18n/*.ts` for every new user-facing string in every locale
   (en, es, ca).
@@ -74,6 +92,18 @@ tests: <file: cases and gate result line for each implement-stage gate>
 deviations: <anything done differently from the spec and why>
 open_questions: <or "—">
 ```
+
+## Cleanup
+
+Before finishing (whether reporting done, bouncing back, or being cancelled):
+1. Kill the dev server: `lsof -ti :$PORT | xargs kill 2>/dev/null || true`
+2. De-register from the dashboard:
+   ```bash
+   curl -sf -X POST http://localhost:4399/api/done \
+     -H "Content-Type: application/json" \
+     -d "{\"id\":\"$(git rev-parse --abbrev-ref HEAD)\"}" || true
+   ```
+   The organiser re-registers you if you bounce, so always de-register first.
 
 ## On a bounce
 
