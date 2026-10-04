@@ -7,6 +7,8 @@ import LiquidGlassBubble from './LiquidGlassBubble.astro'
 import '../../content/projects/alterio/index'
 import '../../content/projects/diskspace/index'
 
+// design-system: molecule candidate — BubbleGlass composition is tested via render output
+
 describe('LiquidGlassBubble', () => {
   let container: AstroContainer
 

@@ -1,0 +1,250 @@
+---
+/**
+ * Language selector glass pill + dropdown panel.
+ * Extracted from SiteControls — the left bubble showing the current locale flag and code.
+ *
+ * @slot — (none; all content is derived from props)
+ */
+import { LOCALES, LOCALE_LABELS, LOCALE_TAGS, type Locale } from '../../config'
+import { localePath, stripLocale, useTranslations } from '../../i18n'
+
+interface Props {
+  locale: Locale
+}
+
+const { locale } = Astro.props
+const t = useTranslations(locale)
+const path = stripLocale(Astro.url.pathname)
+const otherLocales = LOCALES.filter((l) => l !== locale)
+
+function flagSvg(loc: Locale): string {
+  if (loc === 'en') {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 27 18" width="27" height="18" aria-hidden="true" data-flag="en" style="border-radius:2px;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.18);flex-shrink:0"><defs><clipPath id="flag-en-clip"><rect width="27" height="18" rx="2"/></clipPath></defs><g clip-path="url(#flag-en-clip)"><rect width="27" height="18" fill="#012169"/><line x1="-1" y1="-1" x2="28" y2="19" stroke="white" stroke-width="5.4"/><line x1="28" y1="-1" x2="-1" y2="19" stroke="white" stroke-width="5.4"/><line x1="-1" y1="-1" x2="28" y2="19" stroke="#C8102E" stroke-width="2.7"/><line x1="28" y1="-1" x2="-1" y2="19" stroke="#C8102E" stroke-width="2.7"/><rect x="10.5" y="0" width="6" height="18" fill="white"/><rect x="0" y="6" width="27" height="6" fill="white"/><rect x="11.5" y="0" width="4" height="18" fill="#C8102E"/><rect x="0" y="7" width="27" height="4" fill="#C8102E"/></g></svg>`
+  }
+  if (loc === 'es') {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 27 18" width="27" height="18" aria-hidden="true" data-flag="es" style="border-radius:2px;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.18);flex-shrink:0"><rect width="27" height="18" rx="2" fill="#AA151B"/><rect x="0" y="4.5" width="27" height="9" fill="#F1BF00"/></svg>`
+  }
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 27 18" width="27" height="18" aria-hidden="true" data-flag="ca" style="border-radius:2px;box-shadow:inset 0 0 0 .5px rgba(0,0,0,.18);flex-shrink:0"><rect width="27" height="18" rx="2" fill="#FCDD09"/><rect x="0" y="2" width="27" height="2" fill="#DA121A"/><rect x="0" y="6" width="27" height="2" fill="#DA121A"/><rect x="0" y="10" width="27" height="2" fill="#DA121A"/><rect x="0" y="14" width="27" height="2" fill="#DA121A"/></svg>`
+}
+---
+
+<nav class="bubble-host rb" aria-label={t.nav.language} data-testid="lang-bubble" data-open="false">
+  <button
+    type="button"
+    class="bubble-glass rb__trigger"
+    data-bubble-trigger
+    aria-expanded="false"
+    aria-controls="lang-bubble-panel"
+    aria-label={`${t.nav.language}: ${LOCALE_LABELS[locale]}`}
+    data-testid="lang-bubble-trigger"
+  >
+    <Fragment set:html={flagSvg(locale)} />
+    <span class="rb__code">{locale.toUpperCase()}</span>
+    <svg
+      class="rb__chevron"
+      viewBox="0 0 8 5"
+      width="8"
+      height="5"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M1 1l3 3 3-3" />
+    </svg>
+  </button>
+
+  <div class="bubble-panel" id="lang-bubble-panel" data-testid="lang-bubble-panel">
+    <ul class="bubble-glass rb__list" style="min-width:172px">
+      <li>
+        <span class="rb__option rb__option--current" aria-current="true">
+          <Fragment set:html={flagSvg(locale)} />
+          <span class="rb__option-label">{LOCALE_LABELS[locale]}</span>
+          <svg
+            viewBox="0 0 16 16"
+            width="14"
+            height="14"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            class="rb__check"
+          >
+            <path d="M3 8l3.5 3.5L13 4" />
+          </svg>
+        </span>
+      </li>
+      <li aria-hidden="true">
+        <div class="rb__sep"></div>
+      </li>
+      {otherLocales.map((l) => (
+        <li>
+          <a
+            href={localePath(l, path)}
+            hreflang={LOCALE_TAGS[l]}
+            lang={LOCALE_TAGS[l]}
+            data-lang-link={l}
+            data-testid={`lang-option-${l}`}
+            class="rb__option"
+          >
+            <Fragment set:html={flagSvg(l)} />
+            <span class="rb__option-label">{LOCALE_LABELS[l]}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</nav>
+
+<style>
+  /* Trigger button */
+  .rb__trigger {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    height: 40px;
+    padding: 0 12px;
+    border-radius: 99px;
+    border: 1px solid color-mix(in srgb, var(--sc-accent) 40%, rgba(255, 255, 255, 0.09));
+    background: none;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.72);
+    transition: color 0.15s;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme='dark']) .rb__trigger {
+      border-color: color-mix(in srgb, var(--sc-accent) 55%, rgba(0, 0, 0, 0.07));
+      color: rgba(0, 0, 0, 0.6);
+    }
+    :root:not([data-theme='dark']) .rb__trigger:hover {
+      color: rgba(0, 0, 0, 0.9);
+    }
+  }
+  :root[data-theme='light'] .rb__trigger {
+    border-color: color-mix(in srgb, var(--sc-accent) 55%, rgba(0, 0, 0, 0.07));
+    color: rgba(0, 0, 0, 0.6);
+  }
+  :root[data-theme='light'] .rb__trigger:hover {
+    color: rgba(0, 0, 0, 0.9);
+  }
+  .rb__trigger:hover {
+    color: rgba(255, 255, 255, 0.95);
+  }
+
+  /* Chevron rotates when open */
+  .rb__chevron {
+    flex-shrink: 0;
+    transition: transform 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  [data-open='true'] .rb__chevron {
+    transform: rotate(180deg);
+  }
+
+  /* Locale code label */
+  .rb__code {
+    letter-spacing: 0.04em;
+  }
+
+  /* List in the dropdown */
+  .rb__list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px;
+    border-radius: 16px;
+    list-style: none;
+    margin: 0;
+  }
+
+  /* Option rows */
+  .rb__option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 36px;
+    padding: 0 10px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    width: 100%;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.72);
+    text-decoration: none;
+    transition:
+      background 0.12s,
+      color 0.12s;
+  }
+  .rb__option:hover {
+    background: rgba(255, 255, 255, 0.07);
+    color: rgba(255, 255, 255, 0.95);
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme='dark']) .rb__option {
+      color: rgba(0, 0, 0, 0.65);
+    }
+    :root:not([data-theme='dark']) .rb__option:hover {
+      background: rgba(0, 0, 0, 0.05);
+      color: rgba(0, 0, 0, 0.9);
+    }
+  }
+  :root[data-theme='light'] .rb__option {
+    color: rgba(0, 0, 0, 0.65);
+  }
+  :root[data-theme='light'] .rb__option:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: rgba(0, 0, 0, 0.9);
+  }
+
+  /* Current locale shown as non-interactive span */
+  .rb__option--current {
+    cursor: default;
+    opacity: 0.5;
+  }
+  .rb__option--current:hover {
+    background: none;
+  }
+
+  /* Separator between current locale and alternatives */
+  .rb__sep {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 2px 4px;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme='dark']) .rb__sep {
+      background: rgba(0, 0, 0, 0.08);
+    }
+  }
+  :root[data-theme='light'] .rb__sep {
+    background: rgba(0, 0, 0, 0.08);
+  }
+
+  .rb__option-label {
+    flex: 1;
+    text-align: left;
+  }
+
+  .rb__check {
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+
+  /* Mobile: hide chevron and reduce padding */
+  @media (max-width: 639px) {
+    .rb__chevron {
+      display: none;
+    }
+    .rb__trigger {
+      padding: 0 10px;
+      gap: 6px;
+    }
+  }
+</style>

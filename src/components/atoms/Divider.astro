@@ -1,0 +1,49 @@
+---
+/**
+ * 1px vertical separator used inside glass pill bubbles.
+ * Adapts its colour to the active theme.
+ *
+ * @slot — (none)
+ */
+interface Props {
+  /** Orientation. Defaults to vertical (for inline row layouts). */
+  orientation?: 'vertical' | 'horizontal'
+  class?: string
+}
+
+const { orientation = 'vertical', class: cls } = Astro.props
+---
+
+<div
+  aria-hidden="true"
+  class:list={['divider', orientation === 'horizontal' ? 'divider--h' : 'divider--v', cls]}
+></div>
+
+<style>
+  .divider--v {
+    width: 1px;
+    height: 18px;
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.12);
+  }
+  .divider--h {
+    height: 1px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.12);
+    margin: 2px 4px;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme='dark']) .divider--v {
+      background: rgba(0, 0, 0, 0.1);
+    }
+    :root:not([data-theme='dark']) .divider--h {
+      background: rgba(0, 0, 0, 0.08);
+    }
+  }
+  :root[data-theme='light'] .divider--v {
+    background: rgba(0, 0, 0, 0.1);
+  }
+  :root[data-theme='light'] .divider--h {
+    background: rgba(0, 0, 0, 0.08);
+  }
+</style>

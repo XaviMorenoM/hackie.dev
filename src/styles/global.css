@@ -10,22 +10,84 @@
  * (forced state) — so the toggle wins in both directions. Every colour goes through
  * these tokens; `@theme inline` maps them onto Tailwind utilities.
  */
+
+/* ═══════════════════════════════════════════════
+   DESIGN TOKENS — single source of truth
+   ═══════════════════════════════════════════════ */
+
 :root {
   color-scheme: dark;
+
+  /* COLOR — brand */
+  --t-lime: #c6ff3d; /* accent for text, icons, rules */
+  --t-lime-fill: #c6ff3d; /* filled buttons/badges — always paired with --t-lime-ink text */
+  --t-lime-ink: #101400;
+
+  /* COLOR — neutrals */
   --t-bg: #0b0b0c;
   --t-surface: #141416;
   --t-line: #232326;
   --t-fg: #f5f5f5;
   --t-muted: #9a9a9a;
-  --t-lime: #c6ff3d; /* accent for text, icons, rules */
-  --t-lime-fill: #c6ff3d; /* filled buttons/badges — always paired with --t-lime-ink text */
-  --t-lime-ink: #101400;
   --t-bezel: #1c1c1f; /* phone-frame bezel — a device colour, same in both themes */
+
+  /* COLOR — project accents (set by ProjectLayout via <html style>) */
+  /* --project-accent, --project-accent-dark, --project-accent-ink are injected per-page */
+
+  /* TYPOGRAPHY — scale */
+  --t-text-xs: 0.75rem; /* 12px */
+  --t-text-sm: 0.8125rem; /* 13px */
+  --t-text-base: 1rem; /* 16px */
+  --t-text-lg: 1.125rem; /* 18px */
+  --t-text-xl: 1.25rem; /* 20px */
+  --t-text-2xl: 1.5rem; /* 24px */
+  --t-text-display: 2.5rem; /* 40px */
+  --t-leading-tight: 1.15;
+  --t-leading-base: 1.5;
+  --t-tracking-tight: -0.02em;
+  --t-tracking-wide: 0.06em;
+
+  /* SPACING — scale */
+  --t-space-1: 0.25rem;
+  --t-space-2: 0.5rem;
+  --t-space-3: 0.75rem;
+  --t-space-4: 1rem;
+  --t-space-5: 1.25rem;
+  --t-space-6: 1.5rem;
+  --t-space-8: 2rem;
+  --t-space-10: 2.5rem;
+  --t-space-12: 3rem;
+  --t-space-16: 4rem;
+
+  /* SHADOWS — cards, bubbles, deep */
   --t-card-shadow:
     0 1px 2px rgb(0 0 0 / 0.45), 0 4px 12px rgb(0 0 0 / 0.35), 0 12px 32px -8px rgb(0 0 0 / 0.3);
   --t-card-shadow-hover:
     0 2px 4px rgb(0 0 0 / 0.45), 0 12px 24px rgb(0 0 0 / 0.4), 0 24px 48px -12px rgb(0 0 0 / 0.45);
-  /* Per-theme media: exactly one of each pair is `block`. */
+  --t-bubble-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 8px 40px rgba(0, 0, 0, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.2);
+  --t-bubble-shadow-light:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 8px 40px rgba(0, 0, 0, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.06);
+
+  /* GLASS — backdrop params (used by .bubble-glass) */
+  --t-glass-blur: blur(32px) saturate(180%) brightness(105%);
+  --t-glass-bg-dark: rgba(16, 16, 20, 0.68);
+  --t-glass-bg-light: rgba(255, 255, 255, 0.78);
+  --t-glass-border-dark: rgba(255, 255, 255, 0.09);
+  --t-glass-border-light: rgba(0, 0, 0, 0.07);
+
+  /* ANIMATION — easings + durations */
+  --t-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* waterdrop bounce */
+  --t-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --t-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --t-duration-fast: 150ms;
+  --t-duration-base: 220ms;
+  --t-duration-slow: 400ms;
+
+  /* SURFACE — page bg, card bg, line color (aliases for readability) */
+  /* These mirror the --t-* neutrals above */
   --shot-light: none;
   --shot-dark: block;
 }
@@ -33,20 +95,27 @@
 @media (prefers-color-scheme: light) {
   :root:not([data-theme='dark']) {
     color-scheme: light;
+
+    /* COLOR — brand (light overrides) */
+    --t-lime: #4a6600;
+    --t-lime-fill: #c6ff3d;
+    --t-lime-ink: #101400;
+
+    /* COLOR — neutrals (light overrides) */
     --t-bg: #f6f4ee;
     --t-surface: #ffffff;
     --t-line: #e3dfd5;
     --t-fg: #141413;
     --t-muted: #5c5a54;
-    --t-lime: #4a6600;
-    --t-lime-fill: #c6ff3d;
-    --t-lime-ink: #101400;
+
+    /* SHADOWS — cards (light overrides) */
     --t-card-shadow:
       0 1px 2px rgb(20 20 19 / 0.06), 0 4px 12px rgb(20 20 19 / 0.05),
       0 12px 32px -8px rgb(20 20 19 / 0.08);
     --t-card-shadow-hover:
       0 2px 4px rgb(20 20 19 / 0.08), 0 12px 24px rgb(20 20 19 / 0.1),
       0 24px 48px -12px rgb(20 20 19 / 0.18);
+
     --shot-light: block;
     --shot-dark: none;
   }
@@ -54,20 +123,27 @@
 
 :root[data-theme='light'] {
   color-scheme: light;
+
+  /* COLOR — brand (light overrides) */
+  --t-lime: #4a6600;
+  --t-lime-fill: #c6ff3d;
+  --t-lime-ink: #101400;
+
+  /* COLOR — neutrals (light overrides) */
   --t-bg: #f6f4ee;
   --t-surface: #ffffff;
   --t-line: #e3dfd5;
   --t-fg: #141413;
   --t-muted: #5c5a54;
-  --t-lime: #4a6600;
-  --t-lime-fill: #c6ff3d;
-  --t-lime-ink: #101400;
+
+  /* SHADOWS — cards (light overrides) */
   --t-card-shadow:
     0 1px 2px rgb(20 20 19 / 0.06), 0 4px 12px rgb(20 20 19 / 0.05),
     0 12px 32px -8px rgb(20 20 19 / 0.08);
   --t-card-shadow-hover:
     0 2px 4px rgb(20 20 19 / 0.08), 0 12px 24px rgb(20 20 19 / 0.1),
     0 24px 48px -12px rgb(20 20 19 / 0.18);
+
   --shot-light: block;
   --shot-dark: none;
 }
@@ -189,32 +265,23 @@
 @layer components {
   /* Shared liquid-glass surface used by LiquidGlassBubble and SiteControls. */
   .bubble-glass {
-    background: rgba(16, 16, 20, 0.68);
-    backdrop-filter: blur(32px) saturate(180%) brightness(105%);
-    -webkit-backdrop-filter: blur(32px) saturate(180%) brightness(105%);
-    border: 1px solid rgba(255, 255, 255, 0.09);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.07),
-      0 8px 40px rgba(0, 0, 0, 0.4),
-      0 2px 8px rgba(0, 0, 0, 0.2);
+    background: var(--t-glass-bg-dark);
+    backdrop-filter: var(--t-glass-blur);
+    -webkit-backdrop-filter: var(--t-glass-blur);
+    border: 1px solid var(--t-glass-border-dark);
+    box-shadow: var(--t-bubble-shadow);
   }
   @media (prefers-color-scheme: light) {
     :root:not([data-theme='dark']) .bubble-glass {
-      background: rgba(255, 255, 255, 0.78);
-      border-color: rgba(0, 0, 0, 0.07);
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.95),
-        0 8px 40px rgba(0, 0, 0, 0.08),
-        0 2px 8px rgba(0, 0, 0, 0.06);
+      background: var(--t-glass-bg-light);
+      border-color: var(--t-glass-border-light);
+      box-shadow: var(--t-bubble-shadow-light);
     }
   }
   :root[data-theme='light'] .bubble-glass {
-    background: rgba(255, 255, 255, 0.78);
-    border-color: rgba(0, 0, 0, 0.07);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.95),
-      0 8px 40px rgba(0, 0, 0, 0.08),
-      0 2px 8px rgba(0, 0, 0, 0.06);
+    background: var(--t-glass-bg-light);
+    border-color: var(--t-glass-border-light);
+    box-shadow: var(--t-bubble-shadow-light);
   }
 
   /* Popup host: relative so the panel can be absolutely positioned. */
@@ -232,8 +299,9 @@
     transform: translateY(-4px) scale(0.96);
     transform-origin: top right;
     transition:
-      opacity 160ms cubic-bezier(0.2, 0.8, 0.2, 1),
-      transform 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
+      opacity var(--t-duration-base) var(--t-ease-spring),
+      transform var(--t-duration-base) var(--t-ease-spring),
+      visibility 0s var(--t-duration-base);
     visibility: hidden;
   }
   [data-open='true'] > .bubble-panel {

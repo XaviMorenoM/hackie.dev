@@ -1,0 +1,505 @@
+---
+/**
+ * Dev-only design-system reference page.
+ * Available at /{locale}/design-system/ — NOT linked from the main navigation.
+ */
+import Base from '../../../layouts/Base.astro'
+import Icon from '../../../components/atoms/Icon.astro'
+import Typography from '../../../components/atoms/Typography.astro'
+import Divider from '../../../components/atoms/Divider.astro'
+import Badge from '../../../components/atoms/Badge.astro'
+import BubbleGlass from '../../../components/molecules/BubbleGlass.astro'
+import { localeStaticPaths, useTranslations } from '../../../i18n'
+import type { Locale } from '../../../config'
+import { animation } from '../../../design-system/tokens'
+
+export const getStaticPaths = localeStaticPaths
+
+interface Props {
+  locale?: Locale
+}
+
+// In production: locale comes from Astro.params (getStaticPaths).
+// In test: locale comes from Astro.props.locale (AstroContainer.renderToString).
+const locale = (Astro.props.locale ?? Astro.params.locale) as Locale
+
+const colorTokens = [
+  { name: '--t-lime', var: 'var(--t-lime)', label: 'lime (accent text)' },
+  { name: '--t-lime-fill', var: 'var(--t-lime-fill)', label: 'lime-fill (buttons/badges)' },
+  { name: '--t-bg', var: 'var(--t-bg)', label: 'bg (page ground)' },
+  { name: '--t-surface', var: 'var(--t-surface)', label: 'surface (cards)' },
+  { name: '--t-line', var: 'var(--t-line)', label: 'line (borders)' },
+  { name: '--t-fg', var: 'var(--t-fg)', label: 'fg (primary text)' },
+  { name: '--t-muted', var: 'var(--t-muted)', label: 'muted (secondary text)' },
+  { name: '--t-bezel', var: 'var(--t-bezel)', label: 'bezel (device chrome)' },
+]
+
+const typographyRows = [
+  { label: 'display (2.5rem)', cls: 'ty-sample-display' },
+  { label: 'heading-xl (2.5rem bold)', cls: 'ty-sample-hxl' },
+  { label: 'heading-lg (1.5rem bold)', cls: 'ty-sample-hlg' },
+  { label: 'heading-md (1.25rem 600)', cls: 'ty-sample-hmd' },
+  { label: 'heading-sm (1rem 600)', cls: 'ty-sample-hsm' },
+  { label: 'body-lg (1.125rem)', cls: 'ty-sample-blg' },
+  { label: 'body (1rem)', cls: 'ty-sample-b' },
+  { label: 'body-sm (0.875rem)', cls: 'ty-sample-bsm' },
+  { label: 'eyebrow (0.75rem caps)', cls: 'ty-sample-ey' },
+  { label: 'label (0.8125rem 600)', cls: 'ty-sample-lb' },
+  { label: 'muted (0.875rem muted)', cls: 'ty-sample-mt' },
+]
+
+const iconPaths = [
+  {
+    name: 'grid',
+    path: '<rect x="0" y="0" width="6" height="6" rx="1.5" fill="currentColor" opacity=".9"/><rect x="8" y="0" width="6" height="6" rx="1.5" fill="currentColor" opacity=".9"/><rect x="0" y="8" width="6" height="6" rx="1.5" fill="currentColor" opacity=".9"/><rect x="8" y="8" width="6" height="6" rx="1.5" fill="currentColor" opacity=".9"/>',
+    size: 14,
+  },
+  { name: 'chevron-down', path: '<path d="M1 1l3 3 3-3"/>', size: 8 },
+  { name: 'check', path: '<path d="M3 8l3.5 3.5L13 4"/>', size: 16 },
+  { name: 'arrow-right', path: '<path d="M5 12h14M13 6l6 6-6 6"/>' },
+]
+---
+
+<Base
+  locale={locale}
+  title="Design System — hackie.dev"
+  description="Component and token reference"
+  noindex={true}
+>
+  <div data-testid="design-system-page" class="ds-page">
+    <header class="ds-section ds-hero">
+      <Typography variant="display" as="h1">
+        Design System
+      </Typography>
+      <Typography variant="body-lg" as="p" class="ds-hero__sub">
+        hackie.dev component and token reference. Dev-only — not linked from navigation.
+      </Typography>
+    </header>
+
+    <!-- COLOR SWATCHES -->
+    <section class="ds-section" aria-labelledby="ds-colors-h">
+      <Typography variant="eyebrow" as="h2" id="ds-colors-h">
+        Color tokens
+      </Typography>
+      <div class="ds-swatches">
+        {colorTokens.map(({ name, var: cssVar, label }) => (
+          <div class="ds-swatch">
+            <div
+              class="ds-swatch__chip"
+              style={`background:${cssVar};border:1px solid var(--t-line)`}
+            ></div>
+            <code class="ds-swatch__name">{name}</code>
+            <span class="ds-swatch__label">{label}</span>
+          </div>
+        ))}
+        <!-- Glass surface swatch -->
+        <div class="ds-swatch">
+          <div class="ds-swatch__chip bubble-glass"></div>
+          <code class="ds-swatch__name">.bubble-glass</code>
+          <span class="ds-swatch__label">glass surface (backdrop-filter)</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- TYPOGRAPHY SCALE -->
+    <section class="ds-section" aria-labelledby="ds-type-h">
+      <Typography variant="eyebrow" as="h2" id="ds-type-h">
+        Typography scale
+      </Typography>
+      <div class="ds-type-list">
+        {typographyRows.map(({ label, cls }) => (
+          <div class="ds-type-row">
+            <span class="ds-type-row__label">{label}</span>
+            <span class:list={['ds-type-row__sample', cls]}>The quick brown fox</span>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <!-- SHADOW EXAMPLES -->
+    <section class="ds-section" aria-labelledby="ds-shadows-h">
+      <Typography variant="eyebrow" as="h2" id="ds-shadows-h">
+        Shadows
+      </Typography>
+      <div class="ds-shadows">
+        <div class="ds-shadow-card ds-shadow-card--rest">
+          <Typography variant="label">Card rest</Typography>
+          <Typography variant="muted">--t-card-shadow</Typography>
+        </div>
+        <div class="ds-shadow-card ds-shadow-card--hover">
+          <Typography variant="label">Card hover</Typography>
+          <Typography variant="muted">--t-card-shadow-hover</Typography>
+        </div>
+      </div>
+    </section>
+
+    <!-- GLASS PILL EXAMPLES -->
+    <section class="ds-section" aria-labelledby="ds-glass-h">
+      <Typography variant="eyebrow" as="h2" id="ds-glass-h">
+        Glass pills (BubbleGlass)
+      </Typography>
+      <div class="ds-glass-row">
+        <BubbleGlass class="ds-glass-pill">
+          <span class="ds-glass-pill__text">Dark theme glass pill</span>
+        </BubbleGlass>
+        <BubbleGlass class="ds-glass-pill" accent="var(--t-lime-fill)">
+          <span class="ds-glass-pill__text">With accent tint</span>
+        </BubbleGlass>
+      </div>
+    </section>
+
+    <!-- ANIMATION DEMO -->
+    <section class="ds-section" aria-labelledby="ds-anim-h">
+      <Typography variant="eyebrow" as="h2" id="ds-anim-h">
+        Animation (spring easing)
+      </Typography>
+      <p class="ds-anim-hint">Hover the pill to see the spring panel open.</p>
+      <div class="ds-anim-demo bubble-host" data-open="false">
+        <button
+          type="button"
+          class="bubble-glass ds-anim-trigger"
+          data-bubble-trigger
+          aria-expanded="false"
+          aria-controls="ds-anim-panel"
+        >
+          Hover me
+        </button>
+        <div class="bubble-panel ds-anim-panel" id="ds-anim-panel">
+          <div class="bubble-glass ds-anim-panel__inner">
+            <Typography variant="label">Spring panel</Typography>
+            <Typography variant="muted">
+              transition: opacity + transform {animation.durationBase} {animation.easeSpring}
+            </Typography>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DIVIDER ATOM -->
+    <section class="ds-section" aria-labelledby="ds-divider-h">
+      <Typography variant="eyebrow" as="h2" id="ds-divider-h">
+        Divider atom
+      </Typography>
+      <div class="ds-divider-demo">
+        <span>Left</span>
+        <Divider />
+        <span>Right (vertical)</span>
+      </div>
+      <div class="ds-divider-demo-h">
+        <Divider orientation="horizontal" />
+      </div>
+    </section>
+
+    <!-- BADGE ATOM -->
+    <section class="ds-section" aria-labelledby="ds-badge-h">
+      <Typography variant="eyebrow" as="h2" id="ds-badge-h">
+        Badge atom
+      </Typography>
+      <div class="ds-badges">
+        <Badge variant="outline">outline</Badge>
+        <Badge variant="filled">filled</Badge>
+        <Badge variant="accent">accent</Badge>
+        <Badge variant="outline">iOS</Badge>
+        <Badge variant="outline">macOS</Badge>
+        <Badge variant="outline">CLI</Badge>
+      </div>
+    </section>
+
+    <!-- ICON ATOM -->
+    <section class="ds-section" aria-labelledby="ds-icons-h">
+      <Typography variant="eyebrow" as="h2" id="ds-icons-h">
+        Icon atom
+      </Typography>
+      <div class="ds-icons">
+        {iconPaths.map(({ name, path, size }) => (
+          <div class="ds-icon-item">
+            <Icon html={path} size={size ?? 24} class="ds-icon" />
+            <span class="ds-icon-label">{name}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .ds-page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 5rem 1.25rem 6rem;
+  }
+
+  .ds-section {
+    margin-top: 3.5rem;
+    border-top: 1px solid var(--t-line);
+    padding-top: 2rem;
+  }
+
+  .ds-hero {
+    border-top: none;
+    margin-top: 0;
+  }
+
+  .ds-hero__sub {
+    margin-top: 0.75rem;
+    color: var(--t-muted);
+    max-width: 520px;
+  }
+
+  /* Color swatches */
+  .ds-swatches {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .ds-swatch {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  .ds-swatch__chip {
+    height: 48px;
+    border-radius: 8px;
+  }
+
+  .ds-swatch__name {
+    font-size: 0.75rem;
+    color: var(--t-fg);
+  }
+
+  .ds-swatch__label {
+    font-size: 0.75rem;
+    color: var(--t-muted);
+  }
+
+  /* Typography */
+  .ds-type-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .ds-type-row {
+    display: flex;
+    align-items: baseline;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .ds-type-row__label {
+    font-size: 0.75rem;
+    color: var(--t-muted);
+    min-width: 200px;
+    flex-shrink: 0;
+  }
+
+  .ds-type-row__sample {
+    color: var(--t-fg);
+  }
+
+  .ty-sample-display {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 2.5rem;
+    line-height: 1;
+  }
+  .ty-sample-hxl {
+    font-size: 2.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .ty-sample-hlg {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .ty-sample-hmd {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+  .ty-sample-hsm {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  .ty-sample-blg {
+    font-size: 1.125rem;
+    line-height: 1.5;
+  }
+  .ty-sample-b {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  .ty-sample-bsm {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+  .ty-sample-ey {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--t-lime);
+  }
+  .ty-sample-lb {
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
+  .ty-sample-mt {
+    font-size: 0.875rem;
+    color: var(--t-muted);
+  }
+
+  /* Shadows */
+  .ds-shadows {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+  }
+
+  .ds-shadow-card {
+    padding: 1.5rem 2rem;
+    border-radius: 1.25rem;
+    border: 1px solid var(--t-line);
+    background: var(--t-surface);
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .ds-shadow-card--rest {
+    box-shadow: var(--t-card-shadow);
+  }
+
+  .ds-shadow-card--hover {
+    box-shadow: var(--t-card-shadow-hover);
+  }
+
+  /* Glass pills */
+  .ds-glass-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+  }
+
+  .ds-glass-pill {
+    border-radius: 99px;
+    padding: 0 1.25rem;
+    height: 40px;
+    display: flex;
+    align-items: center;
+  }
+
+  .ds-glass-pill__text {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.72);
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme='dark']) .ds-glass-pill__text {
+      color: rgba(0, 0, 0, 0.65);
+    }
+  }
+  :root[data-theme='light'] .ds-glass-pill__text {
+    color: rgba(0, 0, 0, 0.65);
+  }
+
+  /* Animation demo */
+  .ds-anim-hint {
+    font-size: 0.875rem;
+    color: var(--t-muted);
+    margin-top: 0.5rem;
+  }
+
+  .ds-anim-demo {
+    margin-top: 1rem;
+    display: inline-block;
+  }
+
+  .ds-anim-trigger {
+    border-radius: 99px;
+    height: 40px;
+    padding: 0 1.25rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--t-glass-border-dark);
+    color: rgba(255, 255, 255, 0.72);
+    display: flex;
+    align-items: center;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme='dark']) .ds-anim-trigger {
+      color: rgba(0, 0, 0, 0.65);
+      border-color: var(--t-glass-border-light);
+    }
+  }
+  :root[data-theme='light'] .ds-anim-trigger {
+    color: rgba(0, 0, 0, 0.65);
+    border-color: var(--t-glass-border-light);
+  }
+
+  .ds-anim-panel {
+    min-width: 260px;
+  }
+
+  .ds-anim-panel__inner {
+    padding: 1rem 1.25rem;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  /* Divider demo */
+  .ds-divider-demo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    font-size: 0.875rem;
+    color: var(--t-fg);
+  }
+
+  .ds-divider-demo-h {
+    margin-top: 1rem;
+    max-width: 240px;
+  }
+
+  /* Badges */
+  .ds-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+  }
+
+  /* Icons */
+  .ds-icons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .ds-icon-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .ds-icon {
+    color: var(--t-fg);
+  }
+
+  .ds-icon-label {
+    font-size: 0.75rem;
+    color: var(--t-muted);
+  }
+</style>
