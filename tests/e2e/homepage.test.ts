@@ -154,6 +154,8 @@ test('#13: focused card has translateY(-4px) transform', async ({ page }) => {
     if (focused) break
   }
   expect(focused).toBe(true)
+  // Wait for the 200ms CSS transition to complete before reading the final value.
+  await page.waitForTimeout(250)
   const transform: string = await page.evaluate(() => {
     const el = document.querySelector('[data-testid="project-card-alterio"]') as HTMLElement
     return getComputedStyle(el).transform
