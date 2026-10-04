@@ -9,7 +9,7 @@ registerProject({
   platform: ['cli', 'macos'],
   accent: '#4E79A7',
   accentDark: '#4E79A7',
-  accentInk: '#F5F5F5',
+  accentInk: '#FFFFFF',
   githubUrl: 'https://github.com/XaviMorenoM/diskspace',
   installCommand: 'go install github.com/XaviMorenoM/diskspace/cmd/diskspace@latest',
   cover: { src: cover, alt: '' },

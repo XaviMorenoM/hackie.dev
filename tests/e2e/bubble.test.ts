@@ -1,5 +1,5 @@
 /**
- * E2E tests for the LiquidGlassBubble component (ticket #5).
+ * E2E tests for the LiquidGlassBubble and SiteControls components.
  *
  * Covers:
  * - Bubble appears exactly once on every sitemap URL
@@ -84,8 +84,8 @@ for (const locale of SWEEP_LOCALES) {
         await page.waitForLoadState('networkidle')
 
         const bubbleBox = await page.getByTestId('site-bubble').boundingBox()
-        const langBox = await page.getByTestId('lang-switcher').boundingBox()
-        const themeBox = await page.getByTestId('theme-switch').boundingBox()
+        const langBox = await page.getByTestId('lang-bubble').boundingBox()
+        const themeBox = await page.getByTestId('theme-bubble').boundingBox()
 
         expect(bubbleBox).not.toBeNull()
 
@@ -102,8 +102,8 @@ for (const locale of SWEEP_LOCALES) {
         }
 
         for (const [name, controlBox] of [
-          ['lang-switcher', langBox],
-          ['theme-switch', themeBox],
+          ['lang-bubble', langBox],
+          ['theme-bubble', themeBox],
         ] as const) {
           if (!controlBox) continue
 
@@ -140,9 +140,7 @@ for (const locale of SWEEP_LOCALES) {
 // ---------------------------------------------------------------------------
 
 for (const locale of ['en', 'es', 'ca'] as const) {
-  test(`bubble does not overlap header controls at 375px/150% text — /${locale}/`, async ({
-    page,
-  }) => {
+  test(`bubble does not overlap lang-bubble at 375px/150% text — /${locale}/`, async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 })
     // 150% text scale: default browser font is 16px → 24px
     await page.goto(`/${locale}/`)
@@ -150,7 +148,7 @@ for (const locale of ['en', 'es', 'ca'] as const) {
     await page.waitForLoadState('networkidle')
 
     const bubble = page.getByTestId('site-bubble')
-    const controls = page.getByTestId('lang-switcher')
+    const controls = page.getByTestId('lang-bubble')
 
     const bubbleBox = await bubble.boundingBox()
     const controlsBox = await controls.boundingBox()
@@ -167,7 +165,7 @@ for (const locale of ['en', 'es', 'ca'] as const) {
         controlsBox.y + controlsBox.height > bubbleBox.y
       expect(
         xOverlap && yOverlap,
-        `bubble must not visually overlap lang-switcher on /${locale}/`,
+        `bubble must not visually overlap lang-bubble on /${locale}/`,
       ).toBe(false)
 
       // no horizontal scroll: neither element overflows the 375px viewport
