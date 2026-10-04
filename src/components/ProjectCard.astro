@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets'
 import type { Project } from '../content/projects/index'
 import { localePath, useTranslations } from '../i18n'
 import type { Locale } from '../config'
@@ -13,10 +14,32 @@ const projectT = (t.projects as Record<string, { tagline: string }>)[project.slu
 
 <a
   href={localePath(locale, `/${project.slug}/`)}
-  class="group flex flex-col gap-0 rounded-2xl border border-line bg-surface p-6 transition-all duration-200 hover:-translate-y-px hover:shadow-lg hover:shadow-black/10 focus-visible:outline-2 focus-visible:outline-[var(--t-lime)]"
+  class="group flex flex-col gap-0 rounded-2xl border border-line bg-surface p-6 focus-visible:outline-2 focus-visible:outline-[var(--t-lime)]"
   style={`--card-accent: ${project.accent}`}
   data-hover-border
+  data-project-card
+  data-testid={`project-card-${project.slug}`}
+  data-has-cover={project.cover ? 'true' : 'false'}
 >
+  {project.cover && (
+    <div
+      class="relative -mx-6 -mt-6 mb-5 aspect-video overflow-hidden rounded-t-[15px]"
+      data-testid="card-cover"
+    >
+      <Image
+        src={project.cover.src}
+        alt={project.cover.alt}
+        widths={[400, 800, 1200]}
+        sizes="(min-width: 1024px) 380px, (min-width: 640px) 50vw, 100vw"
+        class="h-full w-full object-cover transition-[filter] duration-200 ease-out"
+      />
+      <div
+        class="pointer-events-none absolute inset-0 bg-linear-to-b from-transparent from-50% to-surface"
+        aria-hidden="true"
+      />
+    </div>
+  )}
+
   <div class="mb-5">
     <h3 class="text-base font-semibold tracking-tight text-fg">{project.name}</h3>
     <p class="mt-2 text-sm leading-relaxed text-muted">{projectT?.tagline ?? ''}</p>
@@ -40,7 +63,26 @@ const projectT = (t.projects as Record<string, { tagline: string }>)[project.slu
 </a>
 
 <style>
-  [data-hover-border]:hover {
+  [data-project-card] {
+    box-shadow: var(--t-card-shadow);
+    transition:
+      transform 200ms cubic-bezier(0, 0, 0.2, 1),
+      box-shadow 200ms cubic-bezier(0, 0, 0.2, 1),
+      border-color 200ms cubic-bezier(0, 0, 0.2, 1);
+  }
+  [data-project-card]:is(:hover, :focus-visible) {
+    transform: translateY(-4px);
+    box-shadow: var(--t-card-shadow-hover);
+  }
+  [data-project-card]:is(:hover, :focus-visible) [data-testid='card-cover'] img {
+    filter: brightness(1.04);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-project-card]:is(:hover, :focus-visible) {
+      transform: none;
+    }
+  }
+  [data-hover-border]:is(:hover, :focus-visible) {
     border-color: color-mix(in srgb, var(--card-accent) 45%, transparent);
   }
 </style>

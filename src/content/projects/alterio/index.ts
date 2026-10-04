@@ -1,4 +1,5 @@
 import { registerProject } from '../index'
+import cover from '../../../assets/projects/alterio/cover.png'
 
 registerProject({
   slug: 'alterio',
@@ -8,6 +9,7 @@ registerProject({
   accentDark: '#C6FF3D',
   accentInk: '#101400',
   githubUrl: 'https://github.com/XaviMorenoM/gym-tracker',
+  cover: { src: cover, alt: '' },
   changelog: [
     {
       version: 'v0.13.18',
