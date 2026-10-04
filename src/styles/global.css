@@ -45,7 +45,7 @@
   --t-leading-tight: 1.15;
   --t-leading-base: 1.5;
   --t-tracking-tight: -0.02em;
-  --t-tracking-wide: 0.06em;
+  --t-tracking-wide: 0.14em; /* eyebrow / caps labels */
 
   /* SPACING — scale */
   --t-space-1: 0.25rem;
@@ -72,6 +72,7 @@
     0 2px 8px rgba(0, 0, 0, 0.06);
 
   /* GLASS — backdrop params (used by .bubble-glass) */
+  /* backdrop-filter cannot use var() — LightningCSS cannot prefix a var() value. Use literals in .bubble-glass. */
   --t-glass-blur: blur(32px) saturate(180%) brightness(105%);
   --t-glass-bg-dark: rgba(16, 16, 20, 0.68);
   --t-glass-bg-light: rgba(255, 255, 255, 0.78);
@@ -263,24 +264,25 @@
 }
 
 @layer components {
-  /* Shared liquid-glass surface used by LiquidGlassBubble and SiteControls. */
+  /* Shared liquid-glass surface used by LiquidGlassBubble and SiteControls.
+     backdrop-filter must use literal values — LightningCSS cannot add the -webkit-
+     prefix when the value is a var(), so it drops the unprefixed form. */
   .bubble-glass {
-    background: var(--t-glass-bg-dark);
-    backdrop-filter: var(--t-glass-blur);
-    -webkit-backdrop-filter: var(--t-glass-blur);
-    border: 1px solid var(--t-glass-border-dark);
+    background: rgba(16, 16, 20, 0.68);
+    backdrop-filter: blur(32px) saturate(180%) brightness(105%);
+    border: 1px solid rgba(255, 255, 255, 0.09);
     box-shadow: var(--t-bubble-shadow);
   }
   @media (prefers-color-scheme: light) {
     :root:not([data-theme='dark']) .bubble-glass {
-      background: var(--t-glass-bg-light);
-      border-color: var(--t-glass-border-light);
+      background: rgba(255, 255, 255, 0.78);
+      border-color: rgba(0, 0, 0, 0.07);
       box-shadow: var(--t-bubble-shadow-light);
     }
   }
   :root[data-theme='light'] .bubble-glass {
-    background: var(--t-glass-bg-light);
-    border-color: var(--t-glass-border-light);
+    background: rgba(255, 255, 255, 0.78);
+    border-color: rgba(0, 0, 0, 0.07);
     box-shadow: var(--t-bubble-shadow-light);
   }
 
@@ -289,39 +291,30 @@
     position: relative;
   }
 
-  /* Dropdown panel: hidden by default; shown when data-open='true' or focus is inside. */
+  /* Dropdown panel: hidden by default; shown only when data-open='true' (JS-controlled).
+     data-open is the single source of truth — no CSS :hover/:focus-visible auto-open. */
   .bubble-panel {
     position: absolute;
     top: calc(100% + 8px);
     right: 0;
     opacity: 0;
     pointer-events: none;
-    transform: translateY(-4px) scale(0.96);
+    transform: translateY(-4px) scale(0.92);
     transform-origin: top right;
     transition:
-      opacity var(--t-duration-base) var(--t-ease-spring),
-      transform var(--t-duration-base) var(--t-ease-spring),
-      visibility 0s var(--t-duration-base);
+      opacity 220ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      visibility 0s 220ms;
     visibility: hidden;
   }
   [data-open='true'] > .bubble-panel {
     opacity: 1;
     pointer-events: auto;
-    transform: none;
+    transform: translateY(0) scale(1);
     visibility: visible;
-  }
-  .bubble-host:has(:focus-visible) > .bubble-panel {
-    opacity: 1;
-    pointer-events: auto;
-    transform: none;
-    visibility: visible;
-  }
-  @media (hover: hover) {
-    .bubble-host:hover > .bubble-panel {
-      opacity: 1;
-      pointer-events: auto;
-      transform: none;
-      visibility: visible;
-    }
+    transition:
+      opacity 220ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1),
+      visibility 0s 0ms;
   }
 }

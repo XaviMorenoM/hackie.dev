@@ -34,18 +34,31 @@ const colorTokens = [
   { name: '--t-bezel', var: 'var(--t-bezel)', label: 'bezel (device chrome)' },
 ]
 
-const typographyRows = [
-  { label: 'display (2.5rem)', cls: 'ty-sample-display' },
-  { label: 'heading-xl (2.5rem bold)', cls: 'ty-sample-hxl' },
-  { label: 'heading-lg (1.5rem bold)', cls: 'ty-sample-hlg' },
-  { label: 'heading-md (1.25rem 600)', cls: 'ty-sample-hmd' },
-  { label: 'heading-sm (1rem 600)', cls: 'ty-sample-hsm' },
-  { label: 'body-lg (1.125rem)', cls: 'ty-sample-blg' },
-  { label: 'body (1rem)', cls: 'ty-sample-b' },
-  { label: 'body-sm (0.875rem)', cls: 'ty-sample-bsm' },
-  { label: 'eyebrow (0.75rem caps)', cls: 'ty-sample-ey' },
-  { label: 'label (0.8125rem 600)', cls: 'ty-sample-lb' },
-  { label: 'muted (0.875rem muted)', cls: 'ty-sample-mt' },
+type TypographyVariant =
+  | 'display'
+  | 'heading-xl'
+  | 'heading-lg'
+  | 'heading-md'
+  | 'heading-sm'
+  | 'body-lg'
+  | 'body'
+  | 'body-sm'
+  | 'eyebrow'
+  | 'label'
+  | 'muted'
+
+const typographyRows: Array<{ label: string; variant: TypographyVariant }> = [
+  { label: 'display → --t-text-display (2.5rem serif italic)', variant: 'display' },
+  { label: 'heading-xl → 2.5rem 700', variant: 'heading-xl' },
+  { label: 'heading-lg → --t-text-2xl (1.5rem 700)', variant: 'heading-lg' },
+  { label: 'heading-md → --t-text-xl (1.25rem 600)', variant: 'heading-md' },
+  { label: 'heading-sm → --t-text-base (1rem 600)', variant: 'heading-sm' },
+  { label: 'body-lg → --t-text-lg (1.125rem)', variant: 'body-lg' },
+  { label: 'body → --t-text-base (1rem)', variant: 'body' },
+  { label: 'body-sm → --t-text-sm (0.8125rem)', variant: 'body-sm' },
+  { label: 'eyebrow → --t-text-xs (0.75rem caps lime)', variant: 'eyebrow' },
+  { label: 'label → --t-text-sm (0.8125rem 600)', variant: 'label' },
+  { label: 'muted → --t-text-sm (0.8125rem muted)', variant: 'muted' },
 ]
 
 const iconPaths = [
@@ -88,7 +101,7 @@ const iconPaths = [
               class="ds-swatch__chip"
               style={`background:${cssVar};border:1px solid var(--t-line)`}
             ></div>
-            <code class="ds-swatch__name">{name}</code>
+            <code class="ds-swatch__name" data-token={name}>{name}</code>
             <span class="ds-swatch__label">{label}</span>
           </div>
         ))}
@@ -107,10 +120,10 @@ const iconPaths = [
         Typography scale
       </Typography>
       <div class="ds-type-list">
-        {typographyRows.map(({ label, cls }) => (
+        {typographyRows.map(({ label, variant }) => (
           <div class="ds-type-row">
             <span class="ds-type-row__label">{label}</span>
-            <span class:list={['ds-type-row__sample', cls]}>The quick brown fox</span>
+            <Typography variant={variant} as="span">The quick brown fox</Typography>
           </div>
         ))}
       </div>
@@ -142,8 +155,8 @@ const iconPaths = [
         <BubbleGlass class="ds-glass-pill">
           <span class="ds-glass-pill__text">Dark theme glass pill</span>
         </BubbleGlass>
-        <BubbleGlass class="ds-glass-pill" accent="var(--t-lime-fill)">
-          <span class="ds-glass-pill__text">With accent tint</span>
+        <BubbleGlass class="ds-glass-pill">
+          <span class="ds-glass-pill__text">Light theme glass pill</span>
         </BubbleGlass>
       </div>
     </section>
@@ -270,6 +283,12 @@ const iconPaths = [
     color: var(--t-fg);
   }
 
+  .ds-swatch__hex {
+    font-size: 0.6875rem;
+    color: var(--t-muted);
+    font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, monospace;
+  }
+
   .ds-swatch__label {
     font-size: 0.75rem;
     color: var(--t-muted);
@@ -293,64 +312,8 @@ const iconPaths = [
   .ds-type-row__label {
     font-size: 0.75rem;
     color: var(--t-muted);
-    min-width: 200px;
+    min-width: 220px;
     flex-shrink: 0;
-  }
-
-  .ds-type-row__sample {
-    color: var(--t-fg);
-  }
-
-  .ty-sample-display {
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: 2.5rem;
-    line-height: 1;
-  }
-  .ty-sample-hxl {
-    font-size: 2.5rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-  }
-  .ty-sample-hlg {
-    font-size: 1.5rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-  }
-  .ty-sample-hmd {
-    font-size: 1.25rem;
-    font-weight: 600;
-  }
-  .ty-sample-hsm {
-    font-size: 1rem;
-    font-weight: 600;
-  }
-  .ty-sample-blg {
-    font-size: 1.125rem;
-    line-height: 1.5;
-  }
-  .ty-sample-b {
-    font-size: 1rem;
-    line-height: 1.5;
-  }
-  .ty-sample-bsm {
-    font-size: 0.875rem;
-    line-height: 1.5;
-  }
-  .ty-sample-ey {
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--t-lime);
-  }
-  .ty-sample-lb {
-    font-size: 0.8125rem;
-    font-weight: 600;
-  }
-  .ty-sample-mt {
-    font-size: 0.875rem;
-    color: var(--t-muted);
   }
 
   /* Shadows */
@@ -503,3 +466,18 @@ const iconPaths = [
     color: var(--t-muted);
   }
 </style>
+
+<script is:inline>
+  ;(function () {
+    document.querySelectorAll('[data-token]').forEach(function (el) {
+      var name = el.dataset.token
+      var val = getComputedStyle(document.documentElement).getPropertyValue(name).trim()
+      if (val) {
+        var hex = document.createElement('code')
+        hex.className = 'ds-swatch__hex'
+        hex.textContent = val
+        el.parentNode.insertBefore(hex, el.nextSibling)
+      }
+    })
+  })()
+</script>

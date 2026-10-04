@@ -6,15 +6,13 @@
  * @slot default — pill content; add a `.bubble-panel` child for a dropdown
  */
 interface Props {
-  /** Optional project-page accent colour for tinted borders. */
-  accent?: string
   /** HTML element to render. Defaults to 'div'. */
   tag?: string
   class?: string
   [key: string]: unknown
 }
 
-const { accent: _accent, tag = 'div', class: cls, ...rest } = Astro.props
+const { tag = 'div', class: cls, ...rest } = Astro.props
 const Tag = tag
 ---
 
