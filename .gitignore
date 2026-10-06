@@ -9,3 +9,6 @@ media/
 # playwright
 test-results/
 playwright-report/
+
+# runtime — written by dev-dashboard on startup
+.claude/dashboard.json

@@ -42,11 +42,18 @@ Tracker: GitHub Issues (`gh` CLI). Ticket close: `gh issue close <number>`.
 
 ## Pipeline dashboard
 
-Best-effort — never block on this. At the start of your run, register each
-ticket at the submit stage:
+Best-effort — never block on this. Resolve the dashboard URL first:
 
 ```bash
-curl -sf -X POST http://localhost:4399/api/register \
+_REPO=$(cd "$(git rev-parse --git-common-dir 2>/dev/null)" && cd .. && pwd)
+DASHBOARD_URL=$(node -p "try{require('$_REPO/.claude/dashboard.json').url}catch{''}" 2>/dev/null || true)
+DASHBOARD_URL=${DASHBOARD_URL:-http://localhost:4399}
+```
+
+At the start of your run, register each ticket at the submit stage:
+
+```bash
+curl -sf -X POST $DASHBOARD_URL/api/register \
   -H "Content-Type: application/json" \
   -d '{"id":"<TICKET>","ticket":"<TICKET>","description":"<one-line title>","stage":"submit"}' || true
 ```
@@ -54,7 +61,7 @@ curl -sf -X POST http://localhost:4399/api/register \
 After all tickets are closed, de-register each one:
 
 ```bash
-curl -sf -X POST http://localhost:4399/api/done \
+curl -sf -X POST $DASHBOARD_URL/api/done \
   -H "Content-Type: application/json" \
   -d '{"id":"<TICKET>"}' || true
 ```

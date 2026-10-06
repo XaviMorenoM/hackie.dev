@@ -31,7 +31,10 @@ and build exactly that in your own worktree. A validator proves it afterwards.
    nohup npm run dev -- --port $PORT --host > /tmp/astro-dev-$PORT.log 2>&1 &
    disown
    sleep 5
-   curl -sf -X POST http://localhost:4399/api/register \
+   _REPO=$(cd "$(git rev-parse --git-common-dir 2>/dev/null)" && cd .. && pwd)
+   DASHBOARD_URL=$(node -p "try{require('$_REPO/.claude/dashboard.json').url}catch{''}" 2>/dev/null || true)
+   DASHBOARD_URL=${DASHBOARD_URL:-http://localhost:4399}
+   curl -sf -X POST $DASHBOARD_URL/api/register \
      -H "Content-Type: application/json" \
      -d "{\"id\":\"$BRANCH\",\"ticket\":\"<TICKET>\",\"description\":\"<one line>\",\"stage\":\"implement\",\"devPort\":$PORT}" || true
    ```
@@ -99,7 +102,10 @@ Before finishing (whether reporting done, bouncing back, or being cancelled):
 2. De-register from the dashboard (so the organiser can re-register you at the
    next stage with the correct stage label):
    ```bash
-   curl -sf -X POST http://localhost:4399/api/done \
+   _REPO=$(cd "$(git rev-parse --git-common-dir 2>/dev/null)" && cd .. && pwd)
+   DASHBOARD_URL=$(node -p "try{require('$_REPO/.claude/dashboard.json').url}catch{''}" 2>/dev/null || true)
+   DASHBOARD_URL=${DASHBOARD_URL:-http://localhost:4399}
+   curl -sf -X POST $DASHBOARD_URL/api/done \
      -H "Content-Type: application/json" \
      -d "{\"id\":\"$(git rev-parse --abbrev-ref HEAD)\"}" || true
    ```
