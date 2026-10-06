@@ -81,6 +81,28 @@ needs_human:
   - <item> (ticket)
 ```
 
+## Pipeline dashboard
+
+Best-effort — never block on this. At the start of your run, register each
+ticket on the pipeline dashboard:
+
+```bash
+curl -sf -X POST http://localhost:4399/api/register \
+  -H "Content-Type: application/json" \
+  -d '{"id":"<TICKET>","ticket":"<TICKET>","description":"<one-line title>","stage":"lead"}' || true
+```
+
+Just before your report, de-register so the organiser can advance the stage:
+
+```bash
+curl -sf -X POST http://localhost:4399/api/done \
+  -H "Content-Type: application/json" \
+  -d '{"id":"<TICKET>"}' || true
+```
+
+Replace `<TICKET>` with the ticket id (e.g. `#21`). If handling a batch, repeat
+both calls for each ticket.
+
 ## Rules
 
 - Name real files, real identifiers. No "as appropriate".

@@ -40,6 +40,27 @@ Tracker: GitHub Issues (`gh` CLI). Ticket close: `gh issue close <number>`.
 
 4. **Report** what shipped and what to test.
 
+## Pipeline dashboard
+
+Best-effort — never block on this. At the start of your run, register each
+ticket at the submit stage:
+
+```bash
+curl -sf -X POST http://localhost:4399/api/register \
+  -H "Content-Type: application/json" \
+  -d '{"id":"<TICKET>","ticket":"<TICKET>","description":"<one-line title>","stage":"submit"}' || true
+```
+
+After all tickets are closed, de-register each one:
+
+```bash
+curl -sf -X POST http://localhost:4399/api/done \
+  -H "Content-Type: application/json" \
+  -d '{"id":"<TICKET>"}' || true
+```
+
+Replace `<TICKET>` with each ticket id (e.g. `#21`).
+
 ## Never
 
 - Force-push or reset shared history.
