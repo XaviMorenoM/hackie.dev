@@ -441,6 +441,15 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, '0.0.0.0', async () => {
   console.log(`[dev-dashboard] http://${HOSTNAME}:${PORT}/  (pid ${process.pid})`)
+  // Write the actual bound port so agent files can discover it without hardcoding.
+  try {
+    import('node:fs').then(({ writeFileSync }) => {
+      writeFileSync(
+        path.join(REPO_ROOT, '.claude', 'dashboard.json'),
+        JSON.stringify({ url: `http://localhost:${PORT}` }),
+      )
+    })
+  } catch {}
   await syncPreviews()
   // Re-sync every 60 seconds to pick up new/closed PRs
   setInterval(syncPreviews, 60_000)
