@@ -99,15 +99,16 @@ curl -sf -X POST $DASHBOARD_URL/api/register \
   -d '{"id":"<TICKET>","ticket":"<TICKET>","description":"<one-line title>","stage":"lead"}' || true
 ```
 
-Just before your report, de-register so the organiser can advance the stage:
+Just before your report, advance the card to `implement`. Never call `/api/done`
+— only the organiser removes the card after the user approves submit.
 
 ```bash
-curl -sf -X POST $DASHBOARD_URL/api/done \
+curl -sf -X POST $DASHBOARD_URL/api/stage \
   -H "Content-Type: application/json" \
-  -d '{"id":"<TICKET>"}' || true
+  -d '{"id":"<TICKET>","stage":"implement"}' || true
 ```
 
-Replace `<TICKET>` with the ticket id (e.g. `#21`). If handling a batch, repeat
+Replace `<TICKET>` with the ticket id (e.g. `#28`). If handling a batch, repeat
 both calls for each ticket.
 
 ## Rules

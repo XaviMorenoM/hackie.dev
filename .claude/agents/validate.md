@@ -18,20 +18,21 @@ own, and open the pull request.
 
 ## Setup
 
-If the Organiser passes a `devPort`, the implement agent left a running dev server
-on that port. Re-register it under the validate stage (best-effort):
+The implement agent already registered the card under the ticket id. Advance it
+to `validate` (best-effort). The card id is always the **ticket id** (e.g. `#28`),
+never the branch name. Never call `/api/done` — only the organiser removes the
+card after the user approves submit.
 
 ```bash
-BRANCH=$(git rev-parse --abbrev-ref HEAD)
 _REPO=$(cd "$(git rev-parse --git-common-dir 2>/dev/null)" && cd .. && pwd)
 DASHBOARD_URL=$(node -p "try{require('$_REPO/.claude/dashboard.json').url}catch{''}" 2>/dev/null || true)
 DASHBOARD_URL=${DASHBOARD_URL:-http://localhost:4399}
-curl -sf -X POST $DASHBOARD_URL/api/register \
+curl -sf -X POST $DASHBOARD_URL/api/stage \
   -H "Content-Type: application/json" \
-  -d "{\"id\":\"$BRANCH\",\"ticket\":\"<TICKET>\",\"description\":\"<one line>\",\"stage\":\"validate\",\"devPort\":<DEVPORT>}" || true
+  -d "{\"id\":\"<TICKET>\",\"stage\":\"validate\"}" || true
 ```
 
-Do NOT kill the server. Deregister on cleanup (same `api/done` call as implement, using `$DASHBOARD_URL`).
+Do NOT kill the server.
 
 ## Sequence
 
