@@ -111,3 +111,18 @@ const gridClass =
     </div>
   </section>
 </Base>
+
+<style is:global>
+  /* #25 pipeline smoke test: red homepage background (scoped to the directory page) */
+  :root:has([data-testid='home-hero']) {
+    --t-bg: #5a0c10;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme='dark']):has([data-testid='home-hero']) {
+      --t-bg: #fecaca;
+    }
+  }
+  :root[data-theme='light']:has([data-testid='home-hero']) {
+    --t-bg: #fecaca;
+  }
+</style>
