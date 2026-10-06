@@ -132,26 +132,40 @@ function spawnAstro(entry) {
     }
   )
   entry.proc = proc
-  const setReady = () => {
+
+  // Parse actual bound port from Astro's stdout, e.g. "http://localhost:4401/"
+  const portRe = /https?:\/\/(?:localhost|0\.0\.0\.0|\[::\]|\S+?):(\d+)/
+  const setReady = (actualPort) => {
+    if (actualPort && actualPort !== entry.port) {
+      console.log(`[dashboard] ${entry.key}: asked for :${entry.port}, got :${actualPort}`)
+      entry.port = actualPort
+    }
     if (entry.status !== 'ready') {
       entry.status = 'ready'
       broadcastState()
     }
   }
+
   proc.stdout.on('data', (chunk) => {
     const s = chunk.toString()
-    if (s.includes('localhost') || s.includes('http://') || s.includes('ready')) setReady()
+    const m = s.match(portRe)
+    if (m) setReady(Number(m[1]))
+    else if (s.includes('ready') || s.includes('http://')) setReady()
   })
-  proc.stderr.on('data', () => {})
+  proc.stderr.on('data', (chunk) => {
+    const s = chunk.toString()
+    const m = s.match(portRe)
+    if (m) setReady(Number(m[1]))
+  })
   proc.on('close', (code) => {
     entry.proc = null
     entry.status = code === 0 || code === null ? 'ready' : 'error'
     broadcastState()
   })
-  // Optimistically mark ready after 8 seconds if still starting
+  // Optimistically mark ready after 12 seconds if still starting
   setTimeout(() => {
     if (entry.status === 'starting') setReady()
-  }, 8000)
+  }, 12000)
 }
 
 function stopPreview(entry) {
