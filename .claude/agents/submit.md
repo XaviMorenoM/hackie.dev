@@ -58,15 +58,16 @@ curl -sf -X POST $DASHBOARD_URL/api/register \
   -d '{"id":"<TICKET>","ticket":"<TICKET>","description":"<one-line title>","stage":"submit"}' || true
 ```
 
-After all tickets are closed, de-register each one:
+After all tickets are merged and closed, advance each card to `submitted`:
 
 ```bash
-curl -sf -X POST $DASHBOARD_URL/api/done \
+curl -sf -X POST $DASHBOARD_URL/api/stage \
   -H "Content-Type: application/json" \
-  -d '{"id":"<TICKET>"}' || true
+  -d '{"id":"<TICKET>","stage":"submitted"}' || true
 ```
 
-Replace `<TICKET>` with each ticket id (e.g. `#21`).
+**Do NOT call `/api/done`.** The organiser removes the card only after the user
+explicitly approves. Replace `<TICKET>` with each ticket id (e.g. `#28`).
 
 ## Never
 

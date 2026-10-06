@@ -25,8 +25,9 @@ and build exactly that in your own worktree. A validator proves it afterwards.
    Use `nohup` + `disown` so the server keeps running after this agent exits —
    validate and design-review agents will use the same preview URL.
    All steps are best-effort (`|| true`); a missing dashboard never blocks.
+   The dashboard entry ID is always the **ticket id** (e.g. `#28`), passed to you
+   by the organiser — never the branch name.
    ```bash
-   BRANCH=$(git rev-parse --abbrev-ref HEAD)
    PORT=43XX   # e.g. 4333 for ticket #11
    nohup npm run dev -- --port $PORT --host > /tmp/astro-dev-$PORT.log 2>&1 &
    disown
@@ -36,7 +37,7 @@ and build exactly that in your own worktree. A validator proves it afterwards.
    DASHBOARD_URL=${DASHBOARD_URL:-http://localhost:4399}
    curl -sf -X POST $DASHBOARD_URL/api/register \
      -H "Content-Type: application/json" \
-     -d "{\"id\":\"$BRANCH\",\"ticket\":\"<TICKET>\",\"description\":\"<one line>\",\"stage\":\"implement\",\"devPort\":$PORT}" || true
+     -d "{\"id\":\"<TICKET>\",\"ticket\":\"<TICKET>\",\"description\":\"<one line>\",\"stage\":\"implement\",\"devPort\":$PORT}" || true
    ```
    Record `$PORT` — include it in your report so the organiser can pass it to validate.
 
@@ -99,15 +100,15 @@ Before finishing (whether reporting done, bouncing back, or being cancelled):
 
 1. **Do NOT kill the dev server.** It runs until the ticket is fully submitted so
    validate and design-review agents can use the same preview URL.
-2. De-register from the dashboard (so the organiser can re-register you at the
-   next stage with the correct stage label):
+2. Advance the dashboard card to `validate` — **never call `/api/done`**. The card
+   stays alive until the user approves submit; only the organiser removes it.
    ```bash
    _REPO=$(cd "$(git rev-parse --git-common-dir 2>/dev/null)" && cd .. && pwd)
    DASHBOARD_URL=$(node -p "try{require('$_REPO/.claude/dashboard.json').url}catch{''}" 2>/dev/null || true)
    DASHBOARD_URL=${DASHBOARD_URL:-http://localhost:4399}
-   curl -sf -X POST $DASHBOARD_URL/api/done \
+   curl -sf -X POST $DASHBOARD_URL/api/stage \
      -H "Content-Type: application/json" \
-     -d "{\"id\":\"$(git rev-parse --abbrev-ref HEAD)\"}" || true
+     -d "{\"id\":\"<TICKET>\",\"stage\":\"validate\"}" || true
    ```
    The server keeps running. The organiser shuts it down after submit.
 
