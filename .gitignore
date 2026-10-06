@@ -6,6 +6,9 @@ dist/
 # raw media drops (large, copied into src/assets + public/video by the build author)
 media/
 
+# Claude Code worktrees
+.claude/worktrees/
+
 # playwright
 test-results/
 playwright-report/
