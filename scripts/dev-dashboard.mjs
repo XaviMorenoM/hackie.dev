@@ -23,6 +23,7 @@ const execP = promisify(execFile)
 const PORT = 4399
 const MAIN_PREVIEW_PORT = 4400
 const PR_PREVIEW_START = 4401
+// Fallback hostname for log lines; actual preview links use the request's Host header
 const HOSTNAME = os.hostname().replace(/\.local$/, '')
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -233,7 +234,9 @@ async function syncPreviews() {
 
 // ─── Dashboard HTML ───────────────────────────────────────────────────────────
 
-function renderDashboard() {
+function renderDashboard(reqHost) {
+  // reqHost is e.g. "mac-mini:4399" — strip the port to get the bare hostname
+  const clientHost = (reqHost || HOSTNAME).replace(/:\d+$/, '')
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -303,10 +306,10 @@ function renderDashboard() {
 </header>
 <div class="divider"></div>
 <main id="board"><div class="empty">Loading previews…</div></main>
-<footer>Running on <span class="hostname">${HOSTNAME}:${PORT}</span> · previews at <span class="hostname">${HOSTNAME}:4400+</span></footer>
+<footer>Running on <span class="hostname">${clientHost}:${PORT}</span> · previews at <span class="hostname">${clientHost}:4400+</span></footer>
 
 <script>
-const HOSTNAME = ${JSON.stringify(HOSTNAME)}
+const HOSTNAME = ${JSON.stringify(clientHost)}
 let state = {}
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
@@ -402,7 +405,7 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === 'GET' && pathname === '/') {
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
-    return res.end(renderDashboard())
+    return res.end(renderDashboard(req.headers.host))
   }
 
   if (req.method === 'GET' && pathname === '/api/state') {
