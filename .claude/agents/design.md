@@ -100,6 +100,26 @@ bounce:
     verdict: product
 ```
 
+## Pipeline dashboard
+
+Best-effort — never block on this. At the start of your run:
+
+```bash
+curl -sf -X POST http://localhost:4399/api/register \
+  -H "Content-Type: application/json" \
+  -d '{"id":"<TICKET>","ticket":"<TICKET>","description":"<one-line title>","stage":"design"}' || true
+```
+
+Just before your report, de-register:
+
+```bash
+curl -sf -X POST http://localhost:4399/api/done \
+  -H "Content-Type: application/json" \
+  -d '{"id":"<TICKET>"}' || true
+```
+
+Replace `<TICKET>` with the ticket id (e.g. `#21`).
+
 ## Rules
 
 - Always offer multiple proposals in spec mode — single-option specs are not
