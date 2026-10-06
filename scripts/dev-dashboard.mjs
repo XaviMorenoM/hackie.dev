@@ -1,62 +1,245 @@
 #!/usr/bin/env node
 /**
  * hackie.dev dev-dashboard — 0.0.0.0:4399
- * A persistent background server that tracks pipeline agents in real time.
- * Uses only Node.js built-ins + Server-Sent Events (no external packages).
+ *
+ * Lists open PRs, finds their local worktrees, and spins up an `astro dev`
+ * preview server per branch. Access at http://<hostname>:4399/
+ *
+ * Always shows "main" as a baseline preview on port 4400.
+ * Open PR previews start at 4401+.
+ *
+ * Restart required after changes (kill process, then: node scripts/dev-dashboard.mjs)
  */
 
 import http from 'node:http'
+import os from 'node:os'
+import { execFile, spawn } from 'node:child_process'
+import { promisify } from 'node:util'
+import { existsSync } from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
+const execP = promisify(execFile)
 const PORT = 4399
+const MAIN_PREVIEW_PORT = 4400
+const PR_PREVIEW_START = 4401
+const HOSTNAME = os.hostname().replace(/\.local$/, '')
+const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
-// ─── State ───────────────────────────────────────────────────────────────────
+// ─── State ────────────────────────────────────────────────────────────────────
 
-const agents = new Map() // id → { id, ticket, description, stage, devPort?, registeredAt }
-const sseClients = new Set() // res objects
+const previews = new Map() // key (branch) → PreviewEntry
+const sseClients = new Set()
+let nextPort = PR_PREVIEW_START
 
-// ─── SSE helpers ─────────────────────────────────────────────────────────────
+/** @typedef {{ key: string, label: string, branch: string, worktreePath: string, port: number, status: 'starting'|'ready'|'error'|'no-worktree', prNumber?: number, prTitle?: string, isDraft?: boolean, proc?: import('child_process').ChildProcess }} PreviewEntry */
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function broadcast(event, data) {
   const payload = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`
   for (const client of sseClients) {
-    try {
-      client.write(payload)
-    } catch {}
+    try { client.write(payload) } catch {}
   }
 }
 
 function broadcastState() {
-  broadcast('state', Object.fromEntries(agents))
+  const state = {}
+  for (const [k, v] of previews) {
+    // omit proc from the wire payload
+    const { proc: _, ...rest } = v
+    state[k] = rest
+  }
+  broadcast('state', state)
 }
 
-// ─── Request router ───────────────────────────────────────────────────────────
-
-function json(res, status, data) {
-  res.writeHead(status, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
-  res.end(JSON.stringify(data))
+function previewUrl(port) {
+  return `http://${HOSTNAME}:${port}/en/`
 }
 
-function readBody(req) {
-  return new Promise((resolve, reject) => {
-    let buf = ''
-    req.on('data', (chunk) => (buf += chunk))
-    req.on('end', () => {
-      try {
-        resolve(JSON.parse(buf || '{}'))
-      } catch {
-        reject(new Error('bad JSON'))
-      }
+// ─── Worktree discovery ───────────────────────────────────────────────────────
+
+async function getWorktreeBranchMap() {
+  // Returns Map<branch, absPath>
+  let out
+  try {
+    ;({ stdout: out } = await execP('git', ['worktree', 'list', '--porcelain'], { cwd: REPO_ROOT }))
+  } catch {
+    return new Map()
+  }
+  const map = new Map()
+  const entries = out.trim().split(/\n\n+/)
+  for (const entry of entries) {
+    const lines = entry.split('\n')
+    let wpath = null, branch = null
+    for (const line of lines) {
+      if (line.startsWith('worktree ')) wpath = line.slice(9).trim()
+      if (line.startsWith('branch ')) branch = line.slice(7).trim().replace(/^refs\/heads\//, '')
+    }
+    if (wpath && branch) map.set(branch, wpath)
+  }
+  return map
+}
+
+// ─── PR discovery ─────────────────────────────────────────────────────────────
+
+async function getOpenPRs() {
+  try {
+    const { stdout } = await execP('gh', ['pr', 'list', '--json', 'number,title,headRefName,isDraft', '--limit', '50'], { cwd: REPO_ROOT })
+    return JSON.parse(stdout)
+  } catch {
+    return []
+  }
+}
+
+// ─── Server management ────────────────────────────────────────────────────────
+
+function spawnPreview(entry) {
+  if (entry.proc) return // already running
+  if (!existsSync(entry.worktreePath)) {
+    entry.status = 'no-worktree'
+    return
+  }
+  const nmBin = path.join(entry.worktreePath, 'node_modules/.bin/astro')
+  if (!existsSync(nmBin)) {
+    // Try running npm install first, non-blocking
+    entry.status = 'starting'
+    const install = spawn('npm', ['install', '--prefer-offline'], {
+      cwd: entry.worktreePath,
+      stdio: 'ignore',
+      detached: false,
     })
-    req.on('error', reject)
-  })
+    install.on('close', (code) => {
+      if (code === 0) spawnAstro(entry)
+      else { entry.status = 'error'; broadcastState() }
+    })
+    return
+  }
+  spawnAstro(entry)
 }
 
-const DASHBOARD_HTML = `<!doctype html>
+function spawnAstro(entry) {
+  entry.status = 'starting'
+  broadcastState()
+  const proc = spawn(
+    path.join(entry.worktreePath, 'node_modules/.bin/astro'),
+    ['dev', '--port', String(entry.port), '--host'],
+    {
+      cwd: entry.worktreePath,
+      stdio: ['ignore', 'pipe', 'pipe'],
+      detached: false,
+    }
+  )
+  entry.proc = proc
+  const setReady = () => {
+    if (entry.status !== 'ready') {
+      entry.status = 'ready'
+      broadcastState()
+    }
+  }
+  proc.stdout.on('data', (chunk) => {
+    const s = chunk.toString()
+    if (s.includes('localhost') || s.includes('http://') || s.includes('ready')) setReady()
+  })
+  proc.stderr.on('data', () => {})
+  proc.on('close', (code) => {
+    entry.proc = null
+    entry.status = code === 0 || code === null ? 'ready' : 'error'
+    broadcastState()
+  })
+  // Optimistically mark ready after 8 seconds if still starting
+  setTimeout(() => {
+    if (entry.status === 'starting') setReady()
+  }, 8000)
+}
+
+function stopPreview(entry) {
+  if (entry.proc) {
+    try { entry.proc.kill('SIGTERM') } catch {}
+    entry.proc = null
+  }
+}
+
+// ─── Sync loop ────────────────────────────────────────────────────────────────
+
+async function syncPreviews() {
+  const [prs, wtMap] = await Promise.all([getOpenPRs(), getWorktreeBranchMap()])
+
+  // Always ensure main exists
+  if (!previews.has('main')) {
+    const mainPath = REPO_ROOT
+    const port = MAIN_PREVIEW_PORT
+    const entry = {
+      key: 'main',
+      label: 'main',
+      branch: 'main',
+      worktreePath: mainPath,
+      port,
+      status: 'starting',
+      prNumber: undefined,
+      prTitle: 'Production baseline',
+      isDraft: false,
+    }
+    previews.set('main', entry)
+    spawnPreview(entry)
+  }
+
+  // Track which PR keys are still open
+  const activePRKeys = new Set(['main'])
+
+  for (const pr of prs) {
+    const key = `pr-${pr.number}`
+    activePRKeys.add(key)
+
+    if (!previews.has(key)) {
+      const wtPath = wtMap.get(pr.headRefName)
+      const port = nextPort++
+      const entry = {
+        key,
+        label: `PR #${pr.number}`,
+        branch: pr.headRefName,
+        worktreePath: wtPath || '',
+        port,
+        status: wtPath ? 'starting' : 'no-worktree',
+        prNumber: pr.number,
+        prTitle: pr.title,
+        isDraft: pr.isDraft,
+      }
+      previews.set(key, entry)
+      if (wtPath) spawnPreview(entry)
+    } else {
+      // Update title/draft status if changed
+      const entry = previews.get(key)
+      entry.prTitle = pr.title
+      entry.isDraft = pr.isDraft
+      // If worktree appeared since last sync
+      if (entry.status === 'no-worktree' && wtMap.has(pr.headRefName)) {
+        entry.worktreePath = wtMap.get(pr.headRefName)
+        spawnPreview(entry)
+      }
+    }
+  }
+
+  // Remove entries for closed/merged PRs
+  for (const [key, entry] of previews) {
+    if (!activePRKeys.has(key)) {
+      stopPreview(entry)
+      previews.delete(key)
+    }
+  }
+
+  broadcastState()
+}
+
+// ─── Dashboard HTML ───────────────────────────────────────────────────────────
+
+function renderDashboard() {
+  return `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>hackie.dev · Pipeline Dashboard</title>
+<title>hackie.dev · PR Previews</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
@@ -66,463 +249,185 @@ const DASHBOARD_HTML = `<!doctype html>
     --surface-hover: rgba(255,255,255,0.08);
     --border: rgba(255,255,255,0.08);
     --lime: #A8E63D;
-    --lime-dim: rgba(168,230,61,0.18);
     --text: #E8E8E8;
     --muted: #888;
+    --red: #f87171;
+    --yellow: #fbbf24;
   }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; }
-  body {
-    font-family: 'Inter', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-  header {
-    padding: 24px 32px 0;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-  .logo-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .logo-dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    background: var(--lime);
-    box-shadow: 0 0 10px var(--lime);
-    animation: pulse 2s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
-  .logo-text {
-    font-size: 15px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    color: var(--lime);
-  }
-  .pipeline {
-    display: flex;
-    align-items: center;
-    gap: 0;
-    padding: 16px 0;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .pipeline::-webkit-scrollbar { display: none; }
-  .stage-pill {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 18px;
-    border-radius: 99px;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    white-space: nowrap;
-    transition: all 0.3s ease;
-  }
-  .stage-pill.active {
-    border-color: var(--stage-color);
-    background: color-mix(in srgb, var(--stage-color) 12%, transparent);
-    box-shadow: 0 0 18px color-mix(in srgb, var(--stage-color) 35%, transparent);
-    color: var(--stage-color);
-  }
-  .stage-pill .count {
-    background: var(--stage-color);
-    color: #000;
-    border-radius: 99px;
-    padding: 1px 7px;
-    font-size: 10px;
-    font-weight: 700;
-    min-width: 18px;
-    text-align: center;
-  }
-  .stage-arrow {
-    color: var(--muted);
-    font-size: 14px;
-    padding: 0 4px;
-    flex-shrink: 0;
-  }
-  .divider {
-    height: 1px;
-    background: var(--border);
-    margin: 0 32px;
-  }
-  main {
-    padding: 28px 32px;
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 20px;
-    min-height: calc(100vh - 200px);
-  }
-  @media (max-width: 1100px) { main { grid-template-columns: repeat(3, 1fr); } }
-  @media (max-width: 700px) {
-    main { grid-template-columns: 1fr 1fr; }
-    header { padding: 16px 16px 0; }
-    .divider { margin: 0 16px; }
-  }
-  .col { display: flex; flex-direction: column; gap: 12px; }
-  .col-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--border);
-  }
-  .col-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--stage-color); }
-  .col-label {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--stage-color);
-  }
-  .col-count { margin-left: auto; font-size: 11px; color: var(--muted); }
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    backdrop-filter: blur(8px);
-    transition: border-color 0.2s ease, background 0.2s ease;
-    animation: cardIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
-  }
-  .card:hover {
-    background: var(--surface-hover);
-    border-color: rgba(255,255,255,0.14);
-  }
-  @keyframes cardIn {
-    from { opacity: 0; transform: translateY(12px) scale(0.96); }
-    to   { opacity: 1; transform: translateY(0) scale(1); }
-  }
-  .card.removing {
-    animation: cardOut 0.25s ease forwards;
-  }
-  @keyframes cardOut {
-    to { opacity: 0; transform: translateY(-8px) scale(0.95); }
-  }
-  .card-top { display: flex; align-items: flex-start; gap: 8px; }
-  .ticket-badge {
-    background: var(--lime-dim);
-    color: var(--lime);
-    border: 1px solid rgba(168,230,61,0.25);
-    border-radius: 6px;
-    padding: 2px 8px;
-    font-size: 12px;
-    font-weight: 700;
-    flex-shrink: 0;
-  }
-  .card-desc { font-size: 13px; font-weight: 500; line-height: 1.4; flex: 1; }
-  .card-meta { display: flex; flex-direction: column; gap: 5px; }
-  .agent-id { font-size: 10px; color: var(--muted); font-family: 'Courier New', monospace; }
-  .timer { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
-  .stage-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 3px 9px;
-    border-radius: 99px;
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    background: color-mix(in srgb, var(--stage-color) 15%, transparent);
-    color: var(--stage-color);
-    border: 1px solid color-mix(in srgb, var(--stage-color) 30%, transparent);
-    align-self: flex-start;
-  }
-  .preview-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 5px 10px;
-    border-radius: 7px;
-    font-size: 11px;
-    font-weight: 600;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.1);
-    color: var(--text);
-    text-decoration: none;
-    transition: background 0.15s ease, border-color 0.15s ease;
-    align-self: flex-start;
-    cursor: pointer;
-  }
-  .preview-btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.2); }
-  .empty { color: var(--muted); font-size: 12px; text-align: center; padding: 20px 0; }
-  footer {
-    text-align: center;
-    padding: 16px;
-    font-size: 11px;
-    color: var(--muted);
-    border-top: 1px solid var(--border);
-  }
-  .conn-status { display: inline-flex; align-items: center; gap: 6px; }
-  .conn-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--lime); transition: background 0.3s; }
-  .conn-dot.disconnected { background: #ef4444; }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif}
+  header{padding:28px 32px 0;display:flex;align-items:center;gap:12px}
+  .dot{width:10px;height:10px;border-radius:50%;background:var(--lime);box-shadow:0 0 10px var(--lime);animation:pulse 2s ease-in-out infinite;flex-shrink:0}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+  .logo{font-size:15px;font-weight:700;color:var(--lime);letter-spacing:.04em}
+  .subtitle{font-size:14px;color:var(--muted)}
+  .right{margin-left:auto;display:flex;align-items:center;gap:10px}
+  .conn{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+  .conn-dot{width:7px;height:7px;border-radius:50%;background:var(--lime)}
+  .conn-dot.off{background:var(--red)}
+  .divider{height:1px;background:var(--border);margin:20px 32px 0}
+  main{padding:28px 32px;display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:12px;transition:border-color .2s,background .2s}
+  .card:hover{background:var(--surface-hover);border-color:rgba(255,255,255,.14)}
+  .card.main-card{border-color:rgba(168,230,61,.18)}
+  .card-top{display:flex;align-items:flex-start;gap:10px}
+  .pr-badge{background:rgba(168,230,61,.12);color:var(--lime);border:1px solid rgba(168,230,61,.2);border-radius:6px;padding:3px 9px;font-size:12px;font-weight:700;flex-shrink:0;line-height:1.5}
+  .pr-badge.main-badge{background:rgba(255,255,255,.08);color:var(--text);border-color:var(--border)}
+  .pr-badge.draft{opacity:.6}
+  .title{font-size:13px;font-weight:500;line-height:1.45;flex:1;word-break:break-word}
+  .branch{font-size:11px;color:var(--muted);font-family:monospace;margin-top:2px}
+  .status-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .status-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600}
+  .status-pill.ready{background:rgba(110,231,183,.12);color:#6ee7b7;border:1px solid rgba(110,231,183,.25)}
+  .status-pill.starting{background:rgba(251,191,36,.1);color:var(--yellow);border:1px solid rgba(251,191,36,.2)}
+  .status-pill.error{background:rgba(248,113,113,.1);color:var(--red);border:1px solid rgba(248,113,113,.2)}
+  .status-pill.no-worktree{background:rgba(255,255,255,.05);color:var(--muted);border:1px solid var(--border)}
+  .spin{display:inline-block;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .preview-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:8px;font-size:12px;font-weight:600;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:var(--text);text-decoration:none;transition:background .15s,border-color .15s}
+  .preview-btn:hover{background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.22)}
+  .preview-btn.disabled{opacity:.4;pointer-events:none}
+  .empty{text-align:center;padding:60px 32px;color:var(--muted);font-size:14px}
+  footer{padding:16px 32px;font-size:11px;color:var(--muted);border-top:1px solid var(--border);text-align:center}
+  .hostname{font-family:monospace;color:var(--text)}
 </style>
 </head>
 <body>
 <header>
-  <div class="logo-row">
-    <div class="logo-dot"></div>
-    <span class="logo-text">hackie.dev</span>
-    <span style="color:var(--muted);font-size:13px;margin-left:4px;">Pipeline Dashboard</span>
-    <span style="margin-left:auto;font-size:13px;color:var(--muted)" id="agent-count">0 agents</span>
+  <div class="dot"></div>
+  <span class="logo">hackie.dev</span>
+  <span class="subtitle">PR Previews</span>
+  <div class="right">
+    <div class="conn"><div class="conn-dot off" id="conn-dot"></div><span id="conn-label">Connecting…</span></div>
   </div>
-  <div class="pipeline" id="pipeline-bar"></div>
 </header>
 <div class="divider"></div>
-<main id="board"></main>
-<footer>
-  <span class="conn-status">
-    <span class="conn-dot" id="conn-dot"></span>
-    <span id="conn-label">Connecting…</span>
-  </span>
-  &nbsp;·&nbsp; <span id="last-update">—</span>
-</footer>
+<main id="board"><div class="empty">Loading previews…</div></main>
+<footer>Running on <span class="hostname">${HOSTNAME}:${PORT}</span> · previews at <span class="hostname">${HOSTNAME}:4400+</span></footer>
+
 <script>
-const STAGES = ['lead','design','implement','validate','submit'];
-const STAGE_COLORS = {
-  lead: '#A78BFA',
-  design: '#67E8F9',
-  implement: '#FCD34D',
-  validate: '#7DD3FC',
-  submit: '#6EE7B7',
-};
-let state = {};
+const HOSTNAME = ${JSON.stringify(HOSTNAME)}
+let state = {}
 
-function fmt(ms) {
-  const s = Math.floor(ms / 1000);
-  if (s < 60) return s + 's';
-  const m = Math.floor(s / 60), rs = s % 60;
-  if (m < 60) return m + 'm ' + String(rs).padStart(2,'0') + 's';
-  const h = Math.floor(m / 60), rm = m % 60;
-  return h + 'h ' + String(rm).padStart(2,'0') + 'm';
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+
+function statusPill(s){
+  if(s==='ready') return '<span class="status-pill ready">● Ready</span>'
+  if(s==='starting') return '<span class="status-pill starting"><span class="spin">↻</span> Starting…</span>'
+  if(s==='error') return '<span class="status-pill error">✕ Error</span>'
+  return '<span class="status-pill no-worktree">No local worktree</span>'
 }
 
-function escHtml(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function previewUrl(port){ return 'http://'+HOSTNAME+':'+port+'/en/' }
+
+function renderCard(v){
+  const isMain = v.key === 'main'
+  const canPreview = v.status === 'ready' || v.status === 'starting'
+  const badge = isMain
+    ? '<span class="pr-badge main-badge">main</span>'
+    : '<span class="pr-badge'+(v.isDraft?' draft':'')+'">PR #'+esc(v.prNumber)+(v.isDraft?' · draft':'')+' </span>'
+  const previewBtn = canPreview
+    ? '<a class="preview-btn" href="'+previewUrl(v.port)+'" target="_blank">↗ :'+v.port+'</a>'
+    : '<a class="preview-btn disabled" href="#">↗ :'+v.port+'</a>'
+  return '<div class="card'+(isMain?' main-card':'')+'" id="card-'+CSS.escape(v.key)+'">'+
+    '<div class="card-top">'+badge+'<div><div class="title">'+esc(v.prTitle||v.label)+'</div>'+
+    '<div class="branch">'+esc(v.branch)+'</div></div></div>'+
+    '<div class="status-row">'+statusPill(v.status)+previewBtn+'</div>'+
+    '</div>'
 }
 
-function renderPipeline() {
-  const bar = document.getElementById('pipeline-bar');
-  const counts = {};
-  for (const a of Object.values(state)) counts[a.stage] = (counts[a.stage]||0)+1;
-  bar.innerHTML = STAGES.map((s,i) => {
-    const c = counts[s]||0;
-    const active = c > 0;
-    return (i>0?'<span class="stage-arrow">›</span>':'') +
-      '<div class="stage-pill' + (active?' active':'') + '" style="--stage-color:' + STAGE_COLORS[s] + '">' +
-      s.toUpperCase() +
-      (active?'<span class="count">'+c+'</span>':'') +
-      '</div>';
-  }).join('');
+function renderBoard(){
+  const entries = Object.values(state).sort((a,b)=>{
+    if(a.key==='main') return -1
+    if(b.key==='main') return 1
+    return (a.prNumber||0)-(b.prNumber||0)
+  })
+  const board = document.getElementById('board')
+  if(entries.length===0){ board.innerHTML='<div class="empty">No open PRs</div>'; return }
+  board.innerHTML = entries.map(renderCard).join('')
 }
 
-function renderCard(a) {
-  const since = a.registeredAt ? Date.now() - a.registeredAt : 0;
-  const preview = a.devPort
-    ? '<a class="preview-btn" href="http://' + window.location.hostname + ':' + a.devPort + '" target="_blank">🔗 Preview :' + a.devPort + '</a>'
-    : '';
-  return '<div class="card" id="card-' + CSS.escape(a.id) + '" data-registered="' + (a.registeredAt||Date.now()) + '" style="--stage-color:' + STAGE_COLORS[a.stage] + '">' +
-    '<div class="card-top">' +
-    '<span class="ticket-badge">' + escHtml(a.ticket||'#?') + '</span>' +
-    '<span class="card-desc">' + escHtml(a.description||'') + '</span>' +
-    '</div>' +
-    '<div class="card-meta">' +
-    '<span class="agent-id">⚙ ' + a.id.slice(0,8) + '</span>' +
-    '<span class="timer" id="timer-' + CSS.escape(a.id) + '">⏱ ' + fmt(since) + '</span>' +
-    '</div>' +
-    '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
-    '<span class="stage-badge">' + a.stage + '</span>' +
-    preview +
-    '</div></div>';
+const connDot = document.getElementById('conn-dot')
+const connLabel = document.getElementById('conn-label')
+function setConn(ok){ connDot.className='conn-dot'+(ok?'':' off'); connLabel.textContent=ok?'Live':'Reconnecting…' }
+
+function connect(){
+  const es = new EventSource('/events')
+  es.addEventListener('state', e=>{ state=JSON.parse(e.data); renderBoard(); setConn(true) })
+  es.addEventListener('error', ()=>{ setConn(false); es.close(); setTimeout(connect,3000) })
 }
 
-function renderBoard() {
-  const board = document.getElementById('board');
-  board.innerHTML = STAGES.map(s => {
-    const agents = Object.values(state).filter(a => a.stage === s);
-    return '<div class="col" style="--stage-color:' + STAGE_COLORS[s] + '">' +
-      '<div class="col-header"><div class="col-dot"></div>' +
-      '<span class="col-label">' + s + '</span>' +
-      '<span class="col-count">' + agents.length + '</span></div>' +
-      (agents.length === 0 ? '<div class="empty">idle</div>' : agents.map(renderCard).join('')) +
-      '</div>';
-  }).join('');
-  document.getElementById('agent-count').textContent = Object.keys(state).length + ' agent' + (Object.keys(state).length!==1?'s':'');
-}
-
-setInterval(() => {
-  for (const a of Object.values(state)) {
-    const el = document.getElementById('timer-' + CSS.escape(a.id));
-    if (el && a.registeredAt) el.textContent = '⏱ ' + fmt(Date.now() - a.registeredAt);
-  }
-}, 1000);
-
-const connDot = document.getElementById('conn-dot');
-const connLabel = document.getElementById('conn-label');
-const lastUpdate = document.getElementById('last-update');
-
-function connect() {
-  const es = new EventSource('/events');
-  es.addEventListener('state', e => {
-    state = JSON.parse(e.data);
-    renderPipeline();
-    renderBoard();
-    lastUpdate.textContent = 'Updated ' + new Date().toLocaleTimeString();
-    connDot.className = 'conn-dot';
-    connLabel.textContent = 'Live';
-  });
-  es.addEventListener('open', () => {
-    connDot.className = 'conn-dot';
-    connLabel.textContent = 'Live';
-  });
-  es.addEventListener('error', () => {
-    connDot.className = 'conn-dot disconnected';
-    connLabel.textContent = 'Reconnecting…';
-    es.close();
-    setTimeout(connect, 3000);
-  });
-}
-
-fetch('/api/state').then(r=>r.json()).then(s=>{state=s;renderPipeline();renderBoard();}).catch(()=>{});
-connect();
+fetch('/api/state').then(r=>r.json()).then(s=>{ state=s; renderBoard() }).catch(()=>{})
+connect()
 </script>
 </body>
 </html>`
+}
+
+// ─── HTTP server ──────────────────────────────────────────────────────────────
+
+function readBody(req) {
+  return new Promise((resolve, reject) => {
+    let buf = ''
+    req.on('data', c => buf += c)
+    req.on('end', () => { try { resolve(JSON.parse(buf || '{}')) } catch { reject(new Error('bad JSON')) } })
+    req.on('error', reject)
+  })
+}
 
 const server = http.createServer(async (req, res) => {
-  const url = new URL(req.url, 'http://localhost:' + PORT)
-  const path = url.pathname
+  const { pathname } = new URL(req.url, 'http://localhost')
 
   if (req.method === 'OPTIONS') {
-    res.writeHead(204, {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET,POST',
-      'Access-Control-Allow-Headers': 'Content-Type',
-    })
+    res.writeHead(204, { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET,POST', 'Access-Control-Allow-Headers': 'Content-Type' })
     return res.end()
   }
 
-  if (req.method === 'GET' && path === '/events') {
+  if (req.method === 'GET' && pathname === '/events') {
     res.writeHead(200, {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
-      Connection: 'keep-alive',
+      'Connection': 'keep-alive',
       'Access-Control-Allow-Origin': '*',
     })
     res.write(': connected\n\n')
-    res.write('event: state\ndata: ' + JSON.stringify(Object.fromEntries(agents)) + '\n\n')
+    // Send current state immediately
+    const state = {}
+    for (const [k, v] of previews) { const { proc: _, ...rest } = v; state[k] = rest }
+    res.write('event: state\ndata: ' + JSON.stringify(state) + '\n\n')
     sseClients.add(res)
     req.on('close', () => sseClients.delete(res))
     return
   }
 
-  if (req.method === 'GET' && path === '/') {
+  if (req.method === 'GET' && pathname === '/') {
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
-    return res.end(DASHBOARD_HTML)
+    return res.end(renderDashboard())
   }
 
-  if (req.method === 'GET' && path === '/api/state') {
+  if (req.method === 'GET' && pathname === '/api/state') {
+    const state = {}
+    for (const [k, v] of previews) { const { proc: _, ...rest } = v; state[k] = rest }
     res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
-    return res.end(JSON.stringify(Object.fromEntries(agents)))
+    return res.end(JSON.stringify(state))
   }
 
-  if (req.method === 'POST' && path === '/api/register') {
-    try {
-      const body = await readBody(req)
-      const { id, ticket, description, stage = 'lead', devPort } = body
-      if (!id) {
-        res.writeHead(400, { 'Content-Type': 'application/json' })
-        return res.end(JSON.stringify({ error: 'id required' }))
-      }
-      const entry = { id, ticket, description, stage, registeredAt: Date.now() }
-      if (devPort) entry.devPort = devPort
-      agents.set(id, entry)
-      broadcastState()
-      res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
-      return res.end(JSON.stringify({ ok: true, agent: entry }))
-    } catch (e) {
-      res.writeHead(400, { 'Content-Type': 'application/json' })
-      return res.end(JSON.stringify({ error: e.message }))
-    }
-  }
-
-  if (req.method === 'POST' && path === '/api/stage') {
-    try {
-      const body = await readBody(req)
-      const { id, stage } = body
-      if (!id || !stage) {
-        res.writeHead(400, { 'Content-Type': 'application/json' })
-        return res.end(JSON.stringify({ error: 'id and stage required' }))
-      }
-      const entry = agents.get(id)
-      if (!entry) {
-        res.writeHead(404, { 'Content-Type': 'application/json' })
-        return res.end(JSON.stringify({ error: 'agent not found' }))
-      }
-      entry.stage = stage
-      broadcastState()
-      res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
-      return res.end(JSON.stringify({ ok: true, agent: entry }))
-    } catch (e) {
-      res.writeHead(400, { 'Content-Type': 'application/json' })
-      return res.end(JSON.stringify({ error: e.message }))
-    }
-  }
-
-  if (req.method === 'POST' && path === '/api/done') {
-    try {
-      const body = await readBody(req)
-      const { id } = body
-      if (!id) {
-        res.writeHead(400, { 'Content-Type': 'application/json' })
-        return res.end(JSON.stringify({ error: 'id required' }))
-      }
-      const existed = agents.delete(id)
-      broadcastState()
-      res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
-      return res.end(JSON.stringify({ ok: true, removed: existed }))
-    } catch (e) {
-      res.writeHead(400, { 'Content-Type': 'application/json' })
-      return res.end(JSON.stringify({ error: e.message }))
-    }
+  // Legacy pipeline API (kept for backwards compat with any agents still posting)
+  if (req.method === 'POST' && (pathname === '/api/register' || pathname === '/api/stage' || pathname === '/api/done')) {
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' })
+    return res.end(JSON.stringify({ ok: true, ignored: true }))
   }
 
   res.writeHead(404, { 'Content-Type': 'application/json' })
   res.end(JSON.stringify({ error: 'not found' }))
 })
 
-server.listen(PORT, '0.0.0.0', () => {
-  import('node:os').then((os) => {
-    const iface = Object.values(os.networkInterfaces())
-      .flat()
-      .find((a) => a.family === 'IPv4' && !a.internal)
-    const networkAddr = iface ? iface.address : null
-    console.log('[dev-dashboard] running on pid ' + process.pid)
-    console.log('  local:   http://localhost:' + PORT)
-    if (networkAddr) console.log('  network: http://' + networkAddr + ':' + PORT)
-  })
+server.listen(PORT, '0.0.0.0', async () => {
+  console.log(`[dev-dashboard] http://${HOSTNAME}:${PORT}/  (pid ${process.pid})`)
+  await syncPreviews()
+  // Re-sync every 60 seconds to pick up new/closed PRs
+  setInterval(syncPreviews, 60_000)
 })
 
-process.on('SIGTERM', () => {
-  server.close()
-  process.exit(0)
-})
-process.on('SIGINT', () => {
-  server.close()
-  process.exit(0)
-})
+process.on('SIGTERM', () => { for (const [, e] of previews) stopPreview(e); server.close(); process.exit(0) })
+process.on('SIGINT', () => { for (const [, e] of previews) stopPreview(e); server.close(); process.exit(0) })
